@@ -1,0 +1,19 @@
+services:
+  db:
+    image: postgres
+    restart: on-failure
+    env_file:
+      - .env
+    volumes:
+      - ../data/pil_database:/docker-entrypoint-initdb.d
+  be: 
+    depends_on:
+      - db
+    restart: on-failure
+    env_file:
+      - backend.env
+    build:
+      context: ../drugapi
+      dockerfile: ../drugapi/backend.dockerfile
+    ports:
+      - "8080:8080"
