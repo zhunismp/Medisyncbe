@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class AddDrugResponse extends BaseResponse<AddDrugResponse> {
+public class UpdateDrugResponse extends BaseResponse<UpdateDrugResponse> {
     private List<Drug> data;
     private int total;
     private boolean isCompleted;
