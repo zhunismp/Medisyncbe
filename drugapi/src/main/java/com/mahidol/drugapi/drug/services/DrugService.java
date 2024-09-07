@@ -1,23 +1,22 @@
 package com.mahidol.drugapi.drug.services;
 
-import com.mahidol.drugapi.common.exceptions.BindingError;
 import com.mahidol.drugapi.common.models.Pagination;
 import com.mahidol.drugapi.common.services.PaginationService;
 import com.mahidol.drugapi.drug.dtos.request.AddDrugRequest;
 import com.mahidol.drugapi.drug.dtos.request.SearchDrugRequest;
+import com.mahidol.drugapi.drug.dtos.request.UpdateDrugRequest;
 import com.mahidol.drugapi.drug.dtos.response.AddDrugResponse;
 import com.mahidol.drugapi.drug.dtos.response.SearchDrugResponse;
+import com.mahidol.drugapi.drug.dtos.response.UpdateDrugResponse;
 import com.mahidol.drugapi.drug.models.entites.Drug;
 import com.mahidol.drugapi.drug.models.type.MealCondition;
 import com.mahidol.drugapi.drug.repositories.DrugRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.BindingResult;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class DrugService {
@@ -40,7 +39,7 @@ public class DrugService {
     }
 
     public AddDrugResponse add(AddDrugRequest request) {
-        UUID drugId = drugRepository.save(new Drug()
+        Drug addedDrug = drugRepository.save(new Drug()
                 .setUserId(request.getUserId())
                 .setGenericName(request.getGenericName())
                 .setDosageForm(request.getDosageForm())
@@ -53,14 +52,37 @@ public class DrugService {
                 .setSchedules(request.getSchedules())
                 .setIsInternalDrug(request.getIsInternalDrug())
                 .setIsEnable(request.getIsEnabled())
-        ).getId();
+        );
 
         return new AddDrugResponse(
-                List.of(drugId),
+                List.of(addedDrug),
                 1,
                 true
         );
+    }
 
+    public UpdateDrugResponse update(UpdateDrugRequest request) {
+        Drug target = drugRepository.findById(request.getDrugId())
+                .map(drug ->
+                     drug.setGenericName(request.getGenericName().orElse(drug.getGenericName()))
+                            .setDosageForm(request.getDosageForm().orElse(drug.getDosageForm()))
+                            .setUnit(request.getUnit().orElse(drug.getUnit()))
+                            .setStrength(request.getStrength().orElse(drug.getStrength()))
+                            .setAmount(request.getAmount().orElse(drug.getAmount()))
+                            .setDose(request.getDose().orElse(drug.getDose()))
+                            .setUsageTime(request.getUsageTime().map(MealCondition::fromValue).orElse(drug.getUsageTime()))
+                            .setSchedules(request.getSchedules().orElse(drug.getSchedules()))
+                            .setIsEnable(request.getIsEnabled().orElse(drug.getIsEnable()))
+                )
+                .orElseThrow(() -> new EntityNotFoundException("Drug id not found with id " + request.getDrugId()));
+
+        Drug savedDrug = drugRepository.save(target);
+
+        return new UpdateDrugResponse(
+                List.of(savedDrug),
+                1,
+                true
+        );
     }
 
     public void remove(UUID drugId) {

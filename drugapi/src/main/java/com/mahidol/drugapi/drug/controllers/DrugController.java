@@ -3,13 +3,12 @@ package com.mahidol.drugapi.drug.controllers;
 import com.mahidol.drugapi.common.exceptions.BindingError;
 import com.mahidol.drugapi.drug.dtos.request.AddDrugRequest;
 import com.mahidol.drugapi.drug.dtos.request.SearchDrugRequest;
+import com.mahidol.drugapi.drug.dtos.request.UpdateDrugRequest;
 import com.mahidol.drugapi.drug.dtos.response.AddDrugResponse;
 import com.mahidol.drugapi.drug.dtos.response.SearchDrugResponse;
+import com.mahidol.drugapi.drug.dtos.response.UpdateDrugResponse;
 import com.mahidol.drugapi.drug.services.DrugService;
-import com.mahidol.drugapi.internaldrug.controllers.InternalDrugController;
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -41,6 +40,14 @@ public class DrugController {
         AddDrugResponse response = drugService.add(request);
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<?> update(@RequestBody @Valid UpdateDrugRequest request, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) throw new BindingError(bindingResult.getFieldErrors());
+        UpdateDrugResponse response = drugService.update(request);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete")
