@@ -1,0 +1,52 @@
+package com.mahidol.drugapi.drug.controllers;
+
+import com.mahidol.drugapi.common.exceptions.BindingError;
+import com.mahidol.drugapi.drug.dtos.request.AddDrugRequest;
+import com.mahidol.drugapi.drug.dtos.request.SearchDrugRequest;
+import com.mahidol.drugapi.drug.dtos.response.AddDrugResponse;
+import com.mahidol.drugapi.drug.dtos.response.SearchDrugResponse;
+import com.mahidol.drugapi.drug.services.DrugService;
+import com.mahidol.drugapi.internaldrug.controllers.InternalDrugController;
+import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/api/v1/drugs")
+public class DrugController {
+    private final DrugService drugService;
+
+    public DrugController(DrugService drugService) {
+        this.drugService = drugService;
+    }
+
+    @PostMapping("/search")
+    public ResponseEntity<?> search(@RequestBody @Valid SearchDrugRequest request, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) throw new BindingError(bindingResult.getFieldErrors());
+        SearchDrugResponse response = drugService.search(request);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/add")
+    public ResponseEntity<?> add(@RequestBody @Valid AddDrugRequest request, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) throw new BindingError(bindingResult.getFieldErrors());
+        AddDrugResponse response = drugService.add(request);
+
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> remove(@RequestParam UUID drugId) {
+        drugService.remove(drugId);
+        return new ResponseEntity<>(Map.of("drugId", drugId), HttpStatus.ACCEPTED);
+    }
+
+}

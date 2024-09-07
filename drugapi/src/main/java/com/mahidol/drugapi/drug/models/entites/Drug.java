@@ -1,0 +1,58 @@
+package com.mahidol.drugapi.drug.models.entites;
+
+import com.mahidol.drugapi.drug.models.type.MealCondition;
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
+import java.time.LocalTime;
+import java.util.List;
+import java.util.UUID;
+
+@Entity
+@Data
+@Accessors(chain = true)
+@NoArgsConstructor
+@Table(name = "drugdatabase")
+public class Drug {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @Column(name = "user_id", columnDefinition = "TEXT")
+    private UUID userId;
+
+    @Column(name = "generic_name", columnDefinition = "TEXT")
+    private String genericName;
+
+    @Column(name = "dosage_form", columnDefinition = "TEXT")
+    private String dosageForm;
+
+    @Column(name = "unit", columnDefinition = "TEXT")
+    private String unit;
+
+    @Column(name = "strength", columnDefinition = "TEXT")
+    private String strength;
+
+    @Column(name = "amount", columnDefinition = "NUMERIC")
+    private double amount;
+
+    @Column(name = "dose", columnDefinition = "NUMERIC")
+    private double dose;
+
+    @Column(name = "taken_amount", columnDefinition = "NUMERIC")
+    private double takenAmount;
+
+    @Column(name = "usage_time", columnDefinition = "INT")
+    private MealCondition usageTime;
+
+    @Column(name = "schedule", columnDefinition = "TIME[]")
+    private List<LocalTime> schedules;
+
+    @Column(name = "is_internal_drug", columnDefinition = "BOOLEAN")
+    private Boolean isInternalDrug = false;
+
+    @Column(name = "is_enable", columnDefinition = "BOOLEAN")
+    private Boolean isEnable = true;
+}
