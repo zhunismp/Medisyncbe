@@ -1,4 +1,4 @@
-package com.mahidol.drugapi.drug.dtos.request;
+package com.mahidol.drugapi.druggroup.dtos.request;
 
 import com.mahidol.drugapi.common.dtos.BaseSearchRequest;
 import com.mahidol.drugapi.common.models.Pagination;
@@ -6,31 +6,29 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
 import java.util.Optional;
 import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Accessors(chain = true)
 @Data
-public class SearchDrugRequest implements BaseSearchRequest {
+public class SearchGroupRequest implements BaseSearchRequest {
     @NotNull(message = "user id should not be null")
     private UUID userId;
-
     private Pagination pagination;
-
+    private String groupName;
     private String genericName;
-
-
-    // Getter for Optional fields
-    public Optional<String> getGenericName() {
-        return Optional.ofNullable(genericName);
-    }
 
     public Optional<Pagination> getPagination() {
         return Optional.ofNullable(pagination);
     }
 
+    public Optional<String> getGroupName() {
+        return Optional.ofNullable(groupName);
+    }
+
+    public Optional<String> getGenericName() {
+        return Optional.ofNullable(genericName);
+    }
 }

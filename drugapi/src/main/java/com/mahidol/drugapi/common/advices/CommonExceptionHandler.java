@@ -43,8 +43,8 @@ public class CommonExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<?> entityNotFoundExceptionHandler(EntityNotFoundException e) {
+    @ExceptionHandler({EntityNotFoundException.class, IllegalArgumentException.class})
+    public ResponseEntity<?> runtimeExceptionHandler(RuntimeException e) {
         return new ResponseEntity<>(Map.of("errorMessages", e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 }
