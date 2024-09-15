@@ -1,10 +1,10 @@
 package com.mahidol.drugapi.drug.controllers;
 
 import com.mahidol.drugapi.common.exceptions.BindingError;
-import com.mahidol.drugapi.drug.dtos.request.AddDrugRequest;
+import com.mahidol.drugapi.drug.dtos.request.CreateDrugRequest;
 import com.mahidol.drugapi.drug.dtos.request.SearchDrugRequest;
 import com.mahidol.drugapi.drug.dtos.request.UpdateDrugRequest;
-import com.mahidol.drugapi.drug.dtos.response.AddDrugResponse;
+import com.mahidol.drugapi.drug.dtos.response.CreateDrugResponse;
 import com.mahidol.drugapi.drug.dtos.response.SearchDrugResponse;
 import com.mahidol.drugapi.drug.dtos.response.UpdateDrugResponse;
 import com.mahidol.drugapi.drug.services.DrugService;
@@ -35,9 +35,9 @@ public class DrugController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> add(@RequestBody @Valid AddDrugRequest request, BindingResult bindingResult) {
+    public ResponseEntity<?> add(@RequestBody @Valid CreateDrugRequest request, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) throw new BindingError(bindingResult.getFieldErrors());
-        AddDrugResponse response = drugService.add(request);
+        CreateDrugResponse response = drugService.add(request);
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
@@ -51,8 +51,8 @@ public class DrugController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<?> remove(@RequestParam UUID drugId) {
-        drugService.remove(drugId);
+    public ResponseEntity<?> remove(@RequestParam UUID userId, @RequestParam UUID drugId) {
+        drugService.remove(userId, drugId);
         return new ResponseEntity<>(Map.of("drugId", drugId), HttpStatus.ACCEPTED);
     }
 

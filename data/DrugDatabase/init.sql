@@ -13,3 +13,12 @@ CREATE TABLE DRUGDATABASE (
     is_internal_drug BOOLEAN NOT NULL,
     is_enable BOOLEAN NOT NULL
 );
+
+CREATE TABLE DRUGGROUP (
+    id UUID PRIMARY KEY,
+    user_id UUID NOT NULL,
+    group_name TEXT NOT NULL,
+    schedule TIME[] NOT NULL,
+    drug_id UUID[],
+    is_enable BOOLEAN NOT NULL
+);

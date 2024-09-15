@@ -16,6 +16,9 @@ import java.util.UUID;
 @NoArgsConstructor
 @Data
 public class UpdateDrugRequest {
+    @NotNull(message = "user id should not be null")
+    private UUID useId;
+    
     @NotNull(message = "drug id should not be null")
     private UUID drugId;
 
