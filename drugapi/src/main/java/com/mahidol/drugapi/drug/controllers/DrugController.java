@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/drugs")
+@RequestMapping("/api/v1")
 public class DrugController {
     private final DrugService drugService;
 
@@ -26,7 +26,7 @@ public class DrugController {
         this.drugService = drugService;
     }
 
-    @PostMapping("/search")
+    @PostMapping("/searchdrugs")
     public ResponseEntity<?> search(@RequestBody @Valid SearchDrugRequest request, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) throw new BindingError(bindingResult.getFieldErrors());
         SearchDrugResponse response = drugService.search(request);
@@ -34,7 +34,7 @@ public class DrugController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping("/add")
+    @PostMapping("/drugs")
     public ResponseEntity<?> add(@RequestBody @Valid CreateDrugRequest request, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) throw new BindingError(bindingResult.getFieldErrors());
         CreateDrugResponse response = drugService.add(request);
@@ -42,7 +42,7 @@ public class DrugController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @PutMapping("/update")
+    @PutMapping("/drugs")
     public ResponseEntity<?> update(@RequestBody @Valid UpdateDrugRequest request, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) throw new BindingError(bindingResult.getFieldErrors());
         UpdateDrugResponse response = drugService.update(request);
@@ -50,7 +50,7 @@ public class DrugController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/drugs")
     public ResponseEntity<?> remove(@RequestParam UUID userId, @RequestParam UUID drugId) {
         drugService.remove(userId, drugId);
         return new ResponseEntity<>(Map.of("drugId", drugId), HttpStatus.ACCEPTED);

@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/groups")
+@RequestMapping("/api/v1")
 public class DrugGroupController {
     private final DrugGroupService drugGroupService;
 
@@ -27,7 +27,7 @@ public class DrugGroupController {
         this.drugGroupService = drugGroupService;
     }
 
-    @PostMapping("/create")
+    @PostMapping("/searchgroups")
     public ResponseEntity<?> create(@RequestBody @Valid CreateGroupRequest request, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) throw new BindingError(bindingResult.getFieldErrors());
         CreateGroupResponse response = drugGroupService.create(request);
@@ -35,7 +35,7 @@ public class DrugGroupController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @PostMapping("/search")
+    @GetMapping("/groups")
     public ResponseEntity<?> search(@RequestBody @Valid SearchGroupRequest request, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) throw new BindingError(bindingResult.getFieldErrors());
         SearchGroupResponse response = drugGroupService.search(request);
@@ -43,7 +43,7 @@ public class DrugGroupController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @DeleteMapping("/remove")
+    @DeleteMapping("/groups")
     public ResponseEntity<?> remove(
             @RequestParam
             @NotNull(message = "Drug group id should not be null")
@@ -61,7 +61,7 @@ public class DrugGroupController {
         return new ResponseEntity<>(Map.of("drugGroupId", drugGroupId), HttpStatus.OK);
     }
 
-    @PostMapping("/add")
+    @PostMapping("/groups/drugs")
     public ResponseEntity<?> addDrugs(@RequestBody @Valid AddDrugRequest request, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) throw new BindingError(bindingResult.getFieldErrors());
         AddDrugResponse response = drugGroupService.addDrugsToGroup(request);
