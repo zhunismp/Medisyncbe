@@ -6,7 +6,7 @@
 1. Clone the project by using `git clone https://github.com/Zhuuuun/Medisyncbe.git`
 2. Add environment variable into project
     - **.env** and **backend.env** inside **/docker**
-    - **.env** for Java application inside **Medisyncbe\drugapi\src\main\resources** 
+    - **.env** and **keystore.p12** for Java application inside **Medisyncbe\drugapi\src\main\resources** 
 3. Go inside folder **/docker** and run these command to run/stop server
    ```
    docker-compose up --build // run server
