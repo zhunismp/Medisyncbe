@@ -5,9 +5,7 @@ import com.mahidol.drugapi.common.services.PaginationService;
 import com.mahidol.drugapi.drug.dtos.request.CreateDrugRequest;
 import com.mahidol.drugapi.drug.dtos.request.SearchDrugRequest;
 import com.mahidol.drugapi.drug.dtos.request.UpdateDrugRequest;
-import com.mahidol.drugapi.drug.dtos.response.CreateDrugResponse;
 import com.mahidol.drugapi.drug.dtos.response.SearchDrugResponse;
-import com.mahidol.drugapi.drug.dtos.response.UpdateDrugResponse;
 import com.mahidol.drugapi.drug.models.entites.Drug;
 import com.mahidol.drugapi.drug.models.type.MealCondition;
 import com.mahidol.drugapi.drug.repositories.DrugRepository;
@@ -35,10 +33,10 @@ public class DrugService {
                 .map(gname -> drug.getGenericName().contains(gname)).orElse(true)).toList();
 
 
-        return new SearchDrugResponse(applyPaginate(drugs, request.getPagination()), drugs.size(), true);
+        return new SearchDrugResponse(applyPaginate(drugs, request.getPagination()), drugs.size());
     }
 
-    public CreateDrugResponse add(CreateDrugRequest request) {
+    public void add(CreateDrugRequest request) {
         boolean isDrugExists = searchDrugByUserId(request.getUserId())
                 .stream()
                 .map(Drug::getGenericName)
@@ -47,7 +45,7 @@ public class DrugService {
         if (isDrugExists)
             throw new IllegalArgumentException("Drug name already exists, please use another name");
 
-        Drug addedDrug = drugRepository.save(new Drug()
+        drugRepository.save(new Drug()
                 .setUserId(request.getUserId())
                 .setGenericName(request.getGenericName())
                 .setDosageForm(request.getDosageForm())
@@ -61,16 +59,10 @@ public class DrugService {
                 .setIsInternalDrug(request.getIsInternalDrug())
                 .setIsEnable(request.getIsEnabled())
         );
-
-        return new CreateDrugResponse(
-                List.of(addedDrug),
-                1,
-                true
-        );
     }
 
-    public UpdateDrugResponse update(UpdateDrugRequest request) {
-        if (!validateOwner(request.getUseId(), List.of(request.getDrugId())))
+    public void update(UpdateDrugRequest request) {
+        if (!validateOwner(request.getUserId(), List.of(request.getDrugId())))
             throw new IllegalArgumentException("User is not the owner of requested drug.");
 
         Drug target = drugRepository.findById(request.getDrugId())
@@ -86,13 +78,7 @@ public class DrugService {
                 )
                 .orElseThrow(() -> new EntityNotFoundException("Drug id not found with id " + request.getDrugId()));
 
-        Drug savedDrug = drugRepository.save(target);
-
-        return new UpdateDrugResponse(
-                List.of(savedDrug),
-                1,
-                true
-        );
+        drugRepository.save(target);
     }
 
     public void remove(UUID userId, UUID drugId) {
@@ -106,7 +92,7 @@ public class DrugService {
         return drugRepository.findAllById(drugIds);
     }
 
-    public List<Drug> updateAllDrugs(UUID userId, List<Drug> drugs) {
+    public List<Drug> saveAllDrugs(UUID userId, List<Drug> drugs) {
         if (!validateOwner(userId, drugs.stream().map(Drug::getId).toList()))
             throw new IllegalArgumentException("User is not the owner of requested drug.");
 

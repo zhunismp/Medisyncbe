@@ -17,8 +17,8 @@ import java.util.UUID;
 @Data
 public class UpdateDrugRequest {
     @NotNull(message = "user id should not be null")
-    private UUID useId;
-    
+    private UUID userId;
+
     @NotNull(message = "drug id should not be null")
     private UUID drugId;
 

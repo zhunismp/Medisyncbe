@@ -1,6 +1,5 @@
 package com.mahidol.drugapi.external.aws.lambda;
 
-import com.mahidol.drugapi.common.dtos.BaseSearchRequest;
 import com.mahidol.drugapi.common.exceptions.InternalServerError;
 import com.mahidol.drugapi.common.utils.JsonParser;
 import lombok.AllArgsConstructor;
@@ -39,7 +38,7 @@ public class LambdaService {
                 .build();
     }
 
-    public <R, T extends BaseSearchRequest> List<R> get(T request, Class<R> tClass) {
+    public <R, T> List<R> get(T request, Class<R> tClass) {
         try {
             InvokeRequest invokeRequest = InvokeRequest.builder()
                     .functionName(lambdaFunction)
