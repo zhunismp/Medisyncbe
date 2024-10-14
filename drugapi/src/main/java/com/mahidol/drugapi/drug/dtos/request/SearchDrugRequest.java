@@ -1,6 +1,5 @@
 package com.mahidol.drugapi.drug.dtos.request;
 
-import com.mahidol.drugapi.common.dtos.BaseSearchRequest;
 import com.mahidol.drugapi.common.models.Pagination;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -15,7 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Accessors(chain = true)
 @Data
-public class SearchDrugRequest implements BaseSearchRequest {
+public class SearchDrugRequest {
     @NotNull(message = "user id should not be null")
     private UUID userId;
 

@@ -1,7 +1,6 @@
-package com.mahidol.drugapi.druggroup.dtos.response;
+package com.mahidol.drugapi.druggroup.entities;
 
 import com.mahidol.drugapi.drug.models.entites.Drug;
-import com.mahidol.drugapi.druggroup.entities.DrugGroup;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Accessors;

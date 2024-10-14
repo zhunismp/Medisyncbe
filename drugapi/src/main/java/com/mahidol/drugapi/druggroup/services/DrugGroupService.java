@@ -7,9 +7,7 @@ import com.mahidol.drugapi.drug.services.DrugService;
 import com.mahidol.drugapi.druggroup.dtos.request.AddDrugRequest;
 import com.mahidol.drugapi.druggroup.dtos.request.CreateGroupRequest;
 import com.mahidol.drugapi.druggroup.dtos.request.SearchGroupRequest;
-import com.mahidol.drugapi.druggroup.dtos.response.AddDrugResponse;
-import com.mahidol.drugapi.druggroup.dtos.response.CreateGroupResponse;
-import com.mahidol.drugapi.druggroup.dtos.response.DrugGroupWithDrugInfo;
+import com.mahidol.drugapi.druggroup.entities.DrugGroupWithDrugInfo;
 import com.mahidol.drugapi.druggroup.dtos.response.SearchGroupResponse;
 import com.mahidol.drugapi.druggroup.entities.DrugGroup;
 import com.mahidol.drugapi.druggroup.repositories.DrugGroupRepository;
@@ -34,7 +32,7 @@ public class DrugGroupService {
         this.paginationService = paginationService;
     }
 
-    public CreateGroupResponse create(CreateGroupRequest request) {
+    public void create(CreateGroupRequest request) {
         boolean groupNameExists = drugGroupRepository.findByUserId(request.getUserId())
                 .stream()
                 .map(DrugGroup::getGroupName)
@@ -50,15 +48,14 @@ public class DrugGroupService {
                 .setDrugs(request.getDrugs())
                 .setIsEnabled(request.getIsEnabled());
 
-        return new CreateGroupResponse(
-                List.of(DrugGroupWithDrugInfo.fromDrugGroup(
-                        drugGroupRepository.save(group),
-                        drugIds -> drugService.updateAllDrugs(request.getUserId(), drugService.searchAllDrugByDrugsId(request.getUserId(), drugIds).stream()
-                                .map(drug -> drug.setIsEnable(false)).toList())
-                )),
-                1,
-                true
+
+        // disable notification flag for individual drug
+        drugService.saveAllDrugs(
+                request.getUserId(),
+                drugService.searchAllDrugByDrugsId(request.getUserId(), request.getDrugs()).stream()
+                        .map(drug -> drug.setIsEnable(false)).toList()
         );
+        drugGroupRepository.save(group);
     }
 
     public SearchGroupResponse search(SearchGroupRequest request) {
@@ -67,11 +64,11 @@ public class DrugGroupService {
                 .map(drugGroup -> DrugGroupWithDrugInfo.fromDrugGroup(drugGroup, drugsId -> drugService.searchAllDrugByDrugsId(request.getUserId(), drugsId)))
                 .toList();
 
+        // TODO: need a story to do some huge refactor
         if (request.getGenericName().isEmpty() && request.getGroupName().isEmpty())
             return new SearchGroupResponse(
                     applyPaginate(drugGroupWithDrugInfos, request.getPagination()),
-                    drugGroups.size(),
-                    true
+                    drugGroups.size()
             );
         else {
             List<DrugGroupWithDrugInfo> response = drugGroupWithDrugInfos.stream()
@@ -86,58 +83,52 @@ public class DrugGroupService {
 
             return new SearchGroupResponse(
                     applyPaginate(response, request.getPagination()),
-                    response.size(),
-                    true
+                    response.size()
             );
         }
     }
 
     public void remove(UUID drugGroupId, UUID userId, Boolean isRemoveDrug) {
-        List<UUID> drugIds = findDrugGroup(userId, drugGroupId).getDrugs();
+        List<UUID> drugIds = getDrugGroupByGroupId(userId, drugGroupId).getDrugs();
 
         if (isRemoveDrug)
             drugService.deleteAllByDrugIds(userId, drugIds);
         else
             // After remove drug from the drug group, we need to set isEnabled to true again
             // This is for make old notification of drug behavior the same as before.
-            drugService.updateAllDrugs(userId, drugService.searchAllDrugByDrugsId(userId, drugIds).stream()
+            drugService.saveAllDrugs(userId, drugService.searchAllDrugByDrugsId(userId, drugIds).stream()
                     .map(drug -> drug.setIsEnable(true)).toList());
 
 
         drugGroupRepository.deleteById(drugGroupId);
     }
 
-    public AddDrugResponse addDrugsToGroup(AddDrugRequest request) {
-        DrugGroup drugGroup = findDrugGroup(request.getUserId(), request.getGroupId());
+    public void addDrugsToGroup(AddDrugRequest request) {
+        DrugGroup drugGroup = getDrugGroupByGroupId(request.getUserId(), request.getGroupId());
         List<Drug> drugs = drugService.searchAllDrugByDrugsId(request.getUserId(), request.getDrugs()).stream().map(drug -> drug.setIsEnable(false)).toList();
 
-        DrugGroupWithDrugInfo response = DrugGroupWithDrugInfo.fromDrugGroup(
-                drugGroupRepository.save(drugGroup.setDrugs(Stream.concat(drugGroup.getDrugs().stream(), drugs.stream().map(Drug::getId)).distinct().toList())),
-                drugIds -> Stream.concat(
-                        drugService.updateAllDrugs(request.getUserId(), drugs).stream(),
-                        drugService.searchAllDrugByDrugsId(request.getUserId(), drugIds).stream()
-                ).distinct().toList()
-        );
-
-        return new AddDrugResponse(
-                List.of(response),
-                1,
-                true
-        );
+        // disable notification flag for individual drug
+        drugService.saveAllDrugs(request.getUserId(), drugs.stream().map(d -> d.setIsEnable(false)).toList());
+        drugGroupRepository.save(drugGroup.setDrugs(Stream.concat(drugGroup.getDrugs().stream(), drugs.stream().map(Drug::getId)).toList()));
     }
 
-    private DrugGroup findDrugGroup(UUID userId, UUID groupId) {
+    private DrugGroup getDrugGroupByGroupId(UUID userId, UUID groupId) {
         return drugGroupRepository.findById(groupId)
                 .map(dg -> {
-                    if (!dg.getUserId().equals(userId))
-                        throw new IllegalArgumentException("User may not own that drug group");
-                    else return dg;
+                    if (validateOwner(userId, List.of(dg.getId())))
+                        return dg;
+                    else throw new IllegalArgumentException("User not own drug group id: " + groupId);
                 })
                 .orElseThrow(() -> new EntityNotFoundException("User try to add some drug to non exists drug group"));
     }
 
     private List<DrugGroupWithDrugInfo> applyPaginate(List<DrugGroupWithDrugInfo> drugGroups, Optional<Pagination> pagination) {
         return pagination.map(p -> paginationService.paginate(drugGroups, p)).orElse(drugGroups);
+    }
 
+    private Boolean validateOwner(UUID userId, List<UUID> drugGroupIds) {
+        List<UUID> validDrugGroupIds = drugGroupRepository.findByUserId(userId).stream().map(DrugGroup::getId).toList();
+
+        return new HashSet<>(validDrugGroupIds).containsAll(drugGroupIds);
     }
 }

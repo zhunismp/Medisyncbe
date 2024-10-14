@@ -13,5 +13,4 @@ import java.util.List;
 public class InternalDrugSearchResponse {
     private List<InternalDrug> data;
     private int total;
-    private boolean isCompleted;
 }

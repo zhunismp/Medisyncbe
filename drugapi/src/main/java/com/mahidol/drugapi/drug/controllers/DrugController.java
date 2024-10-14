@@ -4,9 +4,7 @@ import com.mahidol.drugapi.common.exceptions.BindingError;
 import com.mahidol.drugapi.drug.dtos.request.CreateDrugRequest;
 import com.mahidol.drugapi.drug.dtos.request.SearchDrugRequest;
 import com.mahidol.drugapi.drug.dtos.request.UpdateDrugRequest;
-import com.mahidol.drugapi.drug.dtos.response.CreateDrugResponse;
 import com.mahidol.drugapi.drug.dtos.response.SearchDrugResponse;
-import com.mahidol.drugapi.drug.dtos.response.UpdateDrugResponse;
 import com.mahidol.drugapi.drug.services.DrugService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -37,17 +35,19 @@ public class DrugController {
     @PostMapping("/drugs")
     public ResponseEntity<?> add(@RequestBody @Valid CreateDrugRequest request, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) throw new BindingError(bindingResult.getFieldErrors());
-        CreateDrugResponse response = drugService.add(request);
 
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        drugService.add(request);
+
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PutMapping("/drugs")
     public ResponseEntity<?> update(@RequestBody @Valid UpdateDrugRequest request, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) throw new BindingError(bindingResult.getFieldErrors());
-        UpdateDrugResponse response = drugService.update(request);
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        drugService.update(request);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("/drugs")

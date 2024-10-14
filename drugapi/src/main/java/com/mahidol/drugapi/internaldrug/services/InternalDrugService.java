@@ -24,8 +24,7 @@ public class InternalDrugService {
 
         return new InternalDrugSearchResponse(
                 internalDrugs,
-                internalDrugs.size(),
-                true
+                internalDrugs.size()
         );
     }
 }
