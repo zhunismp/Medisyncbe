@@ -17,3 +17,14 @@ services:
       dockerfile: ../drugapi/backend.dockerfile
     ports:
       - "8080:8080"
+  ngrok:
+      image: ngrok/ngrok:latest
+      depends_on:
+        - be
+      command:
+        - "http"
+        - "http://host.docker.internal:8080"
+      env_file:
+        - .env
+      ports:
+        - 4040:4040
