@@ -27,11 +27,11 @@ public class LambdaService {
     private Region region;
     private LambdaClient lambdaClient;
 
-    public LambdaService(String lambdaFunction, Region region, String accesskey, String secretkey) {
+    public LambdaService(String lambdaFunction, Region region, String accessKey, String secretKey) {
         this.lambdaFunction = lambdaFunction;
         this.region = region;
 
-        AwsCredentials awsCredentials = AwsBasicCredentials.create(accesskey, secretkey);
+        AwsCredentials awsCredentials = AwsBasicCredentials.create(accessKey, secretKey);
         this.lambdaClient = LambdaClient.builder()
                 .region(region)
                 .credentialsProvider(StaticCredentialsProvider.create(awsCredentials))
