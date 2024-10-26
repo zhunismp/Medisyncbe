@@ -43,7 +43,7 @@ public class GetUserResponse {
 
     public static GetUserResponse fromUser(User u, Optional<String> url) {
         return new GetUserResponse()
-                .setProfileImage(url.orElse(""))
+                .setProfileImage(url.orElse(null))
                 .setId(u.getId())
                 .setFirstName(u.getFirstName())
                 .setLastName(u.getLastName())

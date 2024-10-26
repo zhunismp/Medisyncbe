@@ -72,7 +72,12 @@ public class S3Service {
 
     public Optional<String> getUrl(String bucketName, String key) {
         try {
-            s3Client.headObject(HeadObjectRequest.builder().bucket(bucketName).key(key).build());
+            HeadObjectRequest headObjectRequest = HeadObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(key)
+                    .build();
+
+            s3Client.headObject(headObjectRequest);
 
             GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                     .bucket(bucketName)
@@ -85,10 +90,12 @@ public class S3Service {
                     .build();
 
             return Optional.of(s3Presigner.presignGetObject(presignRequest).url().toString());
-        } catch (NoSuchKeyException e) {
-            return Optional.empty();
+        } catch (S3Exception e) {
+            if (e.statusCode() == 404) return Optional.empty();
+            else throw e;
         }
     }
+
 
     public void deleteFile(String bucketName, String key) {
         try {
@@ -100,6 +107,17 @@ public class S3Service {
         } catch (Exception e) {
             throw new InternalServerError(e.getMessage());
         }
+    }
+
+    private boolean isExists(String bucketName, String key) {
+        ListObjectsV2Request listObjectsV2Request = ListObjectsV2Request.builder()
+                .bucket(bucketName)
+                .build();
+        ListObjectsV2Response listObjectsV2Response = s3Client.listObjectsV2(listObjectsV2Request);
+
+        return listObjectsV2Response.contents()
+                .stream()
+                .anyMatch(s3ObjectSummary -> s3ObjectSummary.getValueForField("key", String.class).map(v -> v.equals(key)).orElse(false));
     }
 
     private File fileTransform(String fileName, MultipartFile file) throws IOException {
