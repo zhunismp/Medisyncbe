@@ -109,17 +109,6 @@ public class S3Service {
         }
     }
 
-    private boolean isExists(String bucketName, String key) {
-        ListObjectsV2Request listObjectsV2Request = ListObjectsV2Request.builder()
-                .bucket(bucketName)
-                .build();
-        ListObjectsV2Response listObjectsV2Response = s3Client.listObjectsV2(listObjectsV2Request);
-
-        return listObjectsV2Response.contents()
-                .stream()
-                .anyMatch(s3ObjectSummary -> s3ObjectSummary.getValueForField("key", String.class).map(v -> v.equals(key)).orElse(false));
-    }
-
     private File fileTransform(String fileName, MultipartFile file) throws IOException {
         File convFile = new File(fileName);
         FileOutputStream fos = new FileOutputStream(convFile);
