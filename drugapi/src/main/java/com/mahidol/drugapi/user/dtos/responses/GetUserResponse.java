@@ -41,6 +41,8 @@ public class GetUserResponse {
 
     private List<String> drugAllergy;
 
+    private List<String> foodAllergy;
+
     public static GetUserResponse fromUser(User u, Optional<String> url) {
         return new GetUserResponse()
                 .setProfileImage(url.orElse(null))
@@ -53,6 +55,7 @@ public class GetUserResponse {
                 .setGender(u.getGender())
                 .setBloodGroup(u.getBloodGroup())
                 .setHealthCondition(StringUtil.stringToArray(u.getHealthCondition()))
-                .setDrugAllergy(StringUtil.stringToArray(u.getDrugAllergy()));
+                .setDrugAllergy(StringUtil.stringToArray(u.getDrugAllergy()))
+                .setFoodAllergy(StringUtil.stringToArray(u.getFoodAllergy()));
     }
 }

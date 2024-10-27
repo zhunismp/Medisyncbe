@@ -36,6 +36,7 @@ public class UserService {
                 .setBloodGroup(BloodGroup.fromValue(request.getBloodGroup()))
                 .setHealthCondition(StringUtil.arrayToString(request.getHealthCondition().orElse(null)))
                 .setDrugAllergy(StringUtil.arrayToString(request.getDrugAllergy().orElse(null)))
+                .setFoodAllergy(StringUtil.arrayToString(request.getFoodAllergy().orElse(null)))
         );
 
         // Upload user profile to s3 bucket
@@ -65,6 +66,7 @@ public class UserService {
                                 .setBloodGroup(request.getBloodGroup().map(BloodGroup::fromValue).orElse(user.getBloodGroup()))
                                 .setHealthCondition(request.getHealthCondition().map(StringUtil::arrayToString).orElse(user.getHealthCondition()))
                                 .setDrugAllergy(request.getDrugAllergy().map(StringUtil::arrayToString).orElse(user.getDrugAllergy()))
+                                .setFoodAllergy(request.getFoodAllergy().map(StringUtil::arrayToString).orElse(user.getDrugAllergy()))
                 ));
 
         request.getProfileImage().map(file -> s3Service.uploadFile("medisync-user-profile", request.getUserId().toString(), file));

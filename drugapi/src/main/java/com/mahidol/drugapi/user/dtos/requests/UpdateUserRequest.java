@@ -29,6 +29,7 @@ public class UpdateUserRequest {
     private String bloodGroup;
     private List<String> healthCondition;
     private List<String> drugAllergy;
+    private List<String> foodAllergy;
 
     public Optional<MultipartFile> getProfileImage() {
         return Optional.ofNullable(profileImage);
@@ -68,5 +69,9 @@ public class UpdateUserRequest {
 
     public Optional<List<String>> getDrugAllergy() {
         return Optional.ofNullable(drugAllergy);
+    }
+
+    public Optional<List<String>> getFoodAllergy() {
+        return Optional.ofNullable(foodAllergy);
     }
 }

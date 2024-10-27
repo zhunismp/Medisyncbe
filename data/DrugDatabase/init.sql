@@ -24,7 +24,8 @@ CREATE TABLE APP_USER (
     gender CHAR NOT NULL,
     blood_group VARCHAR(5) NOT NULL,
     health_condition TEXT,
-    drug_allergy TEXT
+    drug_allergy TEXT,
+    food_allergy TEXT
 );
  
 CREATE TABLE DRUGGROUP (

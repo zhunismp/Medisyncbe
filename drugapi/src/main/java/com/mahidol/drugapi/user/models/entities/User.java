@@ -38,4 +38,6 @@ public class User {
     private String healthCondition;
     @Column(name = "drug_allergy", columnDefinition = "TEXT")
     private String drugAllergy;
+    @Column(name = "food_allergy", columnDefinition = "TEXT")
+    private String foodAllergy;
 }
