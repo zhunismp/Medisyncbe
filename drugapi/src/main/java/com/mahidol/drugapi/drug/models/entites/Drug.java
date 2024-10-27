@@ -14,7 +14,7 @@ import java.util.UUID;
 @Data
 @Accessors(chain = true)
 @NoArgsConstructor
-@Table(name = "drugdatabase")
+@Table(name = "drug")
 public class Drug {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -35,13 +35,13 @@ public class Drug {
     @Column(name = "strength", columnDefinition = "TEXT")
     private String strength;
 
-    @Column(name = "amount", columnDefinition = "NUMERIC")
+    @Column(name = "amount", columnDefinition = "FLOAT")
     private double amount;
 
-    @Column(name = "dose", columnDefinition = "NUMERIC")
+    @Column(name = "dose", columnDefinition = "FLOAT")
     private double dose;
 
-    @Column(name = "taken_amount", columnDefinition = "NUMERIC")
+    @Column(name = "taken_amount", columnDefinition = "FLOAT")
     private double takenAmount;
 
     @Column(name = "usage_time", columnDefinition = "INT")
