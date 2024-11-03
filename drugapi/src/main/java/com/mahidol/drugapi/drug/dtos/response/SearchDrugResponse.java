@@ -11,6 +11,6 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 public class SearchDrugResponse {
-    private List<Drug> data;
+    private List<DrugDTO> data;
     private int total;
 }

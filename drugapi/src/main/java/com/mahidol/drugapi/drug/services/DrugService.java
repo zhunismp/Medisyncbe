@@ -5,10 +5,12 @@ import com.mahidol.drugapi.common.services.PaginationService;
 import com.mahidol.drugapi.drug.dtos.request.CreateDrugRequest;
 import com.mahidol.drugapi.drug.dtos.request.SearchDrugRequest;
 import com.mahidol.drugapi.drug.dtos.request.UpdateDrugRequest;
+import com.mahidol.drugapi.drug.dtos.response.DrugDTO;
 import com.mahidol.drugapi.drug.dtos.response.SearchDrugResponse;
 import com.mahidol.drugapi.drug.models.entites.Drug;
 import com.mahidol.drugapi.drug.models.type.MealCondition;
 import com.mahidol.drugapi.drug.repositories.DrugRepository;
+import com.mahidol.drugapi.external.aws.s3.S3Service;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -18,22 +20,28 @@ import java.util.*;
 public class DrugService {
 
     private final DrugRepository drugRepository;
-    private final PaginationService<Drug> paginationService;
+    private final PaginationService<DrugDTO> paginationService;
+    private final S3Service s3Service;
 
-    public DrugService(DrugRepository drugRepository, PaginationService<Drug> paginationService) {
+    public DrugService(DrugRepository drugRepository, PaginationService<DrugDTO> paginationService, S3Service s3Service) {
         this.drugRepository = drugRepository;
         this.paginationService = paginationService;
+        this.s3Service = s3Service;
     }
 
     public SearchDrugResponse search(SearchDrugRequest request) {
         List<Drug> userDrugs = searchDrugByUserId(request.getUserId());
 
         // TODO: Add applyFilter method
-        List<Drug> drugs = userDrugs.stream().filter(drug -> request.getGenericName()
+        List<Drug> filteredDrugs = userDrugs.stream().filter(drug -> request.getGenericName()
                 .map(gname -> drug.getGenericName().contains(gname)).orElse(true)).toList();
 
+        List<DrugDTO> response = filteredDrugs.stream().map(drug -> {
+            Optional<String> drugImageUrl = s3Service.getUrl("medisync-drug", drug.getId().toString());
+            return DrugDTO.fromDrug(drug, drugImageUrl);
+        }).toList();
 
-        return new SearchDrugResponse(applyPaginate(drugs, request.getPagination()), drugs.size());
+        return new SearchDrugResponse(applyPaginate(response, request.getPagination()), filteredDrugs.size());
     }
 
     public void add(CreateDrugRequest request) {
@@ -45,7 +53,7 @@ public class DrugService {
         if (isDrugExists)
             throw new IllegalArgumentException("Drug name already exists, please use another name");
 
-        drugRepository.save(new Drug()
+        Drug savedDrug = drugRepository.save(new Drug()
                 .setUserId(request.getUserId())
                 .setGenericName(request.getGenericName())
                 .setDosageForm(request.getDosageForm())
@@ -59,6 +67,8 @@ public class DrugService {
                 .setIsInternalDrug(request.getIsInternalDrug())
                 .setIsEnable(request.getIsEnabled())
         );
+
+        request.getImage().map(file -> s3Service.uploadFile("medisync-drug", savedDrug.getId().toString(), file));
     }
 
     public void update(UpdateDrugRequest request) {
@@ -79,6 +89,7 @@ public class DrugService {
                 .orElseThrow(() -> new EntityNotFoundException("Drug id not found with id " + request.getDrugId()));
 
         drugRepository.save(target);
+        request.getImage().map(file -> s3Service.uploadFile("medisync-drug", request.getDrugId().toString(), file));
     }
 
     public void remove(UUID userId, UUID drugId) {
@@ -116,7 +127,7 @@ public class DrugService {
         return drugRepository.findByUserId(userId);
     }
 
-    private List<Drug> applyPaginate(List<Drug> drugs, Optional<Pagination> pagination) {
+    private List<DrugDTO> applyPaginate(List<DrugDTO> drugs, Optional<Pagination> pagination) {
         return pagination.map(p -> paginationService.paginate(drugs, p)).orElse(drugs);
     }
 }
