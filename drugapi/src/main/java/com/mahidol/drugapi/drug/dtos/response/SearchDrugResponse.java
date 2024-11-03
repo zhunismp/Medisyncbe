@@ -1,6 +1,5 @@
 package com.mahidol.drugapi.drug.dtos.response;
 
-import com.mahidol.drugapi.drug.models.entites.Drug;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

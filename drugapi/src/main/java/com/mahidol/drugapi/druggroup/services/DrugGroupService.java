@@ -7,7 +7,7 @@ import com.mahidol.drugapi.drug.services.DrugService;
 import com.mahidol.drugapi.druggroup.dtos.request.AddDrugRequest;
 import com.mahidol.drugapi.druggroup.dtos.request.CreateGroupRequest;
 import com.mahidol.drugapi.druggroup.dtos.request.SearchGroupRequest;
-import com.mahidol.drugapi.druggroup.entities.DrugGroupWithDrugInfo;
+import com.mahidol.drugapi.druggroup.dtos.response.DrugGroupDTO;
 import com.mahidol.drugapi.druggroup.dtos.response.SearchGroupResponse;
 import com.mahidol.drugapi.druggroup.entities.DrugGroup;
 import com.mahidol.drugapi.druggroup.repositories.DrugGroupRepository;
@@ -21,12 +21,12 @@ import java.util.stream.Stream;
 public class DrugGroupService {
     private final DrugGroupRepository drugGroupRepository;
     private final DrugService drugService;
-    private final PaginationService<DrugGroupWithDrugInfo> paginationService;
+    private final PaginationService<DrugGroupDTO> paginationService;
 
     public DrugGroupService(
             DrugGroupRepository drugGroupRepository,
             DrugService drugService,
-            PaginationService<DrugGroupWithDrugInfo> paginationService) {
+            PaginationService<DrugGroupDTO> paginationService) {
         this.drugGroupRepository = drugGroupRepository;
         this.drugService = drugService;
         this.paginationService = paginationService;
@@ -60,8 +60,8 @@ public class DrugGroupService {
 
     public SearchGroupResponse search(SearchGroupRequest request) {
         List<DrugGroup> drugGroups = drugGroupRepository.findByUserId(request.getUserId());
-        List<DrugGroupWithDrugInfo> drugGroupWithDrugInfos = drugGroups.stream()
-                .map(drugGroup -> DrugGroupWithDrugInfo.fromDrugGroup(drugGroup, drugsId -> drugService.searchAllDrugByDrugsId(request.getUserId(), drugsId)))
+        List<DrugGroupDTO> drugGroupWithDrugInfos = drugGroups.stream()
+                .map(drugGroup -> DrugGroupDTO.fromDrugGroup(drugGroup, drugsId -> drugService.searchAllDrugByDrugsId(request.getUserId(), drugsId)))
                 .toList();
 
         // TODO: need a story to do some huge refactor
@@ -71,7 +71,7 @@ public class DrugGroupService {
                     drugGroups.size()
             );
         else {
-            List<DrugGroupWithDrugInfo> response = drugGroupWithDrugInfos.stream()
+            List<DrugGroupDTO> response = drugGroupWithDrugInfos.stream()
                     .filter(drugGroup -> request.getGroupName()
                             .map(groupName -> drugGroup.getGroupName().toLowerCase().contains(groupName.toLowerCase()))
                             .orElse(true))
@@ -122,7 +122,7 @@ public class DrugGroupService {
                 .orElseThrow(() -> new EntityNotFoundException("User try to add some drug to non exists drug group"));
     }
 
-    private List<DrugGroupWithDrugInfo> applyPaginate(List<DrugGroupWithDrugInfo> drugGroups, Optional<Pagination> pagination) {
+    private List<DrugGroupDTO> applyPaginate(List<DrugGroupDTO> drugGroups, Optional<Pagination> pagination) {
         return pagination.map(p -> paginationService.paginate(drugGroups, p)).orElse(drugGroups);
     }
 
