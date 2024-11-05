@@ -1,5 +1,6 @@
 package com.mahidol.drugapi.drug.dtos.request;
 
+import io.vavr.control.Option;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -8,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -17,7 +19,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @Data
 public class CreateDrugRequest {
+    @NotNull(message = "user id should not be null")
     private UUID userId;
+
+    private MultipartFile image;
 
     @NotBlank(message = "generic name should not be null")
     private String genericName;
@@ -50,4 +55,8 @@ public class CreateDrugRequest {
     private Boolean isInternalDrug;
 
     private Boolean isEnabled;
+
+    public Option<MultipartFile> getImage() {
+        return Option.of(image);
+    }
 }
