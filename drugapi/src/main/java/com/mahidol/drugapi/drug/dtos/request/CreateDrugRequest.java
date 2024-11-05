@@ -1,6 +1,7 @@
 package com.mahidol.drugapi.drug.dtos.request;
 
 import io.vavr.control.Option;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -48,6 +49,7 @@ public class CreateDrugRequest {
     @Max(value = 3, message = "Invalid usage time")
     private int usageTime;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private List<LocalTime> schedules;
 
     private Boolean isInternalDrug;

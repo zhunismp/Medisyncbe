@@ -1,5 +1,6 @@
 package com.mahidol.drugapi.druggroup.dtos.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -22,6 +23,7 @@ public class CreateGroupRequest {
     private String groupName;
 
     @NotNull(message = "schedules should not be null")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private List<LocalTime> schedules;
 
     @NotNull(message = "drugs should not be null")
