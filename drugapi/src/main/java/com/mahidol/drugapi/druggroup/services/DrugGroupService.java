@@ -64,29 +64,20 @@ public class DrugGroupService {
                 .map(drugGroup -> DrugGroupDTO.fromDrugGroup(drugGroup, drugsId -> drugService.searchAllDrugByDrugsId(request.getUserId(), drugsId)))
                 .toList();
 
-        // TODO: need a story to do some huge refactor
-        if (request.getGenericName().isEmpty() && request.getGroupName().isEmpty())
-            return new SearchGroupResponse(
-                    applyPaginate(drugGroupWithDrugInfos, request.getPagination()),
-                    drugGroups.size()
-            );
-        else {
-            List<DrugGroupDTO> response = drugGroupWithDrugInfos.stream()
-                    .filter(drugGroup -> request.getGroupName()
-                            .map(groupName -> drugGroup.getGroupName().toLowerCase().contains(groupName.toLowerCase()))
-                            .orElse(true))
-                    .filter(drugGroup -> request.getGenericName()
-                            .map(genericName -> drugGroup.getDrugs().stream().anyMatch(drug -> drug.getGenericName().toLowerCase().contains(genericName.toLowerCase())))
-                            .orElse(true)
-                    )
-                    .toList();
-
-            return new SearchGroupResponse(
-                    applyPaginate(response, request.getPagination()),
-                    response.size()
-            );
-        }
+        return new SearchGroupResponse(
+                applyPaginate(drugGroupWithDrugInfos, request.getPagination()),
+                drugGroupWithDrugInfos.size()
+        );
     }
+
+    public List<DrugGroupDTO> searchAllDrugGroupByDrugGroupIds(List<UUID> drugGroupIds) {
+        List<DrugGroup> drugGroups = drugGroupRepository.findAllById(drugGroupIds);
+
+        return drugGroups.stream()
+                .map(drugGroup -> DrugGroupDTO.fromDrugGroup(drugGroup, drugsId -> drugService.searchAllDrugByDrugsId(null, drugsId)))
+                .toList();
+    }
+
 
     public void remove(UUID drugGroupId, UUID userId, Boolean isRemoveDrug) {
         List<UUID> drugIds = getDrugGroupByGroupId(userId, drugGroupId).getDrugs();

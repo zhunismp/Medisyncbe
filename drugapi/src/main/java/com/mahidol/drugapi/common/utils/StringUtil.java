@@ -5,11 +5,15 @@ import io.vavr.collection.Array;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class StringUtil {
-    public static String arrayToString(List<String> array) {
+    public static <T> String arrayToString(List<T> array) {
         if (array == null || array.isEmpty()) return "";
-        else return String.join(",", array);
+
+        return array.stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining(","));
     }
 
     public static List<String> stringToArray(String str) {
