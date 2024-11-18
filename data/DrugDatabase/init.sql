@@ -14,6 +14,8 @@ CREATE TABLE DRUG (
     is_enable BOOLEAN NOT NULL
 );
 
+CREATE INDEX idx_drug_user_id ON drug (user_id);
+
 CREATE TABLE APP_USER (
     id UUID PRIMARY KEY,
     first_name TEXT NOT NULL,
@@ -28,7 +30,7 @@ CREATE TABLE APP_USER (
     food_allergy TEXT
 );
  
-CREATE TABLE DRUGGROUP (
+CREATE TABLE DRUG_GROUP (
     id UUID PRIMARY KEY,
     user_id UUID NOT NULL,
     group_name TEXT NOT NULL,
@@ -36,3 +38,25 @@ CREATE TABLE DRUGGROUP (
     drug_id UUID[],
     is_enable BOOLEAN NOT NULL
 );
+
+CREATE INDEX idx_drug_group_user_id ON drug_group (user_id);
+
+CREATE TABLE DRUG_SCHEDULE (
+    id UUID PRIMARY KEY,
+    device_id TEXT NOT NULL,
+    user_id TEXT NOT NULL, 
+    drug_id UUID NOT NULL,
+    schedule_time TIME NOT NULL,
+);
+
+CREATE INDEX idx_drug_schedule_schedule_time ON drug_schedule (schedule_time);
+
+CREATE TABLE DRUG_GROUP_SCHEDULE (
+    id UUID PRIMARY KEY,
+    device_id TEXT NOT NULL,
+    user_id TEXT NOT NULL, 
+    drug_group_id UUID NOT NULL,
+    schedule_time TIME NOT NULL,
+);
+
+CREATE INDEX idx_drug_group_schedule_schedule_time ON drug_group_schedule (schedule_time);
