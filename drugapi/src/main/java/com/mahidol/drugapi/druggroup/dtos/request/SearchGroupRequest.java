@@ -16,18 +16,8 @@ public class SearchGroupRequest {
     @NotNull(message = "user id should not be null")
     private UUID userId;
     private Pagination pagination;
-    private String groupName;
-    private String genericName;
 
     public Optional<Pagination> getPagination() {
         return Optional.ofNullable(pagination);
-    }
-
-    public Optional<String> getGroupName() {
-        return Optional.ofNullable(groupName);
-    }
-
-    public Optional<String> getGenericName() {
-        return Optional.ofNullable(genericName);
     }
 }

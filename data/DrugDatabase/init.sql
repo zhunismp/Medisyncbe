@@ -44,9 +44,9 @@ CREATE INDEX idx_drug_group_user_id ON drug_group (user_id);
 CREATE TABLE DRUG_SCHEDULE (
     id UUID PRIMARY KEY,
     device_id TEXT NOT NULL,
-    user_id TEXT NOT NULL, 
+    user_id UUID NOT NULL, 
     drug_id UUID NOT NULL,
-    schedule_time TIME NOT NULL,
+    schedule_time TIME NOT NULL
 );
 
 CREATE INDEX idx_drug_schedule_schedule_time ON drug_schedule (schedule_time);
@@ -54,9 +54,9 @@ CREATE INDEX idx_drug_schedule_schedule_time ON drug_schedule (schedule_time);
 CREATE TABLE DRUG_GROUP_SCHEDULE (
     id UUID PRIMARY KEY,
     device_id TEXT NOT NULL,
-    user_id TEXT NOT NULL, 
+    user_id UUID NOT NULL, 
     drug_group_id UUID NOT NULL,
-    schedule_time TIME NOT NULL,
+    schedule_time TIME NOT NULL
 );
 
 CREATE INDEX idx_drug_group_schedule_schedule_time ON drug_group_schedule (schedule_time);

@@ -97,7 +97,7 @@ public class DrugService {
     }
 
     public List<Drug> searchAllDrugByDrugsId(UUID userId, List<UUID> drugIds) {
-        if (!validateOwner(userId, drugIds))
+        if (userId != null && !validateOwner(userId, drugIds))
             throw new IllegalArgumentException("User is not the owner of requested drug.");
 
         return drugRepository.findAllById(drugIds);
