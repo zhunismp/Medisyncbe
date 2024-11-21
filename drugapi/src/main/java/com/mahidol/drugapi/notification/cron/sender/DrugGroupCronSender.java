@@ -58,8 +58,9 @@ public class DrugGroupCronSender {
 
     private List<NotificationMessage> populateNotificationMessages(List<DrugGroupSchedule> schedules) {
         Map<UUID, DrugGroupDTO> drugGroupMap = drugGroupService.searchAllDrugGroupByDrugGroupIds(
-                schedules.stream().map(DrugGroupSchedule::getDrugGroupId).toList()).stream().collect(Collectors.toMap(DrugGroupDTO::getId, drugGroupDTO -> drugGroupDTO)
-        );
+                        schedules.stream().map(DrugGroupSchedule::getDrugGroupId).toList()).stream()
+                .filter(DrugGroupDTO::getIsEnabled)
+                .collect(Collectors.toMap(DrugGroupDTO::getId, drugGroupDTO -> drugGroupDTO));
 
         return schedules.stream().flatMap(s -> {
             DrugGroupDTO drugGroupDTO = drugGroupMap.get(s.getDrugGroupId());

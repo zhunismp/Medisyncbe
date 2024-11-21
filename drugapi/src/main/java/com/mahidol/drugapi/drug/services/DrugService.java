@@ -11,6 +11,8 @@ import com.mahidol.drugapi.drug.models.entites.Drug;
 import com.mahidol.drugapi.drug.models.type.MealCondition;
 import com.mahidol.drugapi.drug.repositories.DrugRepository;
 import com.mahidol.drugapi.external.aws.s3.S3Service;
+import com.mahidol.drugapi.notification.models.drug.DrugSchedule;
+import com.mahidol.drugapi.notification.repositories.DrugScheduleRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -20,11 +22,18 @@ import java.util.*;
 public class DrugService {
 
     private final DrugRepository drugRepository;
+    private final DrugScheduleRepository drugScheduleRepository;
     private final PaginationService<DrugDTO> paginationService;
     private final S3Service s3Service;
 
-    public DrugService(DrugRepository drugRepository, PaginationService<DrugDTO> paginationService, S3Service s3Service) {
+    public DrugService(
+            DrugRepository drugRepository,
+            DrugScheduleRepository drugScheduleRepository,
+            PaginationService<DrugDTO> paginationService,
+            S3Service s3Service
+    ) {
         this.drugRepository = drugRepository;
+        this.drugScheduleRepository = drugScheduleRepository;
         this.paginationService = paginationService;
         this.s3Service = s3Service;
     }
@@ -68,6 +77,7 @@ public class DrugService {
                 .setIsEnable(request.getIsEnabled())
         );
 
+        scheduledDrug(savedDrug, request.getDeviceId());
         request.getImage().map(file -> s3Service.uploadFile("medisync-drug", savedDrug.getId().toString(), file));
     }
 
@@ -89,10 +99,12 @@ public class DrugService {
                 .orElseThrow(() -> new EntityNotFoundException("Drug id not found with id " + request.getDrugId()));
 
         drugRepository.save(target);
+        scheduledDrug(target, request.getDeviceId());
         request.getImage().map(file -> s3Service.uploadFile("medisync-drug", request.getDrugId().toString(), file));
     }
 
     public void remove(UUID userId, UUID drugId) {
+        drugScheduleRepository.deleteAllByDrugId(drugId);
         deleteAllByDrugIds(userId, List.of(drugId));
     }
 
@@ -115,6 +127,21 @@ public class DrugService {
             throw new IllegalArgumentException("User is not the owner of requested drug.");
 
         drugRepository.deleteAllById(drugIds);
+    }
+
+    private void scheduledDrug(Drug drug, String deviceId) {
+        // remove old schedule.
+        drugScheduleRepository.deleteAllByDrugId(drug.getId());
+
+        List<DrugSchedule> drugSchedules = drug.getSchedules().stream().map(
+                t -> new DrugSchedule()
+                        .setDrugId(drug.getId())
+                        .setScheduledTime(t)
+                        .setUserId(drug.getUserId())
+                        .setDeviceId(deviceId)
+        ).toList();
+
+        drugScheduleRepository.saveAll(drugSchedules);
     }
 
     private Boolean validateOwner(UUID userId, List<UUID> drugIds) {

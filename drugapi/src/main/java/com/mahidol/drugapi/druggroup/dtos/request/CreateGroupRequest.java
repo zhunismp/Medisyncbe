@@ -19,6 +19,9 @@ public class CreateGroupRequest {
     @NotNull(message = "user id should not be null")
     private UUID userId;
 
+    @NotBlank(message = "device id is mandatory")
+    private String deviceId;
+
     @NotBlank(message = "group name should not be null")
     private String groupName;
 

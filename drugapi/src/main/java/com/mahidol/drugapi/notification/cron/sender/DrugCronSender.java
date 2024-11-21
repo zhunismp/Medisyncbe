@@ -57,9 +57,11 @@ public class DrugCronSender {
 
     private List<NotificationMessage> populateNotificationMessages(List<DrugSchedule> drugSchedules) {
         Map<UUID, Drug> drugMap = drugService.searchAllDrugByDrugsId(
-                null,
-                drugSchedules.stream().map(DrugSchedule::getDrugId).toList()).stream().collect(Collectors.toMap(Drug::getId, drug -> drug)
-        );
+                        null,
+                        drugSchedules.stream().map(DrugSchedule::getDrugId).toList()).stream()
+                .filter(Drug::getIsEnable)
+                .collect(Collectors.toMap(Drug::getId, drug -> drug));
+
         return drugSchedules.stream().flatMap(ds -> {
             Drug drug = drugMap.get(ds.getDrugId());
             if (drug != null)
