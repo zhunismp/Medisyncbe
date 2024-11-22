@@ -34,7 +34,7 @@ public class DrugGroupController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @GetMapping("/searchgroups")
+    @PostMapping("/searchgroups")
     public ResponseEntity<?> search(@RequestBody @Valid SearchGroupRequest request, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) throw new BindingError(bindingResult.getFieldErrors());
         SearchGroupResponse response = drugGroupService.search(request);
