@@ -21,7 +21,7 @@ public class DrugGroupSchedule {
     private String deviceId;
     @Column(name = "user_id", columnDefinition = "UUID")
     private UUID userId;
-    @Column(name = "scheduled_time", columnDefinition = "TIME")
+    @Column(name = "schedule_time", columnDefinition = "TIME")
     private LocalTime scheduledTime;
     @Column(name = "drug_group_id", columnDefinition = "UUID")
     private UUID drugGroupId;

@@ -4,6 +4,7 @@ import io.vavr.control.Option;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,6 +22,9 @@ import java.util.UUID;
 public class UpdateDrugRequest {
     @NotNull(message = "user id should not be null")
     private UUID userId;
+
+    @NotBlank(message = "device id is mandatory")
+    private String deviceId;
 
     private MultipartFile image;
 

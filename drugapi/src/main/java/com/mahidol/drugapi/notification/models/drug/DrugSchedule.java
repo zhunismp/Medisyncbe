@@ -1,6 +1,7 @@
 package com.mahidol.drugapi.notification.models.drug;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
@@ -12,6 +13,7 @@ import java.util.UUID;
 @Table(name = "drug_schedule")
 @Data
 @Accessors(chain = true)
+@AllArgsConstructor
 @NoArgsConstructor
 public class DrugSchedule {
     @Id

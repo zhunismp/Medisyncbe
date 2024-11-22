@@ -34,7 +34,7 @@ CREATE TABLE DRUG_GROUP (
     id UUID PRIMARY KEY,
     user_id UUID NOT NULL,
     group_name TEXT NOT NULL,
-    schedule TIME[] NOT NULL,
+    schedule TIME[],
     drug_id UUID[],
     is_enable BOOLEAN NOT NULL
 );

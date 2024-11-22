@@ -11,7 +11,11 @@ import com.mahidol.drugapi.druggroup.dtos.response.DrugGroupDTO;
 import com.mahidol.drugapi.druggroup.dtos.response.SearchGroupResponse;
 import com.mahidol.drugapi.druggroup.entities.DrugGroup;
 import com.mahidol.drugapi.druggroup.repositories.DrugGroupRepository;
+import com.mahidol.drugapi.notification.models.druggroup.DrugGroupSchedule;
+import com.mahidol.drugapi.notification.repositories.DrugGroupScheduleRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -20,14 +24,18 @@ import java.util.stream.Stream;
 @Service
 public class DrugGroupService {
     private final DrugGroupRepository drugGroupRepository;
+    private final DrugGroupScheduleRepository drugGroupScheduleRepository;
     private final DrugService drugService;
     private final PaginationService<DrugGroupDTO> paginationService;
 
     public DrugGroupService(
             DrugGroupRepository drugGroupRepository,
+            DrugGroupScheduleRepository drugGroupScheduleRepository,
             DrugService drugService,
-            PaginationService<DrugGroupDTO> paginationService) {
+            PaginationService<DrugGroupDTO> paginationService
+    ) {
         this.drugGroupRepository = drugGroupRepository;
+        this.drugGroupScheduleRepository = drugGroupScheduleRepository;
         this.drugService = drugService;
         this.paginationService = paginationService;
     }
@@ -55,7 +63,8 @@ public class DrugGroupService {
                 drugService.searchAllDrugByDrugsId(request.getUserId(), request.getDrugs()).stream()
                         .map(drug -> drug.setIsEnable(false)).toList()
         );
-        drugGroupRepository.save(group);
+        DrugGroup savedGroup = drugGroupRepository.save(group);
+        scheduleDrugGroup(savedGroup, request.getDeviceId());
     }
 
     public SearchGroupResponse search(SearchGroupRequest request) {
@@ -90,7 +99,6 @@ public class DrugGroupService {
             drugService.saveAllDrugs(userId, drugService.searchAllDrugByDrugsId(userId, drugIds).stream()
                     .map(drug -> drug.setIsEnable(true)).toList());
 
-
         drugGroupRepository.deleteById(drugGroupId);
     }
 
@@ -101,6 +109,19 @@ public class DrugGroupService {
         // disable notification flag for individual drug
         drugService.saveAllDrugs(request.getUserId(), drugs.stream().map(d -> d.setIsEnable(false)).toList());
         drugGroupRepository.save(drugGroup.setDrugs(Stream.concat(drugGroup.getDrugs().stream(), drugs.stream().map(Drug::getId)).toList()));
+    }
+
+    private void scheduleDrugGroup(DrugGroup drugGroup, String deviceId) {
+        drugGroupScheduleRepository.deleteAllByDrugGroupId(drugGroup.getId());
+        List<DrugGroupSchedule> drugGroupSchedules = drugGroup.getSchedules().stream().map(
+                t -> new DrugGroupSchedule()
+                        .setDrugGroupId(drugGroup.getId())
+                        .setScheduledTime(t)
+                        .setUserId(drugGroup.getUserId())
+                        .setDeviceId(deviceId)
+        ).toList();
+
+        drugGroupScheduleRepository.saveAll(drugGroupSchedules);
     }
 
     private DrugGroup getDrugGroupByGroupId(UUID userId, UUID groupId) {

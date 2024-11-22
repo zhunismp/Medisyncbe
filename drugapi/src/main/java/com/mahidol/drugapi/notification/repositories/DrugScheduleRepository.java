@@ -11,4 +11,6 @@ import java.util.UUID;
 @Repository
 public interface DrugScheduleRepository extends JpaRepository<DrugSchedule, UUID> {
     List<DrugSchedule> findByScheduledTime(LocalTime time);
+
+    void deleteAllByDrugId(UUID drugId);
 }
