@@ -17,8 +17,9 @@ public class SearchGroupRequest {
     @NotNull(message = "user id should not be null")
     private UUID userId;
 
-    @NotBlank(message = "device token is mandatory")
-    private String deviceToken;
+    @NotBlank(message = "device id is mandatory")
+    private String deviceId;
+
     private Pagination pagination;
 
     public Optional<Pagination> getPagination() {
