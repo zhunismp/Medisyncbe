@@ -52,8 +52,9 @@ public class DrugGroupCronSender {
         List<DrugGroupSchedule> drugGroupSchedules = readScheduled(time);
         List<NotificationMessage> messages = populateNotificationMessages(drugGroupSchedules);
 
+        messages.forEach(notificationService::send);
         logger.info("Start notification at: " + time);
-        logger.info("All messages: " + messages.toString());
+        logger.info("All messages: " + messages);
     }
 
     private List<NotificationMessage> populateNotificationMessages(List<DrugGroupSchedule> schedules) {

@@ -7,13 +7,13 @@ import com.mahidol.drugapi.common.exceptions.InternalServerError;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-@Service
+@Component
 public class FCMInitializer {
-    @Value("")
+    @Value("${firebase.config.path}")
     private String firebaseConfigPath;
 
     @PostConstruct

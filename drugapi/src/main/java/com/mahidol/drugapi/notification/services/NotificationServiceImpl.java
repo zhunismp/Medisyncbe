@@ -28,6 +28,4 @@ public class NotificationServiceImpl implements NotificationService {
                 .setToken(message.getDeviceToken())
                 .build();
     }
-
-
 }
