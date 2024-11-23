@@ -1,6 +1,7 @@
 package com.mahidol.drugapi.druggroup.dtos.request;
 
 import com.mahidol.drugapi.common.models.Pagination;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,6 +16,9 @@ import java.util.UUID;
 public class SearchGroupRequest {
     @NotNull(message = "user id should not be null")
     private UUID userId;
+
+    @NotBlank(message = "device token is mandatory")
+    private String deviceToken;
     private Pagination pagination;
 
     public Optional<Pagination> getPagination() {
