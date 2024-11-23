@@ -1,5 +1,6 @@
 package com.mahidol.drugapi.druggroup.dtos.request;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -15,6 +16,9 @@ import java.util.UUID;
 public class AddDrugRequest {
     @NotNull(message = "user id should not be null")
     private UUID userId;
+
+    @NotBlank(message = "device token is mandatory")
+    private String deviceToken;
 
     @NotNull(message = "group id should not be null")
     private UUID groupId;
