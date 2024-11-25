@@ -59,14 +59,16 @@ public class DrugCronSender {
     private List<NotificationMessage> populateNotificationMessages(List<DrugSchedule> drugSchedules) {
         Map<UUID, Drug> drugMap = drugService.searchAllDrugByDrugsId(
                         null,
-                        drugSchedules.stream().map(DrugSchedule::getDrugId).toList()).stream()
-                .filter(Drug::getIsEnable)
-                .collect(Collectors.toMap(Drug::getId, drug -> drug));
+                        drugSchedules.stream()
+                                .filter(DrugSchedule::getIsEnabled)
+                                .map(DrugSchedule::getDrugId).toList()).stream()
+//                .filter(Drug::getIsEnable)
+                                .collect(Collectors.toMap(Drug::getId, drug -> drug));
 
         return drugSchedules.stream().flatMap(ds -> {
             Drug drug = drugMap.get(ds.getDrugId());
             if (drug != null)
-                return Stream.of(new DrugNotificationMessage(ds.getDeviceId(), DrugDTO.fromDrug(drug, Optional.empty())))
+                return Stream.of(new DrugNotificationMessage(ds.getDeviceToken(), DrugDTO.fromDrug(drug, Optional.empty())))
                         .map(notification -> (NotificationMessage) notification);
             else
                 return Stream.empty();

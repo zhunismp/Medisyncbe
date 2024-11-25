@@ -1,5 +1,6 @@
 package com.mahidol.drugapi.drug.dtos.response;
 
+import com.mahidol.drugapi.common.models.Schedule;
 import com.mahidol.drugapi.drug.models.entites.Drug;
 import com.mahidol.drugapi.drug.models.type.MealCondition;
 import lombok.AllArgsConstructor;
@@ -39,11 +40,11 @@ public class DrugDTO {
 
     private MealCondition usageTime;
 
-    private List<LocalTime> schedules;
+    private List<Schedule> schedules;
 
     private Boolean isInternalDrug = false;
 
-    private Boolean isEnable = true;
+//    private Boolean isEnable = true;
 
     public static DrugDTO fromDrug(Drug drug, Optional<String> drugImageUrl) {
         return new DrugDTO()
@@ -58,8 +59,8 @@ public class DrugDTO {
                 .setDose(drug.getDose())
                 .setTakenAmount(drug.getTakenAmount())
                 .setUsageTime(drug.getUsageTime())
-                .setSchedules(drug.getSchedules())
-                .setIsInternalDrug(drug.getIsInternalDrug())
-                .setIsEnable(drug.getIsEnable());
+//                .setSchedules(drug.getSchedules())
+                .setIsInternalDrug(drug.getIsInternalDrug());
+//                .setIsEnable(drug.getIsEnable());
     }
 }
