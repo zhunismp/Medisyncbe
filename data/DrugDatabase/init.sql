@@ -48,6 +48,7 @@ CREATE TABLE APPOINTMENT (
     medic_name TEXT,
     "date" DATE NOT NULL,
     "time" TIME NOT NULL,
+    destination TEXT,
     remark TEXT
 );
 

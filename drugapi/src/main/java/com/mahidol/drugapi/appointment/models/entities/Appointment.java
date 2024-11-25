@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.UUID;
 
 @Entity
@@ -28,10 +30,10 @@ public class Appointment {
     private String medicName;
 
     @Column(name = "date", columnDefinition = "DATE")
-    private String date;
+    private LocalDate date;
 
     @Column(name = "time", columnDefinition = "TIME")
-    private String time;
+    private LocalTime time;
 
     @Column(name = "destination", columnDefinition = "TEXT")
     private String destination;
