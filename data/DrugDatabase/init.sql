@@ -9,9 +9,9 @@ CREATE TABLE DRUG (
     dose FLOAT NOT NULL,
     taken_amount FLOAT,
     usage_time INT NOT NULL,
-    schedule TIME[] NOT NULL,
+--    schedule TIME[] NOT NULL,
     is_internal_drug BOOLEAN NOT NULL,
-    is_enable BOOLEAN NOT NULL
+--    is_enable BOOLEAN NOT NULL
 );
 
 CREATE INDEX idx_drug_user_id ON drug (user_id);
@@ -34,16 +34,16 @@ CREATE TABLE DRUG_GROUP (
     id UUID PRIMARY KEY,
     user_id UUID NOT NULL,
     group_name TEXT NOT NULL,
-    schedule TIME[],
+--    schedule TIME[],
     drug_id UUID[],
-    is_enable BOOLEAN NOT NULL
+--    is_enable BOOLEAN NOT NULL
 );
 
 CREATE INDEX idx_drug_group_user_id ON drug_group (user_id);
 
 CREATE TABLE DRUG_SCHEDULE (
     id UUID PRIMARY KEY,
-    device_id TEXT NOT NULL,
+    device_token TEXT NOT NULL,
     user_id UUID NOT NULL, 
     drug_id UUID NOT NULL,
     schedule_time TIME NOT NULL
@@ -53,7 +53,7 @@ CREATE INDEX idx_drug_schedule_schedule_time ON drug_schedule (schedule_time);
 
 CREATE TABLE DRUG_GROUP_SCHEDULE (
     id UUID PRIMARY KEY,
-    device_id TEXT NOT NULL,
+    device_token TEXT NOT NULL,
     user_id UUID NOT NULL, 
     drug_group_id UUID NOT NULL,
     schedule_time TIME NOT NULL
