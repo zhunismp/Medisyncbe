@@ -156,7 +156,7 @@ public class DrugGroupService {
         return new HashSet<>(validDrugGroupIds).containsAll(drugGroupIds);
     }
 
-    private void SetDrugNotifications(Boolean isEnabled, UUID userId, List<UUID> drugIds, String deviceToken) {
+    private void setDrugNotifications(Boolean isEnabled, UUID userId, List<UUID> drugIds, String deviceToken) {
         List<Drug> drugs = drugService.searchAllDrugByDrugsId(userId, drugIds);
         drugs.forEach(drug -> {
             List<Schedule> drugSchedules = drugScheduleRepository.findByDrugId(drug.getId()).stream()
