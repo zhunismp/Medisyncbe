@@ -58,18 +58,11 @@ public class DrugGroupService {
         DrugGroup group = new DrugGroup()
                 .setUserId(request.getUserId())
                 .setGroupName(request.getGroupName())
-//                .setSchedules(request.getSchedules())
                 .setDrugs(request.getDrugs());
-//                .setIsEnabled(request.getIsEnabled());
 
 
         // disable notification flag for individual drug
         setDrugNotifications(false, group.getUserId(), group.getDrugs(), request.getDeviceToken());
-//        drugService.saveAllDrugs(
-//                request.getUserId(),
-//                drugService.searchAllDrugByDrugsId(request.getUserId(), request.getDrugs()).stream()
-//                        .map(drug -> drug.setIsEnable(false)).toList()
-//        );
         DrugGroup savedGroup = drugGroupRepository.save(group);
         scheduleDrugGroup(savedGroup, request.getSchedules(), request.getDeviceToken());
     }
@@ -104,19 +97,15 @@ public class DrugGroupService {
             // After remove drug from the drug group, we need to set isEnabled to true again
             // This is for make old notification of drug behavior the same as before.
             setDrugNotifications(true, userId, drugIds, deviceToken);
-//            drugService.saveAllDrugs(userId, drugService.searchAllDrugByDrugsId(userId, drugIds).stream()
-//                    .map(drug -> drug.setIsEnable(true)).toList());
 
         drugGroupRepository.deleteById(drugGroupId);
     }
 
     public void addDrugsToGroup(AddDrugRequest request) {
         DrugGroup drugGroup = getDrugGroupByGroupId(request.getUserId(), request.getGroupId());
-//        List<Drug> drugs = drugService.searchAllDrugByDrugsId(request.getUserId(), request.getDrugs()).stream().map(drug -> drug.setIsEnable(false)).toList();
 
         // disable notification flag for individual drug
         setDrugNotifications(false, request.getUserId(), request.getDrugs(), request.getDeviceToken());
-//        drugService.saveAllDrugs(request.getUserId(), drugs.stream().map(d -> d.setIsEnable(false)).toList());
         drugGroupRepository.save(drugGroup.setDrugs(
                 Stream.concat(drugGroup.getDrugs().stream(), request.getDrugs().stream()).collect(Collectors.toList())
         ));

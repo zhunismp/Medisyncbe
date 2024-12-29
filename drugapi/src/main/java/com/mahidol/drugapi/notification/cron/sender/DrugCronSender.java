@@ -62,7 +62,6 @@ public class DrugCronSender {
                         drugSchedules.stream()
                                 .filter(DrugSchedule::getIsEnabled)
                                 .map(DrugSchedule::getDrugId).toList()).stream()
-//                .filter(Drug::getIsEnable)
                                 .collect(Collectors.toMap(Drug::getId, drug -> drug));
 
         return drugSchedules.stream().flatMap(ds -> {

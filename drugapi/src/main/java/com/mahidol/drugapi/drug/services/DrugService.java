@@ -73,9 +73,7 @@ public class DrugService {
                 .setDose(request.getDose())
                 .setTakenAmount(request.getAmount())
                 .setUsageTime(MealCondition.fromValue(request.getUsageTime()))
-//                .setSchedules(request.getSchedules())
                 .setIsInternalDrug(request.getIsInternalDrug())
-//                .setIsEnable(request.getIsEnabled())
         );
 
         scheduledDrug(savedDrug, request.getSchedules(), request.getDeviceToken());
@@ -94,8 +92,6 @@ public class DrugService {
                         .setAmount(request.getAmount().orElse(drug.getAmount()))
                         .setDose(request.getDose().orElse(drug.getDose()))
                         .setUsageTime(request.getUsageTime().map(MealCondition::fromValue).orElse(drug.getUsageTime()))
-//                        .setSchedules(request.getSchedules().orElse(drug.getSchedules()))
-//                        .setIsEnable(request.getIsEnabled().orElse(drug.getIsEnable()))
                 )
                 .orElseThrow(() -> new EntityNotFoundException("Drug id not found with id " + request.getDrugId()));
 
