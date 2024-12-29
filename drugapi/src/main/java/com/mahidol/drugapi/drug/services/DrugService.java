@@ -1,6 +1,7 @@
 package com.mahidol.drugapi.drug.services;
 
 import com.mahidol.drugapi.common.models.Pagination;
+import com.mahidol.drugapi.common.models.Schedule;
 import com.mahidol.drugapi.common.services.PaginationService;
 import com.mahidol.drugapi.drug.dtos.request.CreateDrugRequest;
 import com.mahidol.drugapi.drug.dtos.request.SearchDrugRequest;
@@ -72,12 +73,12 @@ public class DrugService {
                 .setDose(request.getDose())
                 .setTakenAmount(request.getAmount())
                 .setUsageTime(MealCondition.fromValue(request.getUsageTime()))
-                .setSchedules(request.getSchedules())
+//                .setSchedules(request.getSchedules())
                 .setIsInternalDrug(request.getIsInternalDrug())
-                .setIsEnable(request.getIsEnabled())
+//                .setIsEnable(request.getIsEnabled())
         );
 
-        scheduledDrug(savedDrug, request.getDeviceId());
+        scheduledDrug(savedDrug, request.getSchedules(), request.getDeviceToken());
         request.getImage().map(file -> s3Service.uploadFile("medisync-drug", savedDrug.getId().toString(), file));
     }
 
@@ -93,13 +94,13 @@ public class DrugService {
                         .setAmount(request.getAmount().orElse(drug.getAmount()))
                         .setDose(request.getDose().orElse(drug.getDose()))
                         .setUsageTime(request.getUsageTime().map(MealCondition::fromValue).orElse(drug.getUsageTime()))
-                        .setSchedules(request.getSchedules().orElse(drug.getSchedules()))
-                        .setIsEnable(request.getIsEnabled().orElse(drug.getIsEnable()))
+//                        .setSchedules(request.getSchedules().orElse(drug.getSchedules()))
+//                        .setIsEnable(request.getIsEnabled().orElse(drug.getIsEnable()))
                 )
                 .orElseThrow(() -> new EntityNotFoundException("Drug id not found with id " + request.getDrugId()));
 
         drugRepository.save(target);
-        scheduledDrug(target, request.getDeviceId());
+        request.getSchedules().ifPresent(schedules -> scheduledDrug(target, schedules, request.getDeviceToken()));
         request.getImage().map(file -> s3Service.uploadFile("medisync-drug", request.getDrugId().toString(), file));
     }
 
@@ -129,16 +130,17 @@ public class DrugService {
         drugRepository.deleteAllById(drugIds);
     }
 
-    private void scheduledDrug(Drug drug, String deviceId) {
+    public void scheduledDrug(Drug drug, List<Schedule> schedules, String deviceToken) {
         // remove old schedule.
         drugScheduleRepository.deleteAllByDrugId(drug.getId());
 
-        List<DrugSchedule> drugSchedules = drug.getSchedules().stream().map(
-                t -> new DrugSchedule()
+        List<DrugSchedule> drugSchedules = schedules.stream().map(
+                s -> new DrugSchedule()
                         .setDrugId(drug.getId())
-                        .setScheduledTime(t)
+                        .setScheduledTime(s.getTime())
+                        .setIsEnabled(s.getIsEnabled())
                         .setUserId(drug.getUserId())
-                        .setDeviceId(deviceId)
+                        .setDeviceToken(deviceToken)
         ).toList();
 
         drugScheduleRepository.saveAll(drugSchedules);

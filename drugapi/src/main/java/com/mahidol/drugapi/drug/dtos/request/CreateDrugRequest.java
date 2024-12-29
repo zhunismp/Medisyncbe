@@ -1,5 +1,6 @@
 package com.mahidol.drugapi.drug.dtos.request;
 
+import com.mahidol.drugapi.common.models.Schedule;
 import io.vavr.control.Option;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Max;
@@ -22,8 +23,8 @@ public class CreateDrugRequest {
     @NotNull(message = "user id should not be null")
     private UUID userId;
 
-    @NotBlank(message = "device id is mandatory")
-    private String deviceId;
+    @NotBlank(message = "device token is mandatory")
+    private String deviceToken;
 
     private MultipartFile image;
 
@@ -53,11 +54,11 @@ public class CreateDrugRequest {
     private int usageTime;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private List<LocalTime> schedules;
+    private List<Schedule> schedules;
 
     private Boolean isInternalDrug;
 
-    private Boolean isEnabled;
+//    private Boolean isEnabled;
 
     public Option<MultipartFile> getImage() {
         return Option.of(image);

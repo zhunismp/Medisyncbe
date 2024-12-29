@@ -19,12 +19,14 @@ public class DrugSchedule {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    @Column(name = "device_id", columnDefinition = "TEXT")
-    private String deviceId;
+    @Column(name = "device_token", columnDefinition = "TEXT")
+    private String deviceToken;
     @Column(name = "user_id", columnDefinition = "UUID")
     private UUID userId;
     @Column(name = "schedule_time", columnDefinition = "TIME")
     private LocalTime scheduledTime;
+    @Column(name = "is_enabled", columnDefinition = "BOOLEAN")
+    private Boolean isEnabled;
     @Column(name = "drug_id", columnDefinition = "UUID")
     private UUID drugId;
 }

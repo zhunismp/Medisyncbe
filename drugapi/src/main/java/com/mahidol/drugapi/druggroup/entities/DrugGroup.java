@@ -25,12 +25,12 @@ public class DrugGroup {
     @Column(name = "group_name", columnDefinition = "TEXT")
     private String groupName;
 
-    @Column(name = "schedule", columnDefinition = "TIME[]")
-    private List<LocalTime> schedules;
+//    @Column(name = "schedule", columnDefinition = "TIME[]")
+//    private List<LocalTime> schedules;
 
     @Column(name = "drug_id", columnDefinition = "UUID[]")
     private List<UUID> drugs;
 
-    @Column(name = "is_enable", columnDefinition = "BOOLEAN")
-    private Boolean isEnabled;
+//    @Column(name = "is_enable", columnDefinition = "BOOLEAN")
+//    private Boolean isEnabled;
 }
