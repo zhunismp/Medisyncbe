@@ -64,7 +64,7 @@ public class DrugGroupService {
 
 
         // disable notification flag for individual drug
-        SetDrugNotifications(false, group.getUserId(), group.getDrugs(), request.getDeviceToken());
+        setDrugNotifications(false, group.getUserId(), group.getDrugs(), request.getDeviceToken());
 //        drugService.saveAllDrugs(
 //                request.getUserId(),
 //                drugService.searchAllDrugByDrugsId(request.getUserId(), request.getDrugs()).stream()
@@ -103,7 +103,7 @@ public class DrugGroupService {
         else
             // After remove drug from the drug group, we need to set isEnabled to true again
             // This is for make old notification of drug behavior the same as before.
-            SetDrugNotifications(true, userId, drugIds, deviceToken);
+            setDrugNotifications(true, userId, drugIds, deviceToken);
 //            drugService.saveAllDrugs(userId, drugService.searchAllDrugByDrugsId(userId, drugIds).stream()
 //                    .map(drug -> drug.setIsEnable(true)).toList());
 
@@ -115,7 +115,7 @@ public class DrugGroupService {
 //        List<Drug> drugs = drugService.searchAllDrugByDrugsId(request.getUserId(), request.getDrugs()).stream().map(drug -> drug.setIsEnable(false)).toList();
 
         // disable notification flag for individual drug
-        SetDrugNotifications(false, request.getUserId(), request.getDrugs(), request.getDeviceToken());
+        setDrugNotifications(false, request.getUserId(), request.getDrugs(), request.getDeviceToken());
 //        drugService.saveAllDrugs(request.getUserId(), drugs.stream().map(d -> d.setIsEnable(false)).toList());
         drugGroupRepository.save(drugGroup.setDrugs(
                 Stream.concat(drugGroup.getDrugs().stream(), request.getDrugs().stream()).collect(Collectors.toList())
