@@ -41,6 +41,17 @@ CREATE TABLE DRUG_GROUP (
 
 CREATE INDEX idx_drug_group_user_id ON drug_group (user_id);
 
+CREATE TABLE APPOINTMENT (
+    id UUID PRIMARY KEY,
+    user_id UUID NOT NULL,
+    title TEXT NOT NULL,
+    medic_name TEXT,
+    "date" DATE NOT NULL,
+    "time" TIME NOT NULL,
+    destination TEXT,
+    remark TEXT
+);
+
 CREATE TABLE DRUG_SCHEDULE (
     id UUID PRIMARY KEY,
     device_token TEXT NOT NULL,

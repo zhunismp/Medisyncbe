@@ -60,9 +60,9 @@ public class DrugGroupService {
                 .setGroupName(request.getGroupName())
                 .setDrugs(request.getDrugs());
 
-
         // disable notification flag for individual drug
         setDrugNotifications(false, group.getUserId(), group.getDrugs(), request.getDeviceToken());
+
         DrugGroup savedGroup = drugGroupRepository.save(group);
         scheduleDrugGroup(savedGroup, request.getSchedules(), request.getDeviceToken());
     }
@@ -106,6 +106,7 @@ public class DrugGroupService {
 
         // disable notification flag for individual drug
         setDrugNotifications(false, request.getUserId(), request.getDrugs(), request.getDeviceToken());
+
         drugGroupRepository.save(drugGroup.setDrugs(
                 Stream.concat(drugGroup.getDrugs().stream(), request.getDrugs().stream()).collect(Collectors.toList())
         ));
