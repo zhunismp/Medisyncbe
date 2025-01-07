@@ -53,8 +53,6 @@ public class UpdateDrugRequest {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private List<Schedule> schedules;
 
-//    private Boolean isEnabled;
-
     public Option<MultipartFile> getImage() {
         return Option.of(image);
     }
@@ -90,9 +88,4 @@ public class UpdateDrugRequest {
     public Optional<List<Schedule>> getSchedules() {
         return Optional.ofNullable(schedules);
     }
-
-//    public Optional<Boolean> getIsEnabled() {
-//        return Optional.ofNullable(isEnabled);
-//    }
-
 }

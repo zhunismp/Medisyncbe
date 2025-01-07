@@ -62,8 +62,7 @@ public class DrugGroupCronSender {
                         schedules.stream()
                                 .filter(DrugGroupSchedule::getIsEnabled)
                                 .map(DrugGroupSchedule::getDrugGroupId).toList()).stream()
-//                .filter(DrugGroupDTO::getIsEnabled)
-                .collect(Collectors.toMap(DrugGroupDTO::getId, drugGroupDTO -> drugGroupDTO));
+                                .collect(Collectors.toMap(DrugGroupDTO::getId, drugGroupDTO -> drugGroupDTO));
 
         return schedules.stream().flatMap(s -> {
             DrugGroupDTO drugGroupDTO = drugGroupMap.get(s.getDrugGroupId());

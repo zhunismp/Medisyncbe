@@ -30,17 +30,7 @@ public class DrugGroupDTO {
 
     private List<Drug> drugs;
 
-//    private Boolean isEnabled;
-
     public static DrugGroupDTO fromDrugGroup(DrugGroup drugGroup, Function<List<UUID>, List<Drug>> populateDrugs) {
-//        return new DrugGroupDTO(
-//                drugGroup.getId(),
-//                drugGroup.getUserId(),
-//                drugGroup.getGroupName(),
-//                drugGroup.getSchedules(),
-//                populateDrugs.apply(drugGroup.getDrugs()),
-//                drugGroup.getIsEnabled()
-//        );
         return  new DrugGroupDTO()
                 .setId(drugGroup.getId())
                 .setUserId(drugGroup.getUserId())

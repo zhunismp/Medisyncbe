@@ -58,8 +58,6 @@ public class CreateDrugRequest {
 
     private Boolean isInternalDrug;
 
-//    private Boolean isEnabled;
-
     public Option<MultipartFile> getImage() {
         return Option.of(image);
     }

@@ -47,12 +47,6 @@ public class Drug {
     @Column(name = "usage_time", columnDefinition = "INT")
     private MealCondition usageTime;
 
-//    @Column(name = "schedule", columnDefinition = "TIME[]")
-//    private List<LocalTime> schedules;
-
     @Column(name = "is_internal_drug", columnDefinition = "BOOLEAN")
     private Boolean isInternalDrug = false;
-
-//    @Column(name = "is_enable", columnDefinition = "BOOLEAN")
-//    private Boolean isEnable = true;
 }

@@ -58,18 +58,11 @@ public class DrugGroupService {
         DrugGroup group = new DrugGroup()
                 .setUserId(request.getUserId())
                 .setGroupName(request.getGroupName())
-//                .setSchedules(request.getSchedules())
                 .setDrugs(request.getDrugs());
-//                .setIsEnabled(request.getIsEnabled());
-
 
         // disable notification flag for individual drug
-        SetDrugNotifications(false, group.getUserId(), group.getDrugs(), request.getDeviceToken());
-//        drugService.saveAllDrugs(
-//                request.getUserId(),
-//                drugService.searchAllDrugByDrugsId(request.getUserId(), request.getDrugs()).stream()
-//                        .map(drug -> drug.setIsEnable(false)).toList()
-//        );
+        setDrugNotifications(false, group.getUserId(), group.getDrugs(), request.getDeviceToken());
+
         DrugGroup savedGroup = drugGroupRepository.save(group);
         scheduleDrugGroup(savedGroup, request.getSchedules(), request.getDeviceToken());
     }
@@ -103,20 +96,17 @@ public class DrugGroupService {
         else
             // After remove drug from the drug group, we need to set isEnabled to true again
             // This is for make old notification of drug behavior the same as before.
-            SetDrugNotifications(true, userId, drugIds, deviceToken);
-//            drugService.saveAllDrugs(userId, drugService.searchAllDrugByDrugsId(userId, drugIds).stream()
-//                    .map(drug -> drug.setIsEnable(true)).toList());
+            setDrugNotifications(true, userId, drugIds, deviceToken);
 
         drugGroupRepository.deleteById(drugGroupId);
     }
 
     public void addDrugsToGroup(AddDrugRequest request) {
         DrugGroup drugGroup = getDrugGroupByGroupId(request.getUserId(), request.getGroupId());
-//        List<Drug> drugs = drugService.searchAllDrugByDrugsId(request.getUserId(), request.getDrugs()).stream().map(drug -> drug.setIsEnable(false)).toList();
 
         // disable notification flag for individual drug
-        SetDrugNotifications(false, request.getUserId(), request.getDrugs(), request.getDeviceToken());
-//        drugService.saveAllDrugs(request.getUserId(), drugs.stream().map(d -> d.setIsEnable(false)).toList());
+        setDrugNotifications(false, request.getUserId(), request.getDrugs(), request.getDeviceToken());
+
         drugGroupRepository.save(drugGroup.setDrugs(
                 Stream.concat(drugGroup.getDrugs().stream(), request.getDrugs().stream()).collect(Collectors.toList())
         ));

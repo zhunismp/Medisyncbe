@@ -44,8 +44,6 @@ public class DrugDTO {
 
     private Boolean isInternalDrug = false;
 
-//    private Boolean isEnable = true;
-
     public static DrugDTO fromDrug(Drug drug, Optional<String> drugImageUrl) {
         return new DrugDTO()
                 .setId(drug.getId())
@@ -59,8 +57,6 @@ public class DrugDTO {
                 .setDose(drug.getDose())
                 .setTakenAmount(drug.getTakenAmount())
                 .setUsageTime(drug.getUsageTime())
-//                .setSchedules(drug.getSchedules())
                 .setIsInternalDrug(drug.getIsInternalDrug());
-//                .setIsEnable(drug.getIsEnable());
     }
 }
