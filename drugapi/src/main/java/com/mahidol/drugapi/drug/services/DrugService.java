@@ -51,8 +51,8 @@ public class DrugService {
                 .map(gname -> drug.getGenericName().contains(gname)).orElse(true)).toList();
 
         List<DrugDTO> response = filteredDrugs.stream().map(drug -> {
-            Optional<String> drugImageUrl = s3Service.getUrl("medisync-drug", drug.getId().toString());
-            return DrugDTO.fromDrug(drug, drugImageUrl);
+//            Optional<String> drugImageUrl = s3Service.getUrl("medisync-drug", drug.getId().toString());
+            return DrugDTO.fromDrug(drug, Optional.empty());
         }).toList();
 
         return new SearchDrugResponse(applyPaginate(response, request.getPagination()), filteredDrugs.size());
