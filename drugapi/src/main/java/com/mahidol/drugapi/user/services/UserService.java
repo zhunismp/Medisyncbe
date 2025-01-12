@@ -52,12 +52,12 @@ public class UserService {
         return savedUser.getId().toString();
     }
 
-    public GetUserResponse getUser(UUID userId) {
-        return userRepository.findById(userId).map(user -> {
-                    Optional<String> url = s3Service.getUrl("medisync-user-profile", userId.toString());
+    public GetUserResponse getUser() {
+        return userRepository.findById(userContext.getUserId()).map(user -> {
+                    Optional<String> url = s3Service.getUrl("medisync-user-profile", userContext.getUserId().toString());
                     return GetUserResponse.fromUser(user, url);
                 })
-                .orElseThrow(() -> new EntityNotFoundException("User id not found with id: " + userId));
+                .orElseThrow(() -> new EntityNotFoundException("User id not found with id: " + userContext.getUserId()));
     }
 
     public void updateUser(UpdateUserRequest request) {

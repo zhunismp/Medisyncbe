@@ -104,9 +104,9 @@ public class DrugService {
         request.getImage().map(file -> s3Service.uploadFile("medisync-drug", request.getDrugId().toString(), file));
     }
 
-    public void remove(UUID userId, UUID drugId) {
+    public void remove(UUID drugId) {
         drugScheduleRepository.deleteAllByDrugId(drugId);
-        deleteAllByDrugIds(userId, List.of(drugId));
+        deleteAllByDrugIds(userContext.getUserId(), List.of(drugId));
     }
 
     public List<Drug> searchAllDrugByDrugsId(UUID userId, List<UUID> drugIds) {

@@ -51,8 +51,8 @@ public class DrugController {
     }
 
     @DeleteMapping("/drugs")
-    public ResponseEntity<?> remove(@RequestParam UUID userId, @RequestParam UUID drugId) {
-        drugService.remove(userId, drugId);
+    public ResponseEntity<?> remove(@RequestParam UUID drugId) {
+        drugService.remove(drugId);
         return new ResponseEntity<>(Map.of("drugId", drugId), HttpStatus.ACCEPTED);
     }
 

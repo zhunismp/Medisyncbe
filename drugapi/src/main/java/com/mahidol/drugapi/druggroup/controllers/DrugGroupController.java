@@ -49,14 +49,10 @@ public class DrugGroupController {
             UUID drugGroupId,
 
             @RequestParam
-            @NotNull(message = "User id should not be null")
-            UUID userId,
-
-            @RequestParam
             @NotNull(message = "isRemoveDrug flag should not be null")
             Boolean isRemoveDrug
     ) {
-        drugGroupService.remove(drugGroupId, userId, isRemoveDrug);
+        drugGroupService.remove(drugGroupId, isRemoveDrug);
         return new ResponseEntity<>(Map.of("drugGroupId", drugGroupId), HttpStatus.OK);
     }
 

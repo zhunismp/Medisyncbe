@@ -92,15 +92,15 @@ public class DrugGroupService {
     }
 
 
-    public void remove(UUID drugGroupId, UUID userId, String deviceToken, Boolean isRemoveDrug) {
-        List<UUID> drugIds = getDrugGroupByGroupId(userId, drugGroupId).getDrugs();
+    public void remove(UUID drugGroupId, Boolean isRemoveDrug) {
+        List<UUID> drugIds = getDrugGroupByGroupId(userContext.getUserId(), drugGroupId).getDrugs();
 
         if (isRemoveDrug)
-            drugService.deleteAllByDrugIds(userId, drugIds);
-        else
+            drugService.deleteAllByDrugIds(userContext.getUserId(), drugIds);
+//        else
             // After remove drug from the drug group, we need to set isEnabled to true again
             // This is for make old notification of drug behavior the same as before.
-            setDrugNotifications(true, userId, drugIds, deviceToken);
+//            setDrugNotifications(true, userId, drugIds, deviceToken);
 
         drugGroupRepository.deleteById(drugGroupId);
     }
