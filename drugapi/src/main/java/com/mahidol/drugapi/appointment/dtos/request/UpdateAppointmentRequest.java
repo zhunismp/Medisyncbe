@@ -18,8 +18,6 @@ import java.util.UUID;
 public class UpdateAppointmentRequest {
     @NotNull(message = "appointment id should not be null")
     private UUID appointmentId;
-    @NotNull(message = "user id should not be null")
-    private UUID userId;
     private String title;
     private String medicName;
     private LocalDate date;

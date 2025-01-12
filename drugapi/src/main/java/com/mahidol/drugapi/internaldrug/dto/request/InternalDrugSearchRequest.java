@@ -15,8 +15,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Data
 public class InternalDrugSearchRequest {
-    @NotNull(message = "user id should not be null")
-    private UUID userId;
+
     private Pagination pagination;
     @NotBlank(message = "generic name should not be null")
     private String genericName;

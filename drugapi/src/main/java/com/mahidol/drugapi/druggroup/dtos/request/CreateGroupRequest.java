@@ -17,11 +17,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @Data
 public class CreateGroupRequest {
-    @NotNull(message = "user id should not be null")
-    private UUID userId;
-
-    @NotBlank(message = "device token is mandatory")
-    private String deviceToken;
 
     @NotBlank(message = "group name should not be null")
     private String groupName;

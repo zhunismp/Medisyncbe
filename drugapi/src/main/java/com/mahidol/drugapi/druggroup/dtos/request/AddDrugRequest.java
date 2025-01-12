@@ -14,11 +14,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @Data
 public class AddDrugRequest {
-    @NotNull(message = "user id should not be null")
-    private UUID userId;
-
-    @NotBlank(message = "device token is mandatory")
-    private String deviceToken;
 
     @NotNull(message = "group id should not be null")
     private UUID groupId;

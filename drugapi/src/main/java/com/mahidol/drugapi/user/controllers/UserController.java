@@ -34,8 +34,8 @@ public class UserController {
 
     // TODO: Find proper way to handle error and validation
     @GetMapping("/users")
-    public ResponseEntity<?> getUser(@RequestParam UUID userId) {
-        GetUserResponse response = userService.getUser(userId);
+    public ResponseEntity<?> getUser() {
+        GetUserResponse response = userService.getUser();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

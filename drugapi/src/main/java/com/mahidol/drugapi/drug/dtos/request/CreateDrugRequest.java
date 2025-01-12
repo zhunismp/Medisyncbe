@@ -12,19 +12,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalTime;
 import java.util.List;
-import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 public class CreateDrugRequest {
-    @NotNull(message = "user id should not be null")
-    private UUID userId;
-
-    @NotBlank(message = "device token is mandatory")
-    private String deviceToken;
 
     private MultipartFile image;
 
