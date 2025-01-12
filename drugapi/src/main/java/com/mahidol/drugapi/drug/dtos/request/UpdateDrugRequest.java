@@ -21,11 +21,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @Data
 public class UpdateDrugRequest {
-    @NotNull(message = "user id should not be null")
-    private UUID userId;
-
-    @NotBlank(message = "device token is mandatory")
-    private String deviceToken;
 
     private MultipartFile image;
 
