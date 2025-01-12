@@ -15,8 +15,6 @@ import java.util.UUID;
 @Accessors(chain = true)
 @Data
 public class SearchAppointmentRequest {
-    @NotNull(message = "user id should not be null")
-    private UUID userId;
     private LocalDate date;
     private String title;
 

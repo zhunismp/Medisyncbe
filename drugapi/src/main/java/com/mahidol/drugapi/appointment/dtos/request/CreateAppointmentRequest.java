@@ -16,8 +16,6 @@ import java.util.UUID;
 @Accessors(chain = true)
 @Data
 public class CreateAppointmentRequest {
-    @NotNull(message = "user id should not be null")
-    private UUID userId;
     @NotBlank(message = "title is mandatory")
     private String title;
     private String medicName;
