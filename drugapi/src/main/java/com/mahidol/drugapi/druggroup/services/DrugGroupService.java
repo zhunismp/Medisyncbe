@@ -3,6 +3,7 @@ package com.mahidol.drugapi.druggroup.services;
 import com.mahidol.drugapi.common.models.Pagination;
 import com.mahidol.drugapi.common.models.Schedule;
 import com.mahidol.drugapi.common.services.PaginationService;
+import com.mahidol.drugapi.ctx.UserContext;
 import com.mahidol.drugapi.drug.models.entites.Drug;
 import com.mahidol.drugapi.drug.services.DrugService;
 import com.mahidol.drugapi.druggroup.dtos.request.AddDrugRequest;
@@ -31,23 +32,26 @@ public class DrugGroupService {
     private final DrugScheduleRepository drugScheduleRepository;
     private final DrugService drugService;
     private final PaginationService<DrugGroupDTO> paginationService;
+    private final UserContext userContext;
 
     public DrugGroupService(
             DrugGroupRepository drugGroupRepository,
             DrugGroupScheduleRepository drugGroupScheduleRepository,
             DrugScheduleRepository drugScheduleRepository,
             DrugService drugService,
-            PaginationService<DrugGroupDTO> paginationService
+            PaginationService<DrugGroupDTO> paginationService,
+            UserContext userContext
     ) {
         this.drugGroupRepository = drugGroupRepository;
         this.drugGroupScheduleRepository = drugGroupScheduleRepository;
         this.drugScheduleRepository = drugScheduleRepository;
         this.drugService = drugService;
         this.paginationService = paginationService;
+        this.userContext = userContext;
     }
 
     public void create(CreateGroupRequest request) {
-        boolean groupNameExists = drugGroupRepository.findByUserId(request.getUserId())
+        boolean groupNameExists = drugGroupRepository.findByUserId(userContext.getUserId())
                 .stream()
                 .map(DrugGroup::getGroupName)
                 .anyMatch(name -> name.equalsIgnoreCase(request.getGroupName()));
@@ -56,21 +60,21 @@ public class DrugGroupService {
             throw new IllegalArgumentException("Group name already exists, please use another name");
 
         DrugGroup group = new DrugGroup()
-                .setUserId(request.getUserId())
+                .setUserId(userContext.getUserId())
                 .setGroupName(request.getGroupName())
                 .setDrugs(request.getDrugs());
 
         // disable notification flag for individual drug
-        setDrugNotifications(false, group.getUserId(), group.getDrugs(), request.getDeviceToken());
+//        setDrugNotifications(false, group.getUserId(), group.getDrugs(), request.getDeviceToken());
 
         DrugGroup savedGroup = drugGroupRepository.save(group);
-        scheduleDrugGroup(savedGroup, request.getSchedules(), request.getDeviceToken());
+//        scheduleDrugGroup(savedGroup, request.getSchedules(), request.getDeviceToken());
     }
 
     public SearchGroupResponse search(SearchGroupRequest request) {
-        List<DrugGroup> drugGroups = drugGroupRepository.findByUserId(request.getUserId());
+        List<DrugGroup> drugGroups = drugGroupRepository.findByUserId(userContext.getUserId());
         List<DrugGroupDTO> drugGroupWithDrugInfos = drugGroups.stream()
-                .map(drugGroup -> DrugGroupDTO.fromDrugGroup(drugGroup, drugsId -> drugService.searchAllDrugByDrugsId(request.getUserId(), drugsId)))
+                .map(drugGroup -> DrugGroupDTO.fromDrugGroup(drugGroup, drugsId -> drugService.searchAllDrugByDrugsId(userContext.getUserId(), drugsId)))
                 .toList();
 
         return new SearchGroupResponse(
@@ -102,10 +106,10 @@ public class DrugGroupService {
     }
 
     public void addDrugsToGroup(AddDrugRequest request) {
-        DrugGroup drugGroup = getDrugGroupByGroupId(request.getUserId(), request.getGroupId());
+        DrugGroup drugGroup = getDrugGroupByGroupId(userContext.getUserId(), request.getGroupId());
 
         // disable notification flag for individual drug
-        setDrugNotifications(false, request.getUserId(), request.getDrugs(), request.getDeviceToken());
+//        setDrugNotifications(false, request.getUserId(), request.getDrugs(), request.getDeviceToken());
 
         drugGroupRepository.save(drugGroup.setDrugs(
                 Stream.concat(drugGroup.getDrugs().stream(), request.getDrugs().stream()).collect(Collectors.toList())

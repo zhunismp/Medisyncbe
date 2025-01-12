@@ -3,6 +3,7 @@ package com.mahidol.drugapi.drug.services;
 import com.mahidol.drugapi.common.models.Pagination;
 import com.mahidol.drugapi.common.models.Schedule;
 import com.mahidol.drugapi.common.services.PaginationService;
+import com.mahidol.drugapi.ctx.UserContext;
 import com.mahidol.drugapi.drug.dtos.request.CreateDrugRequest;
 import com.mahidol.drugapi.drug.dtos.request.SearchDrugRequest;
 import com.mahidol.drugapi.drug.dtos.request.UpdateDrugRequest;
@@ -25,22 +26,25 @@ public class DrugService {
     private final DrugRepository drugRepository;
     private final DrugScheduleRepository drugScheduleRepository;
     private final PaginationService<DrugDTO> paginationService;
+    private final UserContext userContext;
     private final S3Service s3Service;
 
     public DrugService(
             DrugRepository drugRepository,
             DrugScheduleRepository drugScheduleRepository,
             PaginationService<DrugDTO> paginationService,
+            UserContext userContext,
             S3Service s3Service
     ) {
         this.drugRepository = drugRepository;
         this.drugScheduleRepository = drugScheduleRepository;
         this.paginationService = paginationService;
+        this.userContext = userContext;
         this.s3Service = s3Service;
     }
 
     public SearchDrugResponse search(SearchDrugRequest request) {
-        List<Drug> userDrugs = searchDrugByUserId(request.getUserId());
+        List<Drug> userDrugs = searchDrugByUserId(userContext.getUserId());
 
         // TODO: Add applyFilter method
         List<Drug> filteredDrugs = userDrugs.stream().filter(drug -> request.getGenericName()
@@ -55,7 +59,7 @@ public class DrugService {
     }
 
     public void add(CreateDrugRequest request) {
-        boolean isDrugExists = searchDrugByUserId(request.getUserId())
+        boolean isDrugExists = searchDrugByUserId(userContext.getUserId())
                 .stream()
                 .map(Drug::getGenericName)
                 .anyMatch(name -> name.equalsIgnoreCase(request.getGenericName()));
@@ -64,7 +68,7 @@ public class DrugService {
             throw new IllegalArgumentException("Drug name already exists, please use another name");
 
         Drug savedDrug = drugRepository.save(new Drug()
-                .setUserId(request.getUserId())
+                .setUserId(userContext.getUserId())
                 .setGenericName(request.getGenericName())
                 .setDosageForm(request.getDosageForm())
                 .setUnit(request.getUnit())
@@ -76,12 +80,12 @@ public class DrugService {
                 .setIsInternalDrug(request.getIsInternalDrug())
         );
 
-        scheduledDrug(savedDrug, request.getSchedules(), request.getDeviceToken());
+//        scheduledDrug(savedDrug, request.getSchedules(), userContext.getDeviceToken());
         request.getImage().map(file -> s3Service.uploadFile("medisync-drug", savedDrug.getId().toString(), file));
     }
 
     public void update(UpdateDrugRequest request) {
-        if (!validateOwner(request.getUserId(), List.of(request.getDrugId())))
+        if (!validateOwner(userContext.getUserId(), List.of(request.getDrugId())))
             throw new IllegalArgumentException("User is not the owner of requested drug.");
 
         Drug target = drugRepository.findById(request.getDrugId())
@@ -96,7 +100,7 @@ public class DrugService {
                 .orElseThrow(() -> new EntityNotFoundException("Drug id not found with id " + request.getDrugId()));
 
         drugRepository.save(target);
-        request.getSchedules().ifPresent(schedules -> scheduledDrug(target, schedules, request.getDeviceToken()));
+//        request.getSchedules().ifPresent(schedules -> scheduledDrug(target, schedules, request.getDeviceToken()));
         request.getImage().map(file -> s3Service.uploadFile("medisync-drug", request.getDrugId().toString(), file));
     }
 

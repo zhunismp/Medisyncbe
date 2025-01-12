@@ -8,6 +8,7 @@ import com.mahidol.drugapi.appointment.dtos.response.SearchAppointmentResponse;
 import com.mahidol.drugapi.appointment.models.entities.Appointment;
 import com.mahidol.drugapi.appointment.repositories.AppointmentRepository;
 import com.mahidol.drugapi.appointment.services.AppointmentService;
+import com.mahidol.drugapi.ctx.UserContext;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -15,14 +16,16 @@ import java.util.*;
 @Service
 public class AppointmentServiceImpl implements AppointmentService {
     private final AppointmentRepository appointmentRepository;
+    private final UserContext userContext;
 
-    public AppointmentServiceImpl(AppointmentRepository appointmentRepository) {
+    public AppointmentServiceImpl(AppointmentRepository appointmentRepository, UserContext userContext) {
         this.appointmentRepository = appointmentRepository;
+        this.userContext = userContext;
     }
     @Override
     public SearchAppointmentResponse searchAppointment(SearchAppointmentRequest request) {
         boolean isFilter = request.getDate().isPresent() || request.getTitle().isPresent();
-        List<Appointment> allAppointments = appointmentRepository.findByUserId(request.getUserId());
+        List<Appointment> allAppointments = appointmentRepository.findByUserId(userContext.getUserId());
         List<Appointment> filteredAppointment = allAppointments;
 
         if (isFilter) {
@@ -49,7 +52,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public void createAppointment(CreateAppointmentRequest request) {
         Appointment target = new Appointment()
-                .setUserId(request.getUserId())
+                .setUserId(userContext.getUserId())
                 .setTitle(request.getTitle())
                 .setMedicName(request.getMedicName())
                 .setDate(request.getDate())
@@ -74,7 +77,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     public void updateAppointment(UpdateAppointmentRequest request) {
         if (!appointmentRepository.existsById(request.getAppointmentId()))
             throw new IllegalArgumentException("Appointment id: " + request.getAppointmentId() + " doesn't exists");
-        if (!validateOwner(request.getUserId(), request.getAppointmentId()))
+        if (!validateOwner(userContext.getUserId(), request.getAppointmentId()))
             throw new IllegalArgumentException("User is not the owner of the appointment");
 
         Appointment target = appointmentRepository.findById(request.getAppointmentId()).get();

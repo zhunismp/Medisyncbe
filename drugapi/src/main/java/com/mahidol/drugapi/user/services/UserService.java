@@ -1,6 +1,7 @@
 package com.mahidol.drugapi.user.services;
 
 import com.mahidol.drugapi.common.utils.StringUtil;
+import com.mahidol.drugapi.ctx.UserContext;
 import com.mahidol.drugapi.external.aws.s3.S3Service;
 import com.mahidol.drugapi.user.dtos.requests.CreateUserRequest;
 import com.mahidol.drugapi.user.dtos.requests.UpdateUserRequest;
@@ -19,10 +20,16 @@ import java.util.UUID;
 public class UserService {
     private final UserRepository userRepository;
     private final S3Service s3Service;
+    private final UserContext userContext;
 
-    public UserService(UserRepository userRepository, S3Service s3Service) {
+    public UserService(
+            UserRepository userRepository,
+            S3Service s3Service,
+            UserContext userContext
+    ) {
         this.userRepository = userRepository;
         this.s3Service = s3Service;
+        this.userContext = userContext;
     }
 
     public String createUser(CreateUserRequest request) {
@@ -54,7 +61,7 @@ public class UserService {
     }
 
     public void updateUser(UpdateUserRequest request) {
-        userRepository.findById(request.getUserId()).map(user ->
+        userRepository.findById(userContext.getUserId()).map(user ->
                 userRepository.save(
                         user
                                 .setFirstName(request.getFirstName().orElse(user.getFirstName()))
@@ -69,6 +76,6 @@ public class UserService {
                                 .setFoodAllergy(request.getFoodAllergy().map(StringUtil::arrayToString).orElse(user.getDrugAllergy()))
                 ));
 
-        request.getProfileImage().map(file -> s3Service.uploadFile("medisync-user-profile", request.getUserId().toString(), file));
+        request.getProfileImage().map(file -> s3Service.uploadFile("medisync-user-profile", userContext.getUserId().toString(), file));
     }
 }

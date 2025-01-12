@@ -16,8 +16,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateUserRequest {
-    @NotNull(message = "user id should not be null")
-    private UUID userId;
     private MultipartFile profileImage;
     private String firstName;
     private String lastName;
