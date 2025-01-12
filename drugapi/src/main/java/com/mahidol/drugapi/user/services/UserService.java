@@ -1,7 +1,7 @@
 package com.mahidol.drugapi.user.services;
 
 import com.mahidol.drugapi.common.utils.StringUtil;
-import com.mahidol.drugapi.ctx.UserContext;
+import com.mahidol.drugapi.common.ctx.UserContext;
 import com.mahidol.drugapi.external.aws.s3.S3Service;
 import com.mahidol.drugapi.user.dtos.requests.CreateUserRequest;
 import com.mahidol.drugapi.user.dtos.requests.UpdateUserRequest;
@@ -14,7 +14,6 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class UserService {

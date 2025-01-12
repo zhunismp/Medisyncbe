@@ -8,7 +8,7 @@ import com.mahidol.drugapi.appointment.dtos.response.SearchAppointmentResponse;
 import com.mahidol.drugapi.appointment.models.entities.Appointment;
 import com.mahidol.drugapi.appointment.repositories.AppointmentRepository;
 import com.mahidol.drugapi.appointment.services.AppointmentService;
-import com.mahidol.drugapi.ctx.UserContext;
+import com.mahidol.drugapi.common.ctx.UserContext;
 import org.springframework.stereotype.Service;
 
 import java.util.*;

@@ -3,7 +3,7 @@ package com.mahidol.drugapi.druggroup.services;
 import com.mahidol.drugapi.common.models.Pagination;
 import com.mahidol.drugapi.common.models.Schedule;
 import com.mahidol.drugapi.common.services.PaginationService;
-import com.mahidol.drugapi.ctx.UserContext;
+import com.mahidol.drugapi.common.ctx.UserContext;
 import com.mahidol.drugapi.drug.models.entites.Drug;
 import com.mahidol.drugapi.drug.services.DrugService;
 import com.mahidol.drugapi.druggroup.dtos.request.AddDrugRequest;
@@ -17,8 +17,6 @@ import com.mahidol.drugapi.notification.models.druggroup.DrugGroupSchedule;
 import com.mahidol.drugapi.notification.repositories.DrugGroupScheduleRepository;
 import com.mahidol.drugapi.notification.repositories.DrugScheduleRepository;
 import jakarta.persistence.EntityNotFoundException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.*;

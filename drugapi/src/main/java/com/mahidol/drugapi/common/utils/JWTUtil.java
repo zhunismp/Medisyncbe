@@ -1,13 +1,8 @@
-package com.mahidol.drugapi.auth.utils;
+package com.mahidol.drugapi.common.utils;
 
-import com.mahidol.drugapi.notification.cron.sender.DrugCronSender;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
-import java.util.function.Function;
 
 @Component
 public class JWTUtil {

@@ -1,7 +1,6 @@
-package com.mahidol.drugapi.config;
+package com.mahidol.drugapi.common.configurations;
 
-import com.google.cloud.storage.HttpMethod;
-import com.mahidol.drugapi.auth.filter.JWTFilter;
+import com.mahidol.drugapi.common.middleware.JWTFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

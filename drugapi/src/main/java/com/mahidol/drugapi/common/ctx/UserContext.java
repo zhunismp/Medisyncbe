@@ -1,4 +1,4 @@
-package com.mahidol.drugapi.ctx;
+package com.mahidol.drugapi.common.ctx;
 
 import lombok.Data;
 import org.springframework.stereotype.Component;

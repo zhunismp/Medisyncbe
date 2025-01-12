@@ -1,7 +1,7 @@
-package com.mahidol.drugapi.auth.filter;
+package com.mahidol.drugapi.common.middleware;
 
-import com.mahidol.drugapi.auth.utils.JWTUtil;
-import com.mahidol.drugapi.ctx.UserContext;
+import com.mahidol.drugapi.common.utils.JWTUtil;
+import com.mahidol.drugapi.common.ctx.UserContext;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

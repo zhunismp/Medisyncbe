@@ -3,7 +3,7 @@ package com.mahidol.drugapi.drug.services;
 import com.mahidol.drugapi.common.models.Pagination;
 import com.mahidol.drugapi.common.models.Schedule;
 import com.mahidol.drugapi.common.services.PaginationService;
-import com.mahidol.drugapi.ctx.UserContext;
+import com.mahidol.drugapi.common.ctx.UserContext;
 import com.mahidol.drugapi.drug.dtos.request.CreateDrugRequest;
 import com.mahidol.drugapi.drug.dtos.request.SearchDrugRequest;
 import com.mahidol.drugapi.drug.dtos.request.UpdateDrugRequest;
