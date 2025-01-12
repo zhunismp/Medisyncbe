@@ -2,12 +2,14 @@ package com.mahidol.drugapi.common.utils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class JWTUtil {
 
-    private final String SECRET_KEY = "b63b08b8e7a911b5d63e8fd15e64c79fa4570389c7d9d9f156120eb3a2182b68";
+    @Value("${jwt.secret}")
+    private String SECRET_KEY;
 
     public String extractClaim(String token, String claimName) {
         Claims claims = extractAllClaims(token);
