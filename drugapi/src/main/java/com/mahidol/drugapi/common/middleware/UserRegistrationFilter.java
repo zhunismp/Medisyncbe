@@ -42,12 +42,13 @@ public class UserRegistrationFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.split(" ")[1].trim();
             UUID userId = UUID.fromString(jwtUtil.extractClaim(token, "userId"));
-            logger.info("user id: " + userId);
 
             if (!userService.isExists(userId)) {
+                String errorResp = "{\"errorMessage\": \"User not registered\"}";
+
+                response.setContentType("application/json");
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                logger.error("user not exists with id: " + userId);
-                response.getWriter().write("Forbidden: User not registered");
+                response.getWriter().write(errorResp);
                 return;
             }
         }
