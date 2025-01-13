@@ -14,6 +14,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -31,8 +32,15 @@ public class UserService {
         this.userContext = userContext;
     }
 
-    public String createUser(CreateUserRequest request) {
+    public Boolean isExists(UUID userId) {
+        return userRepository.existsById(userId);
+    }
+
+    public void createUser(CreateUserRequest request) {
+        if (userRepository.existsById(userContext.getUserId())) throw new IllegalArgumentException("User already exists.");
+
         User savedUser = userRepository.save(new User()
+                .setId(userContext.getUserId())
                 .setFirstName(request.getFirstName())
                 .setLastName(request.getLastName().orElse(null))
                 .setBirthDate(request.getBirthDate())
@@ -47,8 +55,6 @@ public class UserService {
 
         // Upload user profile to s3 bucket
         request.getProfileImage().map(file -> s3Service.uploadFile("medisync-user-profile", savedUser.getId().toString(), file));
-
-        return savedUser.getId().toString();
     }
 
     public GetUserResponse getUser() {
@@ -73,7 +79,8 @@ public class UserService {
                                 .setHealthCondition(request.getHealthCondition().map(StringUtil::arrayToString).orElse(user.getHealthCondition()))
                                 .setDrugAllergy(request.getDrugAllergy().map(StringUtil::arrayToString).orElse(user.getDrugAllergy()))
                                 .setFoodAllergy(request.getFoodAllergy().map(StringUtil::arrayToString).orElse(user.getDrugAllergy()))
-                ));
+                )
+        ).orElseThrow(() -> new EntityNotFoundException("User id does not exists."));
 
         request.getProfileImage().map(file -> s3Service.uploadFile("medisync-user-profile", userContext.getUserId().toString(), file));
     }

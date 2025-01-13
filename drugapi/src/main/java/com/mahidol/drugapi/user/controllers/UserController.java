@@ -28,8 +28,8 @@ public class UserController {
     public ResponseEntity<?> createUser(@ModelAttribute @Valid CreateUserRequest request, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) throw new BindingError(bindingResult.getFieldErrors());
 
-        String response = userService.createUser(request);
-        return new ResponseEntity<>(Map.of("userId", response), HttpStatus.CREATED);
+        userService.createUser(request);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     // TODO: Find proper way to handle error and validation
