@@ -48,6 +48,9 @@ dependencies {
     // Firebase
     implementation 'com.google.firebase:firebase-admin:9.4.1'
 
+    // Google
+    implementation 'com.google.api-client:google-api-client:2.7.1'
+
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor 'org.projectlombok:lombok'
