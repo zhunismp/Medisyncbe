@@ -45,4 +45,9 @@ public class UserController {
         userService.updateUser(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @PostMapping("/users/setup")
+    public ResponseEntity<?> setUp(@RequestParam("fcm") String FCMToken) {
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
 }
