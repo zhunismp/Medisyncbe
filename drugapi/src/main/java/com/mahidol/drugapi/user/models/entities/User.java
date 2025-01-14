@@ -18,6 +18,8 @@ import java.util.UUID;
 public class User {
     @Id
     private UUID id;
+    @Column(name = "register_token", columnDefinition = "TEXT")
+    private String registerToken;
     @Column(name = "first_name", columnDefinition = "TEXT")
     private String firstName;
     @Column(name = "last_name", columnDefinition = "TEXT")

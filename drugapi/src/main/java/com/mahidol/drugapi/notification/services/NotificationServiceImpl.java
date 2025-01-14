@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class NotificationServiceImpl implements NotificationService {
+
+    @Override
     public void send(NotificationMessage message) {
         Message fMessage = transformMessage(message);
         FirebaseMessaging.getInstance().sendAsync(fMessage);
