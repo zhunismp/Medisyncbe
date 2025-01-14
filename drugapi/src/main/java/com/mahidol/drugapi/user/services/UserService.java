@@ -1,5 +1,8 @@
 package com.mahidol.drugapi.user.services;
 
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingException;
+import com.google.firebase.messaging.Message;
 import com.mahidol.drugapi.common.utils.StringUtil;
 import com.mahidol.drugapi.common.ctx.UserContext;
 import com.mahidol.drugapi.external.aws.s3.S3Service;
@@ -11,6 +14,8 @@ import com.mahidol.drugapi.user.models.types.BloodGroup;
 import com.mahidol.drugapi.user.models.types.Gender;
 import com.mahidol.drugapi.user.repositories.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -18,18 +23,23 @@ import java.util.UUID;
 
 @Service
 public class UserService {
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+
     private final UserRepository userRepository;
     private final S3Service s3Service;
     private final UserContext userContext;
+    private final FirebaseMessaging firebaseMessaging;
 
     public UserService(
             UserRepository userRepository,
             S3Service s3Service,
-            UserContext userContext
+            UserContext userContext,
+            FirebaseMessaging firebaseMessaging
     ) {
         this.userRepository = userRepository;
         this.s3Service = s3Service;
         this.userContext = userContext;
+        this.firebaseMessaging = firebaseMessaging;
     }
 
     public Boolean isExists(UUID userId) {
@@ -83,5 +93,21 @@ public class UserService {
         ).orElseThrow(() -> new EntityNotFoundException("User id does not exists."));
 
         request.getProfileImage().map(file -> s3Service.uploadFile("medisync-user-profile", userContext.getUserId().toString(), file));
+    }
+
+    public void setUpRegisterToken(String token) {
+        Message dummy = Message.builder()
+                .setToken(token)
+                .build();
+
+        try {
+            firebaseMessaging.send(dummy, true);
+            User u = userRepository.getReferenceById(userContext.getUserId());
+
+            userRepository.save(u.setRegisterToken(token));
+        } catch (FirebaseMessagingException ex) {
+            logger.error("Error from cloud messaging: " + ex.getMessage());
+            throw new IllegalArgumentException("Firebase thing go wrong");
+        }
     }
 }

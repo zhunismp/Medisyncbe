@@ -11,9 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
-import java.util.UUID;
-
 @RestController
 @RequestMapping("/api/v1")
 public class UserController {
@@ -23,7 +20,6 @@ public class UserController {
         this.userService = userService;
     }
 
-    // Return userId for now because we don't have an authentication service yet.
     @PostMapping(path = "/users", consumes = "multipart/form-data")
     public ResponseEntity<?> createUser(@ModelAttribute @Valid CreateUserRequest request, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) throw new BindingError(bindingResult.getFieldErrors());
@@ -44,5 +40,11 @@ public class UserController {
         if (bindingResult.hasErrors()) throw new BindingError(bindingResult.getFieldErrors());
         userService.updateUser(request);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/users/token")
+    public ResponseEntity<?> setUp(@RequestParam("registerToken") String RegisterToken) {
+        userService.setUpRegisterToken(RegisterToken);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

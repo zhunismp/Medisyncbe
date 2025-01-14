@@ -1,16 +1,16 @@
 spring:
-application:
-  name: drugapi
-jpa:
-  hibernate:
-    ddl-auto: update
-  properties:
+  application:
+    name: drugapi
+  jpa:
     hibernate:
-      dialect: org.hibernate.dialect.PostgreSQLDialect
-datasource:
-  url: ${SQL_DATABASE}
-  username: ${SQL_USERNAME}
-  password: ${SQL_PASSWORD}
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  datasource:
+    url: ${SQL_DATABASE}
+    username: ${SQL_USERNAME}
+    password: ${SQL_PASSWORD}
 
 jwt:
   secret: ${JWT_SECRET}
