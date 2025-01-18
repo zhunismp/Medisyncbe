@@ -4,10 +4,11 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type History struct {
-	ID         uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
+	ID         uuid.UUID `gorm:"type:uuid;primaryKey"`
 	UserID     uuid.UUID `gorm:"type:uuid;not null"`
 	DrugID     uuid.UUID `gorm:"type:uuid;not null"`
 	GroupID    *uuid.UUID `gorm:"type:uuid"`
@@ -16,4 +17,13 @@ type History struct {
 	NotifiedAt time.Time `gorm:"type:timestamp;not null"`
 	Count      int       `gorm:"type:int;default:0;not null"`
 	User       AppUser   `gorm:"foreignKey:UserID"`
+}
+
+func (History) TableName() string {
+	return "HISTORY"
+}
+
+func (h *History) BeforeCreate(tx *gorm.DB) (err error) {
+	h.ID = uuid.New()
+	return nil
 }

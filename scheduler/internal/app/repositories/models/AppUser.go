@@ -27,3 +27,7 @@ type AppUser struct {
 	UpdatedAt      time.Time
 	DeletedAt      gorm.DeletedAt `gorm:"index"`
 }
+
+func (AppUser) TableName() string {
+	return "APP_USER"
+}

@@ -11,3 +11,7 @@ type DrugGroup struct {
 	DrugIDs  []uuid.UUID `gorm:"type:uuid[]"`
 	User     AppUser     `gorm:"foreignKey:UserID"`
 }
+
+func (DrugGroup) TableName() string {
+	return "DRUG_GROUP"
+}
