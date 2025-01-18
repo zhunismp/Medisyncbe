@@ -68,5 +68,7 @@ CREATE TABLE HISTORY (
     drug_id UUID NOT NULL,
     group_id UUID,
     "status" TEXT CHECK ("status" IN ('taken', 'missed', 'skipped')),
+    taken_at TIMESTAMP,
     notified_at TIMESTAMP NOT NULL,
+    count INT NOT NULL DEFAULT 0
 );
