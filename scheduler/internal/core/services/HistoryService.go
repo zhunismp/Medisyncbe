@@ -17,9 +17,16 @@ func NewHistoryService(db *gorm.DB) *HistoryService {
 	return &HistoryService{DB: db}
 }
 
+func (h *HistoryService) GetAllHistory() []models.History {
+    var histories *[]models.History
+    h.DB.Find(&histories)
+
+    return *histories
+}
+
 func (h *HistoryService) CreateHistory(schedules []models.Schedule) {
 	for _, s := range schedules {
-        if s.Type != 0 {
+        if s.Type == 0 {
             if err := h.createDrugHistory(s); err != nil {
                 fmt.Println("Error creating history record:", err)
             }
@@ -46,10 +53,22 @@ func (h *HistoryService) createDrugHistory(s models.Schedule) (error) {
 }
 
 func (h *HistoryService) createDrugGroupHistory(s models.Schedule) (error) {
-	var drugIds = []uuid.UUID{}
-	h.DB.Model(&models.DrugGroup{}).Where("id = ?", s.ReferenceID).Select("drug_id").Find(&drugIds)
+    
+    var drugIds []uuid.UUID
+
+    err := h.DB.Raw(`
+        SELECT unnest(drug_id)
+        FROM drug_group
+        WHERE id = ?`, s.ReferenceID,
+    ).Scan(&drugIds).Error
+
+    if err != nil {
+        fmt.Println("Error fetching drug IDs:", err)
+        return err
+    }
 
 	for _, drugID := range drugIds {
+        fmt.Println("Saved history for drug id: ", drugID, "in group id: ", s.ReferenceID)
 		h.createHistoryRecord(s.UserID, drugID, &s.ReferenceID, "missed", s.ScheduleTime, 0)
 	}
 
@@ -57,13 +76,20 @@ func (h *HistoryService) createDrugGroupHistory(s models.Schedule) (error) {
 }
 
 func (h *HistoryService) createHistoryRecord(userID, drugID uuid.UUID, groupID *uuid.UUID, status string, notifiedAt time.Time, count int) error {
+    timeOnly := notifiedAt.Format("15:04:05")
+    currentDate := time.Now().Format("2006-01-02")
+    updatedNotifiedAt, err := time.Parse("2006-01-02 15:04:05", currentDate + " " + timeOnly)
+    if err != nil {
+        fmt.Println(err)
+    }
+
     history := models.History{
         UserID:     userID,
         DrugID:     drugID,
         GroupID:    groupID,
         Status:     status,
         TakenAt:    nil,
-        NotifiedAt: notifiedAt,
+        NotifiedAt: updatedNotifiedAt,
         Count:      count,
     }
 

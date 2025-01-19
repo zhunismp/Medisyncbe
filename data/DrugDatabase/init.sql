@@ -52,10 +52,11 @@ CREATE TABLE APPOINTMENT (
 -- 0 is drug
 -- 1 is drug group
 -- reference_id is either drug_id or drug_group_id
+-- schedule_time field have dummy date. Please consider only time
 CREATE TABLE SCHEDULE (
     id UUID PRIMARY KEY,
     user_id UUID NOT NULL,
-    schedule_time TIME NOT NULL,
+    schedule_time TIMESTAMP NOT NULL,
     "type" INT NOT NULL,
     "name" TEXT NOT NULL,
     reference_id UUID NOT NULL,

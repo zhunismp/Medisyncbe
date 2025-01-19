@@ -14,9 +14,8 @@ type Schedule struct {
 	Name         string    `gorm:"type:text;not null"`
 	ReferenceID  uuid.UUID `gorm:"type:uuid;not null"`
 	IsEnabled    bool      `gorm:"type:boolean;not null"`
-	User         AppUser   `gorm:"foreignKey:UserID"`
 }
 
 func (Schedule) TableName() string {
-	return "SCHEDULE"
+	return `schedule`
 }

@@ -16,11 +16,10 @@ type History struct {
 	TakenAt    *time.Time `gorm:"type:timestamp"`
 	NotifiedAt time.Time `gorm:"type:timestamp;not null"`
 	Count      int       `gorm:"type:int;default:0;not null"`
-	User       AppUser   `gorm:"foreignKey:UserID"`
 }
 
 func (History) TableName() string {
-	return "HISTORY"
+	return `history`
 }
 
 func (h *History) BeforeCreate(tx *gorm.DB) (err error) {

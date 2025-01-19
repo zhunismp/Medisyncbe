@@ -20,14 +20,11 @@ type AppUser struct {
 	HealthCondition string        `gorm:"type:text"`
 	DrugAllergy    string         `gorm:"type:text"`
 	FoodAllergy    string         `gorm:"type:text"`
-	DrugGroups     []DrugGroup    `gorm:"foreignKey:UserID"`
-	Schedules      []Schedule     `gorm:"foreignKey:UserID"`
-	Histories      []History      `gorm:"foreignKey:UserID"`
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 	DeletedAt      gorm.DeletedAt `gorm:"index"`
 }
 
 func (AppUser) TableName() string {
-	return "APP_USER"
+	return `app_user`
 }

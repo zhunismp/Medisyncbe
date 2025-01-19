@@ -51,8 +51,8 @@ func main() {
 		),
 		gocron.NewTask(
 			func() {
-				now := time.Now().Truncate(time.Minute)
-				drugNotificationJob.Task(now)
+				now := time.Now().Truncate(time.Minute) 
+    			drugNotificationJob.Task(now)
 			},
 		),
 		gocron.WithName("DrugNotificationJob"),

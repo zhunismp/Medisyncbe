@@ -25,13 +25,11 @@ func NewDrugNotificationJob(
 
 // Time in format "15:04:05"
 func (j *DrugNotificationJob) Task(time time.Time) {
-	schedules, err := j.scheduleService.GetScheduleWithTime(time)
-	if err != nil {
-		log.Println("Error fetching schedules:", err)
-		return
-	}
+    schedules, err := j.scheduleService.GetScheduleWithTime(time)
+    if err != nil {
+        log.Println("Error fetching schedules:", err)
+        return
+    }
 
-	j.historyService.CreateHistory(schedules)
-
-	log.Println("All schedules for time", time.Format("00:00:00"), "are: ", schedules)
-}	
+    j.historyService.CreateHistory(schedules)
+}
