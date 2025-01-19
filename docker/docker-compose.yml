@@ -6,6 +6,19 @@ services:
       - .env
     volumes:
       - ../data/DrugDatabase:/docker-entrypoint-initdb.d
+
+  cron:
+    depends_on:
+      - drugdb
+    restart: on-failure
+    env_file: 
+      - cron.env
+    build: 
+      context: ../scheduler
+      dockerfile: ../scheduler/cron.dockerfile
+    volumes:
+      - ./firebase-config.json:/app/firebase-config.json
+
   be: 
     depends_on:
       - drugdb
@@ -17,6 +30,7 @@ services:
       dockerfile: ../drugapi/backend.dockerfile
     ports:
       - "8080:8080"
+
   ngrok:
       image: ngrok/ngrok:latest
       depends_on:

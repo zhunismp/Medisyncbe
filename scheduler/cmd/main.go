@@ -16,7 +16,7 @@ import (
 )
 
 func main() {
-	firebaseConfigPath := "./configs/firebase-config.json"
+	firebaseConfigPath := getFirebaseConfigPath()
 
 	// Load configuration
 	cfg, err := config.LoadConfig()
@@ -55,7 +55,7 @@ func main() {
 	// Add DrugNotificationJob 
 	s.NewJob(
 		gocron.CronJob(
-			"*/1 * * * *",
+			"*/15 * * * *",
 			true,
 		),
 		gocron.NewTask(
@@ -80,4 +80,14 @@ func main() {
 	for {
 
 	}
+}
+
+func getFirebaseConfigPath() string {
+    env := os.Getenv("ENV") 
+
+    if env == "prod" {
+        return "/app/firebase-config.json"
+    }
+
+    return "./configs/firebase-config.json"
 }
