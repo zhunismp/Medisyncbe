@@ -55,7 +55,7 @@ func main() {
 	// Add DrugNotificationJob 
 	s.NewJob(
 		gocron.CronJob(
-			"*/15 * * * *",
+			"*/1 * * * *",
 			true,
 		),
 		gocron.NewTask(

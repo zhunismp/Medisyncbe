@@ -20,7 +20,7 @@ func (s *SchedulerService) GetScheduleWithTime(t time.Time) ([]models.Schedule, 
 	var schedules []models.Schedule
 	fixedDate := time.Date(2000, time.January, 1, t.Hour(), t.Minute(), 0, 0, t.Location()) 
 
-	result := s.DB.Where("schedule_time = ?", fixedDate).Find(&schedules)
+	result := s.DB.Preload("User").Where("schedule_time = ?", fixedDate).Find(&schedules)
 	if result.Error != nil {
 		return nil, fmt.Errorf("failed to fetch schedules for time %v: %w", t, result.Error)
 	}

@@ -32,9 +32,9 @@ func NewNotificationService(firebaseCredentialsPath string) (*NotificationServic
 	}, nil
 }
 
-func (ns *NotificationService) SendNotificationToTopic(topic string, title string, body string) error {
+func (ns *NotificationService) SendNotification(token string, title string, body string) error {
 	message := &messaging.Message{
-		Topic: topic,
+		Token: token,
 		Notification: &messaging.Notification{
 			Title: title,
 			Body:  body,
@@ -60,6 +60,6 @@ func (ns *NotificationService) SendNotificationToTopic(topic string, title strin
 		return fmt.Errorf("error sending FCM message: %v", err)
 	}
 
-	log.Printf("Successfully sent message to topic %s: %s", topic, response)
+	log.Printf("Successfully sent message: %s", response)
 	return nil
 }

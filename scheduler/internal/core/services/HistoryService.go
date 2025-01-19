@@ -49,7 +49,7 @@ func (h *HistoryService) GetIgnoredHistories(offset int) ([]models.History, erro
 }
 
 func (h *HistoryService) createDrugHistory(s models.Schedule) (error) {
-	return h.createHistoryRecord(s.UserID, s.ReferenceID, nil, "missed", s.ScheduleTime, 0)
+	return h.createHistoryRecord(s.User.ID, s.ReferenceID, nil, "missed", s.ScheduleTime, 0)
 }
 
 func (h *HistoryService) createDrugGroupHistory(s models.Schedule) (error) {
@@ -69,7 +69,7 @@ func (h *HistoryService) createDrugGroupHistory(s models.Schedule) (error) {
 
 	for _, drugID := range drugIds {
         fmt.Println("Saved history for drug id: ", drugID, "in group id: ", s.ReferenceID)
-		h.createHistoryRecord(s.UserID, drugID, &s.ReferenceID, "missed", s.ScheduleTime, 0)
+		h.createHistoryRecord(s.User.ID, drugID, &s.ReferenceID, "missed", s.ScheduleTime, 0)
 	}
 
 	return nil
