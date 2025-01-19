@@ -16,7 +16,7 @@ import (
 )
 
 func main() {
-	firebaseConfigPath := "../configs/firebase-config.json"
+	firebaseConfigPath := "./configs/firebase-config.json"
 
 	// Load configuration
 	cfg, err := config.LoadConfig()

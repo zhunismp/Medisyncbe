@@ -5,16 +5,15 @@ import (
 	"fmt"
 	"log"
 
-	"firebase.google.com/go"
-	"firebase.google.com/go/messaging"
 	"google.golang.org/api/option"
+	firebase "firebase.google.com/go/v4"
+	"firebase.google.com/go/v4/messaging"
 )
 
 type NotificationService struct {
 	client *messaging.Client
 }
 
-// NewNotificationService initializes a new NotificationService.
 func NewNotificationService(firebaseCredentialsPath string) (*NotificationService, error) {
 
 	opt := option.WithCredentialsFile(firebaseCredentialsPath)
@@ -34,13 +33,26 @@ func NewNotificationService(firebaseCredentialsPath string) (*NotificationServic
 }
 
 func (ns *NotificationService) SendNotificationToTopic(topic string, title string, body string) error {
-	// Create a message to send to the topic
 	message := &messaging.Message{
 		Topic: topic,
 		Notification: &messaging.Notification{
 			Title: title,
 			Body:  body,
 		},
+		APNS: &messaging.APNSConfig{
+            Headers: map[string]string{
+                "apns-priority": "10",
+            },
+            Payload: &messaging.APNSPayload{
+                Aps: &messaging.Aps{
+                    Alert: &messaging.ApsAlert{
+                        Title: title,
+                        Body:  body,
+                    },
+                    Sound: "default",
+                },
+            },
+        },
 	}
 
 	response, err := ns.client.Send(context.Background(), message)
