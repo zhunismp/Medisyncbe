@@ -16,6 +16,7 @@ import (
 )
 
 func main() {
+	firebaseConfigPath := "../configs/firebase-config.json"
 
 	// Load configuration
 	cfg, err := config.LoadConfig()
@@ -32,9 +33,17 @@ func main() {
 	db := connections.DB
 	schedulerService := services.NewSchedulerService(db)
 	historyService := services.NewHistoryService(db)	
+	notificationService, err := services.NewNotificationService(firebaseConfigPath)
+	if err != nil {
+		fmt.Println("Error initiate notification service: ", err)
+	}
 
 	// Initialize jobs
-	drugNotificationJob := jobs.NewDrugNotificationJob(schedulerService, historyService)
+	drugNotificationJob := jobs.NewDrugNotificationJob(
+		schedulerService, 
+		historyService,
+		notificationService,
+	)
 
 	// Initialize scheduler
 	s, err := gocron.NewScheduler()

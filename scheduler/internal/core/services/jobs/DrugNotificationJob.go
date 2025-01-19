@@ -10,15 +10,18 @@ import (
 type DrugNotificationJob struct {
 	scheduleService *services.SchedulerService
 	historyService *services.HistoryService
+	notificationService *services.NotificationService
 }
 
 func NewDrugNotificationJob(
 	scheduleService *services.SchedulerService, 
 	historyService *services.HistoryService,
+	notificationService *services.NotificationService,
 ) *DrugNotificationJob {
 	return &DrugNotificationJob{
 		scheduleService: scheduleService,
 		historyService: historyService,
+		notificationService: notificationService,
 	}
 }
 
