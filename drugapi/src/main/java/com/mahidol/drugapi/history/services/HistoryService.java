@@ -1,5 +1,8 @@
 package com.mahidol.drugapi.history.services;
 
-public interface HistoryService {
+import com.mahidol.drugapi.history.dtos.request.SearchHistoryRequest;
+import com.mahidol.drugapi.history.dtos.response.SearchHistoryResponse;
 
+public interface HistoryService {
+    SearchHistoryResponse search(SearchHistoryRequest request);
 }

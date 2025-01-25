@@ -15,15 +15,17 @@ import java.util.UUID;
 @Data
 @Accessors(chain = true)
 public class SearchHistoryRequest {
-    @Min(1)
-    @Max(12)
+    @Min(value = 1, message = "Please specify valid month")
+    @Max(value = 12, message = "Please specify valid month")
     private Integer month;
     private Integer year;
-    private LocalDate preferredDate;
+    @Min(value = 1, message = "Please specify valid date")
+    @Max(value = 31, message = "Please specify valid date")
+    private Integer preferredDate;
     private UUID referenceId; // Either drugId or groupId
     private Pagination pagination;
 
-    public Optional<LocalDate> getPreferredDate() {
+    public Optional<Integer> getPreferredDate() {
         return Optional.ofNullable(preferredDate);
     }
 
@@ -44,11 +46,22 @@ public class SearchHistoryRequest {
         return year <= currentYear;
     }
 
-    @AssertTrue(message = "Preferred date cannot be in the future")
-    public boolean checkPreferredDateValidity() {
-        if (preferredDate == null) {
+    @AssertTrue(message = "Provided date cannot be in the future")
+    public boolean checkDateValidity() {
+        if (year == null || month == null || preferredDate == null) {
             return true;
         }
-        return !preferredDate.isAfter(LocalDate.now());
+
+        LocalDate currentDate = LocalDate.now();
+        int currentYear = currentDate.getYear();
+        int currentMonth = currentDate.getMonthValue();
+        int currentDayOfMonth = currentDate.getDayOfMonth();
+
+        if (year > currentYear) return false;
+        if (year == currentYear && month > currentMonth) return false;
+
+
+        // If the year and month are the same as the current year and month, check the day
+        return year != currentYear || month != currentMonth || preferredDate <= currentDayOfMonth;
     }
 }
