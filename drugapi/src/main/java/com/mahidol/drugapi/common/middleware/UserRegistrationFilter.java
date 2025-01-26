@@ -39,10 +39,10 @@ public class UserRegistrationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
 
+        // TODO: Remove this if, to check no matter what.
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.split(" ")[1].trim();
             UUID userId = UUID.fromString(jwtUtil.extractClaim(token, "userId"));
-            logger.info("user id: " + userId);
 
             if (!userService.isExists(userId)) {
                 String errorResp = "{\"errorMessage\": \"User not registered\"}";

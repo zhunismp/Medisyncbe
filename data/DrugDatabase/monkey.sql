@@ -8,10 +8,10 @@ INSERT INTO APP_USER (
 
 -- Insert individual drugs for the user
 INSERT INTO DRUG (id, user_id, generic_name, dosage_form, unit, strength, amount, dose, taken_amount, usage_time, is_internal_drug) VALUES
-('b2876821-1f75-4c1a-999a-46f8f03d7a4b', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 'Paracetamol', 'Tablet', 'mg', '500mg', 20.0, 500.0, NULL, 1, TRUE),
-('b2876821-1f75-4c1a-999a-46f8f03d7a4c', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 'Ibuprofen', 'Tablet', 'mg', '200mg', 30.0, 200.0, NULL, 1, TRUE),
-('b2876821-1f75-4c1a-999a-46f8f03d7a4d', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 'Aspirin', 'Tablet', 'mg', '100mg', 15.0, 100.0, NULL, 1, TRUE),
-('b2876821-1f75-4c1a-999a-46f8f03d7a4e', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 'Diclofenac', 'Tablet', 'mg', '50mg', 25.0, 50.0, NULL, 1, TRUE);
+('b2876821-1f75-4c1a-999a-46f8f03d7a4b', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 'Paracetamol', 'Tablet', 'mg', '500mg', 20.0, 500.0, 0.0, 1, TRUE),
+('b2876821-1f75-4c1a-999a-46f8f03d7a4c', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 'Ibuprofen', 'Tablet', 'mg', '200mg', 30.0, 200.0, 0.0, 1, TRUE),
+('b2876821-1f75-4c1a-999a-46f8f03d7a4d', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 'Aspirin', 'Tablet', 'mg', '100mg', 15.0, 100.0, 0.0, 1, TRUE),
+('b2876821-1f75-4c1a-999a-46f8f03d7a4e', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 'Diclofenac', 'Tablet', 'mg', '50mg', 25.0, 50.0, 0.0, 1, TRUE);
 
 -- Insert drug group
 INSERT INTO DRUG_GROUP (id, user_id, group_name, drug_id) VALUES (

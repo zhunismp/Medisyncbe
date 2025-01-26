@@ -31,6 +31,30 @@ public class JWTFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+
+        // TODO: Remove before go live
+        String skipJwtHeader = request.getHeader("X-Skip-JWT");
+
+        if (skipJwtHeader != null && skipJwtHeader.equalsIgnoreCase("true")) {
+            logger.info("Skipping JWT validation due to X-Skip-JWT header");
+
+            UUID mockUserId = UUID.fromString("a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68");
+            userContext.setUserId(mockUserId);
+
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    mockUserId,
+                    null,
+                    Collections.emptyList()
+            );
+
+            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
