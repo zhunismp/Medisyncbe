@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
@@ -15,5 +16,13 @@ import java.util.UUID;
 public class History {
     private UUID id;
     private String status;
-    private LocalDate notifiedAt;
+    private LocalDateTime notifiedAt;
+
+    public static History fromH(com.mahidol.drugapi.history.models.entities.History h) {
+        return new History(
+                h.getId(),
+                h.getStatus().toString(),
+                h.getNotifiedAt()
+        );
+    }
 }
