@@ -15,6 +15,6 @@ public interface HistoryRepository extends JpaRepository<History, UUID> {
     @Query("SELECT h FROM History h WHERE h.userId = :userId AND FUNCTION('MONTH', h.notifiedAt) = :month AND FUNCTION('YEAR', h.notifiedAt) = :year")
     List<History> findByUserIdAndMonth(@Param("userId") UUID userId, @Param("month") int month, @Param("year") int year);
 
-    @Query(value = "SELECT * FROM history h WHERE h.user_id = :userId AND h.taken_at::date = :date", nativeQuery = true)
+    @Query(value = "SELECT * FROM history h WHERE h.user_id = :userId AND h.notified_at::date = :date", nativeQuery = true)
     List<History> findByUserIdAndDate(@Param("userId") UUID userId, @Param("date") LocalDate date);
 }

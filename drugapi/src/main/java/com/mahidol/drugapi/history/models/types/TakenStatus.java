@@ -6,7 +6,7 @@ import lombok.Getter;
 public enum TakenStatus {
     TAKEN("taken"),
     SKIPPED("skipped"),
-    MISSING("missing");
+    MISSED("missed");
 
     private final String value;
 

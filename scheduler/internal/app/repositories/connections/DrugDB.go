@@ -3,6 +3,7 @@ package connections
 import (
 	"fmt"
 	"log"
+	"time"
 
 	dbmodels "github.com/zhunismp/Medisyncbe/scheduler/internal/app/repositories/models"
 	amodels "github.com/zhunismp/Medisyncbe/scheduler/internal/core/models"
@@ -18,9 +19,23 @@ func Connect(cfg *amodels.Config) error {
 	
 	fmt.Print(dsn)
 
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	maxRetries := 5
+	retryDelay := 2 * time.Second
+
+	var db *gorm.DB
+	var err error
+	for i := 0; i < maxRetries; i++ {
+		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+		if err == nil {
+			break
+		}
+
+		log.Printf("Failed to connect to database. Retrying in %s... (attempt %d/%d)", retryDelay, i+1, maxRetries)
+		time.Sleep(retryDelay)
+	}
+
 	if err != nil {
-		return fmt.Errorf("failed to connect to database: %w", err)
+		return fmt.Errorf("failed to connect to database after %d attempts: %w", maxRetries, err)
 	}
 
 	if err := db.AutoMigrate(

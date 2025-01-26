@@ -45,7 +45,7 @@ public class HistoryServiceImpl implements HistoryService {
         UUID userId = userContext.getUserId();
         List<History> histories = request.getPreferredDate()
                 .map(d -> historyRepository.findByUserIdAndDate(userId, LocalDate.of(request.getYear(), request.getMonth(), d)))
-                .orElseGet(() -> historyRepository.findByUserIdAndMonth(userId, request.getMonth(), request.getMonth()));
+                .orElseGet(() -> historyRepository.findByUserIdAndMonth(userId, request.getMonth(), request.getYear()));
 
         List<History> filteredHistories = request.getReferenceId()
                 .map(id -> histories.stream()
