@@ -89,6 +89,13 @@ public class DrugGroupService {
                 .toList();
     }
 
+    public Optional<DrugGroup> getDrugGroupByGroupIdOpt(UUID userId, UUID groupId) {
+        if (!validateOwner(userId, List.of(groupId)))
+            throw new IllegalArgumentException("User is not the owner of requested drug group.");
+
+        return drugGroupRepository.findById(groupId);
+    }
+
 
     public void remove(UUID drugGroupId, Boolean isRemoveDrug) {
         List<UUID> drugIds = getDrugGroupByGroupId(userContext.getUserId(), drugGroupId).getDrugs();

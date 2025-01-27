@@ -116,6 +116,13 @@ public class DrugService {
         return drugRepository.findAllById(drugIds);
     }
 
+    public Optional<Drug> searchDrugByDrugId(UUID userId, UUID drugId) {
+        if (userId != null && !validateOwner(userId, List.of(drugId)))
+            throw new IllegalArgumentException("User is not the owner of requested drug.");
+
+        return drugRepository.findById(drugId);
+    }
+
     public List<Drug> saveAllDrugs(UUID userId, List<Drug> drugs) {
         if (!validateOwner(userId, drugs.stream().map(Drug::getId).toList()))
             throw new IllegalArgumentException("User is not the owner of requested drug.");

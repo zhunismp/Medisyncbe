@@ -13,7 +13,7 @@ import java.util.UUID;
 @Data
 @Accessors(chain = true)
 @NoArgsConstructor
-@Table(name = "druggroup")
+@Table(name = "drug_group")
 public class DrugGroup {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
