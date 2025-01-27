@@ -30,3 +30,21 @@ INSERT INTO HISTORY (id, user_id, drug_id, group_id, status, taken_at, notified_
     '9c77574b-b1ab-49a4-8bb3-bddff16718da', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 
     'b2876821-1f75-4c1a-999a-46f8f03d7a4b', NULL, 'taken', '2025-01-18 09:00:00', '2025-01-18 08:45:00', 1
 );
+
+INSERT INTO HISTORY (id, user_id, drug_id, group_id, status, taken_at, notified_at, count) VALUES 
+('9c77574b-b1ab-49a4-8bb3-bddff16718db', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 
+    'b2876821-1f75-4c1a-999a-46f8f03d7a4b', NULL, 'taken', '2025-01-18 09:00:00', '2025-01-18 08:45:00', 1),
+('9c77574b-b1ab-49a4-8bb3-bddff16718dc', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 
+    'b2876821-1f75-4c1a-999a-46f8f03d7a4c', NULL, 'taken', '2025-01-18 10:00:00', '2025-01-18 09:45:00', 2),
+('9c77574b-b1ab-49a4-8bb3-bddff16718dd', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 
+    'b2876821-1f75-4c1a-999a-46f8f03d7a4d', NULL, 'taken', '2025-01-18 11:00:00', '2025-01-18 10:45:00', 1),
+('9c77574b-b1ab-49a4-8bb3-bddff16718de', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 
+    'b2876821-1f75-4c1a-999a-46f8f03d7a4e', NULL, 'taken', '2025-01-18 12:00:00', '2025-01-18 11:45:00', 1),
+('9c77574b-b1ab-49a4-8bb3-bddff16718df', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 
+    'b2876821-1f75-4c1a-999a-46f8f03d7a4b', NULL, 'missed', '2025-01-19 09:00:00', '2025-01-19 08:45:00', 0),
+('9c77574b-b1ab-49a4-8bb3-bddff16718e0', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 
+    'b2876821-1f75-4c1a-999a-46f8f03d7a4c', NULL, 'taken', '2025-01-19 10:00:00', '2025-01-19 09:45:00', 1),
+('9c77574b-b1ab-49a4-8bb3-bddff16718e1', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 
+    'b2876821-1f75-4c1a-999a-46f8f03d7a4d', NULL, 'missed', '2025-01-19 11:00:00', '2025-01-19 10:45:00', 0),
+('9c77574b-b1ab-49a4-8bb3-bddff16718e2', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 
+    'b2876821-1f75-4c1a-999a-46f8f03d7a4e', NULL, 'taken', '2025-01-19 12:00:00', '2025-01-19 11:45:00', 1);
