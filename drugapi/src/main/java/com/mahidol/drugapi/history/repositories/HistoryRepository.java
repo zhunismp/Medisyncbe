@@ -12,9 +12,11 @@ import java.util.UUID;
 
 @Repository
 public interface HistoryRepository extends JpaRepository<History, UUID> {
-    @Query("SELECT h FROM History h WHERE h.userId = :userId AND FUNCTION('MONTH', h.notifiedAt) = :month AND FUNCTION('YEAR', h.notifiedAt) = :year")
+    @Query("SELECT h FROM History h WHERE h.userId = :userId AND EXTRACT(MONTH FROM h.notifiedAt) = :month AND EXTRACT(YEAR FROM h.notifiedAt) = :year")
     List<History> findByUserIdAndMonth(@Param("userId") UUID userId, @Param("month") int month, @Param("year") int year);
 
     @Query(value = "SELECT * FROM history h WHERE h.user_id = :userId AND h.notified_at::date = :date", nativeQuery = true)
     List<History> findByUserIdAndDate(@Param("userId") UUID userId, @Param("date") LocalDate date);
+
+    List<History> findByUserId(UUID userId);
 }

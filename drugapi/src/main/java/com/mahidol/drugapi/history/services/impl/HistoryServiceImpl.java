@@ -2,13 +2,17 @@ package com.mahidol.drugapi.history.services.impl;
 
 import com.mahidol.drugapi.common.ctx.UserContext;
 import com.mahidol.drugapi.common.models.Pagination;
+import com.mahidol.drugapi.drug.models.entites.Drug;
 import com.mahidol.drugapi.drug.services.DrugService;
 import com.mahidol.drugapi.druggroup.services.DrugGroupService;
+import com.mahidol.drugapi.history.dtos.request.EditHistoryRequest;
+import com.mahidol.drugapi.history.dtos.request.HistoryEntry;
 import com.mahidol.drugapi.history.dtos.request.SearchHistoryRequest;
 import com.mahidol.drugapi.history.dtos.response.SearchHistoryResponse;
 import com.mahidol.drugapi.history.models.DrugHistory;
 import com.mahidol.drugapi.history.models.GroupHistory;
 import com.mahidol.drugapi.history.models.entities.History;
+import com.mahidol.drugapi.history.models.types.TakenStatus;
 import com.mahidol.drugapi.history.repositories.HistoryRepository;
 import com.mahidol.drugapi.history.services.HistoryService;
 import org.springframework.stereotype.Service;
@@ -76,6 +80,43 @@ public class HistoryServiceImpl implements HistoryService {
         );
     }
 
+    @Override
+    public void editHistory(EditHistoryRequest request) {
+        UUID userId = userContext.getUserId();
+
+        List<UUID> historyIds = request.getHistories()
+                .stream()
+                .map(HistoryEntry::getId)
+                .toList();
+
+        if (!validate(userId, historyIds)) {
+            throw new IllegalArgumentException("User might not own these histories");
+        }
+
+        List<History> histories = historyRepository.findAllById(historyIds);
+        List<Drug> updateDrugs = drugService.searchAllDrugByDrugsId(userId,  histories.stream()
+                .filter(history -> request.getHistories().stream()
+                        .anyMatch(h -> h.getStatus() == TakenStatus.TAKEN)
+                )
+                .map(History::getUserId).toList()
+        );
+
+        // set status
+        histories.forEach(history ->
+            request.getHistories().stream()
+                    .filter(h -> h.getId().equals(history.getId()))
+                    .findFirst()
+                    .ifPresent(h -> history.setStatus(h.getStatus()))
+        );
+
+        // update taken amount
+        // TODO: Archive drug that taken amt >= amt
+        updateDrugs.forEach(drug -> drug.setTakenAmount(drug.getTakenAmount() + drug.getDose()));
+
+        historyRepository.saveAll(histories);
+        drugService.saveAllDrugs(userId, updateDrugs);
+    }
+
     private List<DrugHistory> buildDrugHistories(UUID userId, List<History> drugHistories) {
         return drugHistories.stream()
                 .collect(Collectors.groupingBy(History::getDrugId))
@@ -112,5 +153,11 @@ public class HistoryServiceImpl implements HistoryService {
         int end = Math.min(start + pageSize, items.size());
 
         return items.subList(start, end);
+    }
+
+    private boolean validate(UUID userId, List<UUID> historyIds) {
+        List<UUID> validHistories = historyRepository.findByUserId(userId).stream().map(History::getUserId).toList();
+
+        return new HashSet<>(validHistories).containsAll(historyIds);
     }
 }
