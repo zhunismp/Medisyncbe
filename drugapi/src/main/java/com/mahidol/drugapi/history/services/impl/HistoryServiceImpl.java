@@ -98,7 +98,7 @@ public class HistoryServiceImpl implements HistoryService {
                 .filter(history -> request.getHistories().stream()
                         .anyMatch(h -> h.getStatus() == TakenStatus.TAKEN)
                 )
-                .map(History::getUserId).toList()
+                .map(History::getDrugId).toList()
         );
 
         // set status
@@ -156,7 +156,7 @@ public class HistoryServiceImpl implements HistoryService {
     }
 
     private boolean validate(UUID userId, List<UUID> historyIds) {
-        List<UUID> validHistories = historyRepository.findByUserId(userId).stream().map(History::getUserId).toList();
+        List<UUID> validHistories = historyRepository.findByUserId(userId).stream().map(History::getId).toList();
 
         return new HashSet<>(validHistories).containsAll(historyIds);
     }
