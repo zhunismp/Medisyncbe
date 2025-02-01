@@ -1,8 +1,11 @@
 package com.mahidol.drugapi.druggroup.services;
 
 import com.mahidol.drugapi.common.models.Pagination;
+import com.mahidol.drugapi.common.models.ScheduleTime;
 import com.mahidol.drugapi.common.services.PaginationService;
 import com.mahidol.drugapi.common.ctx.UserContext;
+import com.mahidol.drugapi.drug.dtos.response.DrugDTO;
+import com.mahidol.drugapi.drug.models.entites.Drug;
 import com.mahidol.drugapi.drug.services.DrugService;
 import com.mahidol.drugapi.druggroup.dtos.request.AddDrugRequest;
 import com.mahidol.drugapi.druggroup.dtos.request.CreateGroupRequest;
@@ -65,7 +68,7 @@ public class DrugGroupService {
     public SearchGroupResponse search(SearchGroupRequest request) {
         List<DrugGroup> drugGroups = drugGroupRepository.findByUserId(userContext.getUserId());
         List<DrugGroupDTO> drugGroupWithDrugInfos = drugGroups.stream()
-                .map(drugGroup -> DrugGroupDTO.fromDrugGroup(drugGroup, drugsId -> drugService.searchAllDrugByDrugsId(userContext.getUserId(), drugsId)))
+                .map(this::transformDTO)
                 .toList();
 
         return new SearchGroupResponse(
@@ -78,7 +81,7 @@ public class DrugGroupService {
         List<DrugGroup> drugGroups = drugGroupRepository.findAllById(drugGroupIds);
 
         return drugGroups.stream()
-                .map(drugGroup -> DrugGroupDTO.fromDrugGroup(drugGroup, drugsId -> drugService.searchAllDrugByDrugsId(null, drugsId)))
+                .map(this::transformDTO)
                 .toList();
     }
 
@@ -132,5 +135,20 @@ public class DrugGroupService {
         List<UUID> validDrugGroupIds = drugGroupRepository.findByUserId(userId).stream().map(DrugGroup::getId).toList();
 
         return new HashSet<>(validDrugGroupIds).containsAll(drugGroupIds);
+    }
+
+    private DrugGroupDTO transformDTO(DrugGroup group) {
+        List<Drug> drugs = drugService.searchAllDrugByDrugsId(userContext.getUserId(), group.getDrugs());
+        List<ScheduleTime> scheduleTimes = scheduleService.get(group.getId()).stream().map(s ->
+                new ScheduleTime(s.getScheduleTime().toLocalTime(), s.getIsEnabled())
+        ).toList();
+
+        return new DrugGroupDTO(
+                group.getId(),
+                userContext.getUserId(),
+                group.getGroupName(),
+                scheduleTimes,
+                drugs
+        );
     }
 }

@@ -13,7 +13,6 @@ import com.mahidol.drugapi.drug.models.entites.Drug;
 import com.mahidol.drugapi.drug.models.type.MealCondition;
 import com.mahidol.drugapi.drug.repositories.DrugRepository;
 import com.mahidol.drugapi.external.aws.s3.S3Service;
-import com.mahidol.drugapi.notification.models.drug.DrugSchedule;
 import com.mahidol.drugapi.notification.repositories.DrugScheduleRepository;
 import com.mahidol.drugapi.schedule.services.ScheduleService;
 import jakarta.persistence.EntityNotFoundException;
@@ -54,7 +53,7 @@ public class DrugService {
 
         List<DrugDTO> response = filteredDrugs.stream().map(drug -> {
 //            Optional<String> drugImageUrl = s3Service.getUrl("medisync-drug", drug.getId().toString());
-            return DrugDTO.fromDrug(drug, Optional.empty());
+            return transformDTO(drug);
         }).toList();
 
         return new SearchDrugResponse(applyPaginate(response, request.getPagination()), filteredDrugs.size());
@@ -138,6 +137,26 @@ public class DrugService {
             throw new IllegalArgumentException("User is not the owner of requested drug.");
 
         drugRepository.deleteAllById(drugIds);
+    }
+
+    private DrugDTO transformDTO(Drug drug) {
+        List<ScheduleTime> scheduleTimes = scheduleService.get(drug.getId()).stream()
+                .map(s -> new ScheduleTime(s.getScheduleTime().toLocalTime(), s.getIsEnabled())).toList();
+
+        return new DrugDTO()
+                .setId(drug.getId())
+//                .setDrugImageUrl(drugImageUrl.orElse(""))
+                .setUserId(drug.getUserId())
+                .setGenericName(drug.getGenericName())
+                .setDosageForm(drug.getDosageForm())
+                .setUnit(drug.getUnit())
+                .setStrength(drug.getStrength())
+                .setAmount(drug.getAmount())
+                .setDose(drug.getDose())
+                .setTakenAmount(drug.getTakenAmount())
+                .setUsageTime(drug.getUsageTime())
+                .setIsInternalDrug(drug.getIsInternalDrug())
+                .setScheduleTimes(scheduleTimes);
     }
 
     private Boolean validateOwner(UUID userId, List<UUID> drugIds) {
