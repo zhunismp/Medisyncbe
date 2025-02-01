@@ -1,18 +1,16 @@
 package com.mahidol.drugapi.drug.dtos.request;
 
-import com.mahidol.drugapi.common.models.Schedule;
+import com.mahidol.drugapi.common.models.ScheduleTime;
 import io.vavr.control.Option;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -46,7 +44,7 @@ public class UpdateDrugRequest {
     private Integer usageTime;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private List<Schedule> schedules;
+    private List<ScheduleTime> scheduleTimes;
 
     public Option<MultipartFile> getImage() {
         return Option.of(image);
@@ -80,7 +78,7 @@ public class UpdateDrugRequest {
         return Optional.ofNullable(usageTime);
     }
 
-    public Optional<List<Schedule>> getSchedules() {
-        return Optional.ofNullable(schedules);
+    public Optional<List<ScheduleTime>> getScheduleTimes() {
+        return Optional.ofNullable(scheduleTimes);
     }
 }

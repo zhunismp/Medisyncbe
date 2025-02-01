@@ -1,6 +1,6 @@
 package com.mahidol.drugapi.drug.dtos.request;
 
-import com.mahidol.drugapi.common.models.Schedule;
+import com.mahidol.drugapi.common.models.ScheduleTime;
 import io.vavr.control.Option;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Max;
@@ -47,7 +47,7 @@ public class CreateDrugRequest {
     private int usageTime;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private List<Schedule> schedules;
+    private List<ScheduleTime> scheduleTimes;
 
     private Boolean isInternalDrug;
 

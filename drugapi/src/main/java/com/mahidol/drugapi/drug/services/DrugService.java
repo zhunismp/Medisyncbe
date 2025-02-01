@@ -1,7 +1,7 @@
 package com.mahidol.drugapi.drug.services;
 
 import com.mahidol.drugapi.common.models.Pagination;
-import com.mahidol.drugapi.common.models.Schedule;
+import com.mahidol.drugapi.common.models.ScheduleTime;
 import com.mahidol.drugapi.common.services.PaginationService;
 import com.mahidol.drugapi.common.ctx.UserContext;
 import com.mahidol.drugapi.drug.dtos.request.CreateDrugRequest;
@@ -13,8 +13,8 @@ import com.mahidol.drugapi.drug.models.entites.Drug;
 import com.mahidol.drugapi.drug.models.type.MealCondition;
 import com.mahidol.drugapi.drug.repositories.DrugRepository;
 import com.mahidol.drugapi.external.aws.s3.S3Service;
-import com.mahidol.drugapi.notification.models.drug.DrugSchedule;
 import com.mahidol.drugapi.notification.repositories.DrugScheduleRepository;
+import com.mahidol.drugapi.schedule.services.ScheduleService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +24,7 @@ import java.util.*;
 public class DrugService {
 
     private final DrugRepository drugRepository;
-    private final DrugScheduleRepository drugScheduleRepository;
+    private final ScheduleService scheduleService;
     private final PaginationService<DrugDTO> paginationService;
     private final UserContext userContext;
     private final S3Service s3Service;
@@ -32,12 +32,13 @@ public class DrugService {
     public DrugService(
             DrugRepository drugRepository,
             DrugScheduleRepository drugScheduleRepository,
+            ScheduleService scheduleService,
             PaginationService<DrugDTO> paginationService,
             UserContext userContext,
             S3Service s3Service
     ) {
         this.drugRepository = drugRepository;
-        this.drugScheduleRepository = drugScheduleRepository;
+        this.scheduleService = scheduleService;
         this.paginationService = paginationService;
         this.userContext = userContext;
         this.s3Service = s3Service;
@@ -52,7 +53,7 @@ public class DrugService {
 
         List<DrugDTO> response = filteredDrugs.stream().map(drug -> {
 //            Optional<String> drugImageUrl = s3Service.getUrl("medisync-drug", drug.getId().toString());
-            return DrugDTO.fromDrug(drug, Optional.empty());
+            return transformDTO(drug);
         }).toList();
 
         return new SearchDrugResponse(applyPaginate(response, request.getPagination()), filteredDrugs.size());
@@ -80,8 +81,10 @@ public class DrugService {
                 .setIsInternalDrug(request.getIsInternalDrug())
         );
 
-//        scheduledDrug(savedDrug, request.getSchedules(), userContext.getDeviceToken());
-        request.getImage().map(file -> s3Service.uploadFile("medisync-drug", savedDrug.getId().toString(), file));
+        // TODO: Fixed AWS service
+//         request.getImage().map(file -> s3Service.uploadFile("medisync-drug", savedDrug.getId().toString(), file));
+        scheduleService.set(savedDrug, request.getScheduleTimes());
+
     }
 
     public void update(UpdateDrugRequest request) {
@@ -100,12 +103,11 @@ public class DrugService {
                 .orElseThrow(() -> new EntityNotFoundException("Drug id not found with id " + request.getDrugId()));
 
         drugRepository.save(target);
-//        request.getSchedules().ifPresent(schedules -> scheduledDrug(target, schedules, request.getDeviceToken()));
-        request.getImage().map(file -> s3Service.uploadFile("medisync-drug", request.getDrugId().toString(), file));
+        request.getScheduleTimes().ifPresent(s -> scheduleService.set(target, s));
+//        request.getImage().map(file -> s3Service.uploadFile("medisync-drug", request.getDrugId().toString(), file));
     }
 
     public void remove(UUID drugId) {
-        drugScheduleRepository.deleteAllByDrugId(drugId);
         deleteAllByDrugIds(userContext.getUserId(), List.of(drugId));
     }
 
@@ -137,20 +139,24 @@ public class DrugService {
         drugRepository.deleteAllById(drugIds);
     }
 
-    public void scheduledDrug(Drug drug, List<Schedule> schedules, String deviceToken) {
-        // remove old schedule.
-        drugScheduleRepository.deleteAllByDrugId(drug.getId());
+    private DrugDTO transformDTO(Drug drug) {
+        List<ScheduleTime> scheduleTimes = scheduleService.get(drug.getId()).stream()
+                .map(s -> new ScheduleTime(s.getScheduleTime().toLocalTime(), s.getIsEnabled())).toList();
 
-        List<DrugSchedule> drugSchedules = schedules.stream().map(
-                s -> new DrugSchedule()
-                        .setDrugId(drug.getId())
-                        .setScheduledTime(s.getTime())
-                        .setIsEnabled(s.getIsEnabled())
-                        .setUserId(drug.getUserId())
-                        .setDeviceToken(deviceToken)
-        ).toList();
-
-        drugScheduleRepository.saveAll(drugSchedules);
+        return new DrugDTO()
+                .setId(drug.getId())
+//                .setDrugImageUrl(drugImageUrl.orElse(""))
+                .setUserId(drug.getUserId())
+                .setGenericName(drug.getGenericName())
+                .setDosageForm(drug.getDosageForm())
+                .setUnit(drug.getUnit())
+                .setStrength(drug.getStrength())
+                .setAmount(drug.getAmount())
+                .setDose(drug.getDose())
+                .setTakenAmount(drug.getTakenAmount())
+                .setUsageTime(drug.getUsageTime())
+                .setIsInternalDrug(drug.getIsInternalDrug())
+                .setScheduleTimes(scheduleTimes);
     }
 
     private Boolean validateOwner(UUID userId, List<UUID> drugIds) {
