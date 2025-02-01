@@ -1,5 +1,6 @@
 package com.mahidol.drugapi.schedule.services.impl;
 
+import com.mahidol.drugapi.common.models.ScheduleTime;
 import com.mahidol.drugapi.drug.models.entites.Drug;
 import com.mahidol.drugapi.druggroup.entities.DrugGroup;
 import com.mahidol.drugapi.schedule.models.entities.Schedule;
@@ -26,38 +27,38 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public void set(Drug drug, List<LocalTime> schedules, Boolean isEnabled) {
+    public void set(Drug drug, List<ScheduleTime> schedules) {
         scheduleRepository.deleteAllByReferenceId(drug.getId());
 
         // Return to avoid saving empty rows to db
         if (schedules.isEmpty())
             return;
 
-        List<Schedule> s = schedules.stream().map(t -> new Schedule()
-                .setScheduleTime(LocalDateTime.of(dummyDate, t))
+        List<Schedule> s = schedules.stream().map(st -> new Schedule()
+                .setScheduleTime(LocalDateTime.of(dummyDate, st.getTime()))
                 .setType(0)
                 .setName(drug.getGenericName())
                 .setUserId(drug.getUserId())
-                .setIsEnabled(isEnabled)
+                .setIsEnabled(st.getIsEnabled())
                 .setReferenceId(drug.getId())).toList();
 
         scheduleRepository.saveAll(s);
     }
 
     @Override
-    public void set(DrugGroup drugGroup, List<LocalTime> schedules, Boolean isEnabled) {
+    public void set(DrugGroup drugGroup, List<ScheduleTime> schedules) {
         scheduleRepository.deleteAllByReferenceId(drugGroup.getId());
 
         // Return to avoid saving empty rows to db
         if(schedules.isEmpty())
             return;
 
-        List<Schedule> s = schedules.stream().map(t -> new Schedule()
-                .setScheduleTime(LocalDateTime.of(dummyDate, t))
+        List<Schedule> s = schedules.stream().map(st -> new Schedule()
+                .setScheduleTime(LocalDateTime.of(dummyDate, st.getTime()))
                 .setType(1)
                 .setName(drugGroup.getGroupName())
                 .setUserId(drugGroup.getUserId())
-                .setIsEnabled(isEnabled)
+                .setIsEnabled(st.getIsEnabled())
                 .setReferenceId(drugGroup.getId())).toList();
 
         scheduleRepository.saveAll(s);
