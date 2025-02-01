@@ -1,9 +1,6 @@
 package com.mahidol.drugapi.schedule.models.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
@@ -18,6 +15,7 @@ import java.util.UUID;
 @Table(name = "schedule")
 public class Schedule {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name = "user_id", columnDefinition = "UUID")
