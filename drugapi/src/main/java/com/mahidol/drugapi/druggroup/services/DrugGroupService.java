@@ -1,7 +1,7 @@
 package com.mahidol.drugapi.druggroup.services;
 
 import com.mahidol.drugapi.common.models.Pagination;
-import com.mahidol.drugapi.common.models.Schedule;
+import com.mahidol.drugapi.common.models.ScheduleTime;
 import com.mahidol.drugapi.common.services.PaginationService;
 import com.mahidol.drugapi.common.ctx.UserContext;
 import com.mahidol.drugapi.drug.models.entites.Drug;
@@ -121,9 +121,9 @@ public class DrugGroupService {
         ));
     }
 
-    private void scheduleDrugGroup(DrugGroup drugGroup, List<Schedule> schedules, String deviceToken) {
+    private void scheduleDrugGroup(DrugGroup drugGroup, List<ScheduleTime> scheduleTimes, String deviceToken) {
         drugGroupScheduleRepository.deleteAllByDrugGroupId(drugGroup.getId());
-        List<DrugGroupSchedule> drugGroupSchedules = schedules.stream().map(
+        List<DrugGroupSchedule> drugGroupSchedules = scheduleTimes.stream().map(
                 s -> new DrugGroupSchedule()
                         .setDrugGroupId(drugGroup.getId())
                         .setScheduledTime(s.getTime())
@@ -158,9 +158,9 @@ public class DrugGroupService {
     private void setDrugNotifications(Boolean isEnabled, UUID userId, List<UUID> drugIds, String deviceToken) {
         List<Drug> drugs = drugService.searchAllDrugByDrugsId(userId, drugIds);
         drugs.forEach(drug -> {
-            List<Schedule> drugSchedules = drugScheduleRepository.findByDrugId(drug.getId()).stream()
+            List<ScheduleTime> drugScheduleTimes = drugScheduleRepository.findByDrugId(drug.getId()).stream()
                     .map(d -> d.setIsEnabled(isEnabled)).toList();
-            drugService.scheduledDrug(drug, drugSchedules, deviceToken);
+            drugService.scheduledDrug(drug, drugScheduleTimes, deviceToken);
         });
     }
 }

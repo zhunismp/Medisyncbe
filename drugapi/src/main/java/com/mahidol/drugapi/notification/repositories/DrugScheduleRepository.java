@@ -1,6 +1,6 @@
 package com.mahidol.drugapi.notification.repositories;
 
-import com.mahidol.drugapi.common.models.Schedule;
+import com.mahidol.drugapi.common.models.ScheduleTime;
 import com.mahidol.drugapi.notification.models.drug.DrugSchedule;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -12,7 +12,7 @@ import java.util.UUID;
 @Repository
 public interface DrugScheduleRepository extends JpaRepository<DrugSchedule, UUID> {
     List<DrugSchedule> findByScheduledTime(LocalTime time);
-    List<Schedule> findByDrugId(UUID drugId);
+    List<ScheduleTime> findByDrugId(UUID drugId);
 
     void deleteAllByDrugId(UUID drugId);
 

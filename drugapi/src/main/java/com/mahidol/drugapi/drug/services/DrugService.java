@@ -1,7 +1,7 @@
 package com.mahidol.drugapi.drug.services;
 
 import com.mahidol.drugapi.common.models.Pagination;
-import com.mahidol.drugapi.common.models.Schedule;
+import com.mahidol.drugapi.common.models.ScheduleTime;
 import com.mahidol.drugapi.common.services.PaginationService;
 import com.mahidol.drugapi.common.ctx.UserContext;
 import com.mahidol.drugapi.drug.dtos.request.CreateDrugRequest;
@@ -137,11 +137,11 @@ public class DrugService {
         drugRepository.deleteAllById(drugIds);
     }
 
-    public void scheduledDrug(Drug drug, List<Schedule> schedules, String deviceToken) {
+    public void scheduledDrug(Drug drug, List<ScheduleTime> scheduleTimes, String deviceToken) {
         // remove old schedule.
         drugScheduleRepository.deleteAllByDrugId(drug.getId());
 
-        List<DrugSchedule> drugSchedules = schedules.stream().map(
+        List<DrugSchedule> drugSchedules = scheduleTimes.stream().map(
                 s -> new DrugSchedule()
                         .setDrugId(drug.getId())
                         .setScheduledTime(s.getTime())

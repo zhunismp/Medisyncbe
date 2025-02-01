@@ -10,7 +10,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-public class Schedule {
+public class ScheduleTime {
     private LocalTime time;
     private Boolean isEnabled = true;
 }

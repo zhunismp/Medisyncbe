@@ -1,6 +1,6 @@
 package com.mahidol.drugapi.druggroup.dtos.response;
 
-import com.mahidol.drugapi.common.models.Schedule;
+import com.mahidol.drugapi.common.models.ScheduleTime;
 import com.mahidol.drugapi.drug.models.entites.Drug;
 import com.mahidol.drugapi.druggroup.entities.DrugGroup;
 import lombok.AllArgsConstructor;
@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
@@ -26,7 +25,7 @@ public class DrugGroupDTO {
 
     private String groupName;
 
-    private List<Schedule> schedules;
+    private List<ScheduleTime> scheduleTimes;
 
     private List<Drug> drugs;
 
