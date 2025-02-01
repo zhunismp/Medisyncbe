@@ -15,6 +15,7 @@ import com.mahidol.drugapi.drug.repositories.DrugRepository;
 import com.mahidol.drugapi.external.aws.s3.S3Service;
 import com.mahidol.drugapi.notification.models.drug.DrugSchedule;
 import com.mahidol.drugapi.notification.repositories.DrugScheduleRepository;
+import com.mahidol.drugapi.schedule.services.ScheduleService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +25,7 @@ import java.util.*;
 public class DrugService {
 
     private final DrugRepository drugRepository;
-    private final DrugScheduleRepository drugScheduleRepository;
+    private final ScheduleService scheduleService;
     private final PaginationService<DrugDTO> paginationService;
     private final UserContext userContext;
     private final S3Service s3Service;
@@ -32,12 +33,13 @@ public class DrugService {
     public DrugService(
             DrugRepository drugRepository,
             DrugScheduleRepository drugScheduleRepository,
+            ScheduleService scheduleService,
             PaginationService<DrugDTO> paginationService,
             UserContext userContext,
             S3Service s3Service
     ) {
         this.drugRepository = drugRepository;
-        this.drugScheduleRepository = drugScheduleRepository;
+        this.scheduleService = scheduleService;
         this.paginationService = paginationService;
         this.userContext = userContext;
         this.s3Service = s3Service;
@@ -80,8 +82,10 @@ public class DrugService {
                 .setIsInternalDrug(request.getIsInternalDrug())
         );
 
-//        scheduledDrug(savedDrug, request.getSchedules(), userContext.getDeviceToken());
-        request.getImage().map(file -> s3Service.uploadFile("medisync-drug", savedDrug.getId().toString(), file));
+        // TODO: Fixed AWS service
+//         request.getImage().map(file -> s3Service.uploadFile("medisync-drug", savedDrug.getId().toString(), file));
+        scheduleService.set(savedDrug, request.getScheduleTimes());
+
     }
 
     public void update(UpdateDrugRequest request) {
@@ -100,12 +104,11 @@ public class DrugService {
                 .orElseThrow(() -> new EntityNotFoundException("Drug id not found with id " + request.getDrugId()));
 
         drugRepository.save(target);
-//        request.getSchedules().ifPresent(schedules -> scheduledDrug(target, schedules, request.getDeviceToken()));
-        request.getImage().map(file -> s3Service.uploadFile("medisync-drug", request.getDrugId().toString(), file));
+        request.getScheduleTimes().ifPresent(s -> scheduleService.set(target, s));
+//        request.getImage().map(file -> s3Service.uploadFile("medisync-drug", request.getDrugId().toString(), file));
     }
 
     public void remove(UUID drugId) {
-        drugScheduleRepository.deleteAllByDrugId(drugId);
         deleteAllByDrugIds(userContext.getUserId(), List.of(drugId));
     }
 
@@ -135,22 +138,6 @@ public class DrugService {
             throw new IllegalArgumentException("User is not the owner of requested drug.");
 
         drugRepository.deleteAllById(drugIds);
-    }
-
-    public void scheduledDrug(Drug drug, List<ScheduleTime> scheduleTimes, String deviceToken) {
-        // remove old schedule.
-        drugScheduleRepository.deleteAllByDrugId(drug.getId());
-
-        List<DrugSchedule> drugSchedules = scheduleTimes.stream().map(
-                s -> new DrugSchedule()
-                        .setDrugId(drug.getId())
-                        .setScheduledTime(s.getTime())
-                        .setIsEnabled(s.getIsEnabled())
-                        .setUserId(drug.getUserId())
-                        .setDeviceToken(deviceToken)
-        ).toList();
-
-        drugScheduleRepository.saveAll(drugSchedules);
     }
 
     private Boolean validateOwner(UUID userId, List<UUID> drugIds) {

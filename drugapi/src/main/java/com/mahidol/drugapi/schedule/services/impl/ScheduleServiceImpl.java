@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -60,6 +59,14 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .setUserId(drugGroup.getUserId())
                 .setIsEnabled(st.getIsEnabled())
                 .setReferenceId(drugGroup.getId())).toList();
+
+        scheduleRepository.saveAll(s);
+    }
+
+    @Override
+    public void setIsEnabled(UUID referenceId, Boolean isEnabled) {
+        List<Schedule> s = scheduleRepository.findAllByReferenceId(referenceId);
+        s.forEach(sch -> sch.setIsEnabled(isEnabled));
 
         scheduleRepository.saveAll(s);
     }
