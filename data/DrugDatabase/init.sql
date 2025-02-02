@@ -1,6 +1,7 @@
 CREATE TABLE DRUG (
     id UUID PRIMARY KEY,
     user_id UUID NOT NULL,
+    group_id UUID,
     generic_name TEXT NOT NULL,
     dosage_form TEXT,
     unit TEXT NOT NULL,
@@ -10,6 +11,8 @@ CREATE TABLE DRUG (
     taken_amount FLOAT,
     usage_time INT NOT NULL,
     is_internal_drug BOOLEAN NOT NULL
+
+    CONSTRAINT fk_group FOREIGN KEY (group_id) REFERENCES DRUG_GROUP(id)
 );
 
 CREATE INDEX idx_drug_user_id ON drug (user_id);
