@@ -1,6 +1,7 @@
 CREATE TABLE DRUG (
     id UUID PRIMARY KEY,
     user_id UUID NOT NULL,
+    group_id UUID,
     generic_name TEXT NOT NULL,
     dosage_form TEXT,
     unit TEXT NOT NULL,
@@ -32,8 +33,7 @@ CREATE TABLE APP_USER (
 CREATE TABLE DRUG_GROUP (
     id UUID PRIMARY KEY,
     user_id UUID NOT NULL,
-    group_name TEXT NOT NULL,
-    drug_id UUID[]
+    group_name TEXT NOT NULL
 );
 
 CREATE INDEX idx_drug_group_user_id ON drug_group (user_id);
@@ -78,6 +78,10 @@ ALTER TABLE DRUG
 ADD CONSTRAINT fk_drug_user_id
 FOREIGN KEY (user_id) REFERENCES APP_USER(id) ON DELETE CASCADE;
 
+ALTER TABLE DRUG 
+ADD CONSTRAINT fk_drug_group_user_id
+FOREIGN KEY (group_id) REFERENCEs DRUG_GROUP(id);
+
 ALTER TABLE DRUG_GROUP
 ADD CONSTRAINT fk_drug_group_user_id
 FOREIGN KEY (user_id) REFERENCES APP_USER(id) ON DELETE CASCADE;
@@ -92,8 +96,8 @@ FOREIGN KEY (user_id) REFERENCES APP_USER(id) ON DELETE CASCADE;
 
 ALTER TABLE HISTORY
 ADD CONSTRAINT fk_history_drug_id
-FOREIGN KEY (drug_id) REFERENCES DRUG(id) ON DELETE CASCADE;
+FOREIGN KEY (drug_id) REFERENCES DRUG(id);
 
 ALTER TABLE HISTORY
 ADD CONSTRAINT fk_history_group_id
-FOREIGN KEY (group_id) REFERENCES DRUG_GROUP(id) ON DELETE CASCADE;
+FOREIGN KEY (group_id) REFERENCES DRUG_GROUP(id);

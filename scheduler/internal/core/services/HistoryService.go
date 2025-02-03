@@ -57,9 +57,9 @@ func (h *HistoryService) createDrugGroupHistory(s models.Schedule) (error) {
     var drugIds []uuid.UUID
 
     err := h.DB.Raw(`
-        SELECT unnest(drug_id)
-        FROM drug_group
-        WHERE id = ?`, s.ReferenceID,
+        SELECT id
+        FROM drug
+        WHERE group_id = ?`, s.ReferenceID,
     ).Scan(&drugIds).Error
 
     if err != nil {
