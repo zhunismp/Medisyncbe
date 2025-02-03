@@ -26,10 +26,4 @@ public class CreateGroupRequest {
 
     @NotNull(message = "drugs should not be null")
     private List<UUID> drugs;
-
-    private Boolean isEnabled;
-
-    public Boolean getIsEnabled() {
-        return Optional.ofNullable(isEnabled).orElse(true);
-    }
 }
