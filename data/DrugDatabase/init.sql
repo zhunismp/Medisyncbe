@@ -33,8 +33,7 @@ CREATE TABLE APP_USER (
 CREATE TABLE DRUG_GROUP (
     id UUID PRIMARY KEY,
     user_id UUID NOT NULL,
-    group_name TEXT NOT NULL,
-    drug_id UUID[]
+    group_name TEXT NOT NULL
 );
 
 CREATE INDEX idx_drug_group_user_id ON drug_group (user_id);
