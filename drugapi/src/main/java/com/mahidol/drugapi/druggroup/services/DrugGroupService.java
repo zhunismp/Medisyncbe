@@ -55,14 +55,17 @@ public class DrugGroupService {
 
         DrugGroup group = new DrugGroup()
                 .setUserId(userContext.getUserId())
-                .setGroupName(request.getGroupName())
-                .setDrugs(request.getDrugs());
+                .setGroupName(request.getGroupName());
 
-        // disable notification flag for individual drug
+        // associate group_id with drugs
+        List<Drug> updateDrugs = drugService.searchAllDrugByDrugsId(userContext.getUserId(), request.getDrugs())
+                .stream().map(d -> d.setGroupId(group.getId())).toList();
+        drugService.saveAllDrugs(userContext.getUserId(), updateDrugs);
+
+        // scheduler
         request.getDrugs().forEach(id -> scheduleService.setIsEnabled(id, false));
-
         DrugGroup savedGroup = drugGroupRepository.save(group);
-        scheduleService.set(group, request.getScheduleTimes());
+        scheduleService.set(savedGroup, request.getScheduleTimes());
     }
 
     public SearchGroupResponse search(SearchGroupRequest request) {
@@ -94,7 +97,7 @@ public class DrugGroupService {
 
 
     public void remove(UUID drugGroupId, Boolean isRemoveDrug) {
-        List<UUID> drugIds = getDrugGroupByGroupId(userContext.getUserId(), drugGroupId).getDrugs();
+        List<UUID> drugIds = getDrugGroupByGroupId(userContext.getUserId(), drugGroupId).getDrugs().stream().map(Drug::getId).toList();
 
         if (isRemoveDrug)
             drugService.deleteAllByDrugIds(userContext.getUserId(), drugIds);
@@ -112,9 +115,10 @@ public class DrugGroupService {
         // disable notification flag for individual drug
         request.getDrugs().forEach(id -> scheduleService.setIsEnabled(id, false));
 
-        drugGroupRepository.save(drugGroup.setDrugs(
-                Stream.concat(drugGroup.getDrugs().stream(), request.getDrugs().stream()).collect(Collectors.toList())
-        ));
+        // associate group_id with drugs
+        List<Drug> updateDrugs = drugService.searchAllDrugByDrugsId(userContext.getUserId(), request.getDrugs())
+                .stream().map(d -> d.setGroupId(request.getGroupId())).toList();
+        drugService.saveAllDrugs(userContext.getUserId(), updateDrugs);
     }
 
     private DrugGroup getDrugGroupByGroupId(UUID userId, UUID groupId) {
@@ -138,7 +142,7 @@ public class DrugGroupService {
     }
 
     private DrugGroupDTO transformDTO(DrugGroup group) {
-        List<Drug> drugs = drugService.searchAllDrugByDrugsId(userContext.getUserId(), group.getDrugs());
+        List<Drug> drugs = group.getDrugs();
         List<ScheduleTime> scheduleTimes = scheduleService.get(group.getId()).stream().map(s ->
                 new ScheduleTime(s.getScheduleTime().toLocalTime(), s.getIsEnabled())
         ).toList();

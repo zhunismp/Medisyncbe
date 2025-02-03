@@ -20,8 +20,11 @@ public class Drug {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "user_id", columnDefinition = "TEXT")
+    @Column(name = "user_id", columnDefinition = "UUID")
     private UUID userId;
+
+    @Column(name = "group_id", columnDefinition = "UUID")
+    private UUID groupId;
 
     @Column(name = "generic_name", columnDefinition = "TEXT")
     private String genericName;

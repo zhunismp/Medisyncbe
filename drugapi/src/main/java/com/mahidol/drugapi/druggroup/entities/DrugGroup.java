@@ -1,5 +1,6 @@
 package com.mahidol.drugapi.druggroup.entities;
 
+import com.mahidol.drugapi.drug.models.entites.Drug;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,6 +26,8 @@ public class DrugGroup {
     @Column(name = "group_name", columnDefinition = "TEXT")
     private String groupName;
 
-    @Column(name = "drug_id", columnDefinition = "UUID[]")
-    private List<UUID> drugs;
+    @OneToMany
+    @JoinColumn(name = "group_id")
+    private List<Drug> drugs;
+
 }
