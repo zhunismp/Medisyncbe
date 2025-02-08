@@ -8,8 +8,7 @@ INSERT INTO APP_USER (
 
 -- Insert drug group
 INSERT INTO DRUG_GROUP (id, user_id, group_name) VALUES (
-    'c362f634-e49f-44e9-bbe7-49d94488a6ff', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 'Painkillers'
-);
+    'c362f634-e49f-44e9-bbe7-49d94488a6ff', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 'Painkillers');
 
 -- Insert individual drugs for the user
 INSERT INTO DRUG (id, user_id, group_id, generic_name, dosage_form, unit, strength, amount, dose, taken_amount, usage_time, is_internal_drug) VALUES

@@ -4,12 +4,9 @@ import com.mahidol.drugapi.common.models.Pagination;
 import com.mahidol.drugapi.common.models.ScheduleTime;
 import com.mahidol.drugapi.common.services.PaginationService;
 import com.mahidol.drugapi.common.ctx.UserContext;
-import com.mahidol.drugapi.drug.dtos.response.DrugDTO;
 import com.mahidol.drugapi.drug.models.entites.Drug;
 import com.mahidol.drugapi.drug.services.DrugService;
-import com.mahidol.drugapi.druggroup.dtos.request.AddDrugRequest;
-import com.mahidol.drugapi.druggroup.dtos.request.CreateGroupRequest;
-import com.mahidol.drugapi.druggroup.dtos.request.SearchGroupRequest;
+import com.mahidol.drugapi.druggroup.dtos.request.*;
 import com.mahidol.drugapi.druggroup.dtos.response.DrugGroupDTO;
 import com.mahidol.drugapi.druggroup.dtos.response.SearchGroupResponse;
 import com.mahidol.drugapi.druggroup.entities.DrugGroup;
@@ -19,8 +16,6 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class DrugGroupService {
@@ -56,16 +51,26 @@ public class DrugGroupService {
         DrugGroup group = new DrugGroup()
                 .setUserId(userContext.getUserId())
                 .setGroupName(request.getGroupName());
-
-        // associate group_id with drugs
-        List<Drug> updateDrugs = drugService.searchAllDrugByDrugsId(userContext.getUserId(), request.getDrugs())
-                .stream().map(d -> d.setGroupId(group.getId())).toList();
-        drugService.saveAllDrugs(userContext.getUserId(), updateDrugs);
-
-        // scheduler
-        request.getDrugs().forEach(id -> scheduleService.setIsEnabled(id, false));
+        
+        linkDrug(request.getDrugs(), group.getId());
         DrugGroup savedGroup = drugGroupRepository.save(group);
         scheduleService.set(savedGroup, request.getScheduleTimes());
+    }
+
+    public void update(UpdateGroupRequest request) {
+        DrugGroup target = drugGroupRepository.findById(request.getGroupId())
+                .map(d -> {
+                    if (!d.getUserId().equals(userContext.getUserId()))
+                        throw new IllegalArgumentException("User is not the owner of the group");
+
+                    // update schedules
+                    request.getScheduleTimes().ifPresent(s -> scheduleService.set(d, s));
+
+                    return d.setGroupName(request.getGroupName().orElse(d.getGroupName()));
+                })
+                .orElseThrow(() -> new EntityNotFoundException("Drug group not found"));
+
+        drugGroupRepository.save(target);
     }
 
     public SearchGroupResponse search(SearchGroupRequest request) {
@@ -78,6 +83,33 @@ public class DrugGroupService {
                 applyPaginate(drugGroupWithDrugInfos, request.getPagination()),
                 drugGroupWithDrugInfos.size()
         );
+    }
+
+    public void addDrugsToGroup(AddDrugRequest request) {
+        linkDrug(request.getDrugs(), request.getGroupId());
+    }
+
+    public void removeDrugsFromGroup(RemoveDrugRequest request) {
+        List<UUID> drugIds = request.getDrugs();
+
+        if (request.getIsRemoveDrug()) {
+            drugIds.forEach(scheduleService::remove); // remove schedule
+            drugService.deleteAllByDrugIds(userContext.getUserId(), request.getDrugs()); // remove drug
+            return;
+        }
+
+        unlinkDrug(drugIds);
+    }
+
+    public void remove(UUID drugGroupId, Boolean isRemoveDrug) {
+        List<UUID> drugIds = getDrugGroupByGroupId(userContext.getUserId(), drugGroupId).getDrugs().stream().map(Drug::getId).toList();
+
+        if (isRemoveDrug)
+            drugService.deleteAllByDrugIds(userContext.getUserId(), drugIds);
+        else
+            unlinkDrug(drugIds);
+
+        drugGroupRepository.deleteById(drugGroupId);
     }
 
     public List<DrugGroupDTO> searchAllDrugGroupByDrugGroupIds(List<UUID> drugGroupIds) {
@@ -93,32 +125,6 @@ public class DrugGroupService {
             throw new IllegalArgumentException("User is not the owner of requested drug group.");
 
         return drugGroupRepository.findById(groupId);
-    }
-
-
-    public void remove(UUID drugGroupId, Boolean isRemoveDrug) {
-        List<UUID> drugIds = getDrugGroupByGroupId(userContext.getUserId(), drugGroupId).getDrugs().stream().map(Drug::getId).toList();
-
-        if (isRemoveDrug)
-            drugService.deleteAllByDrugIds(userContext.getUserId(), drugIds);
-        else
-            // After remove drug from the drug group, we need to set isEnabled to true again
-            // This is for make old notification of drug behavior the same as before.
-            drugIds.forEach(id -> scheduleService.setIsEnabled(id, true));
-
-        drugGroupRepository.deleteById(drugGroupId);
-    }
-
-    public void addDrugsToGroup(AddDrugRequest request) {
-        DrugGroup drugGroup = getDrugGroupByGroupId(userContext.getUserId(), request.getGroupId());
-
-        // disable notification flag for individual drug
-        request.getDrugs().forEach(id -> scheduleService.setIsEnabled(id, false));
-
-        // associate group_id with drugs
-        List<Drug> updateDrugs = drugService.searchAllDrugByDrugsId(userContext.getUserId(), request.getDrugs())
-                .stream().map(d -> d.setGroupId(request.getGroupId())).toList();
-        drugService.saveAllDrugs(userContext.getUserId(), updateDrugs);
     }
 
     private DrugGroup getDrugGroupByGroupId(UUID userId, UUID groupId) {
@@ -139,6 +145,25 @@ public class DrugGroupService {
         List<UUID> validDrugGroupIds = drugGroupRepository.findByUserId(userId).stream().map(DrugGroup::getId).toList();
 
         return new HashSet<>(validDrugGroupIds).containsAll(drugGroupIds);
+    }
+
+    // After remove drug from the drug group, we need to set isEnabled to true again
+    // This is for make old notification of drug behavior the same as before.
+    private void unlinkDrug(List<UUID> drugIds) {
+        List<Drug> drugs = drugService.searchAllDrugByDrugsId(userContext.getUserId(), drugIds);
+
+        drugService.saveAllDrugs(userContext.getUserId(), drugs.stream().map(d -> d.setGroupId(null)).toList());
+        drugIds.forEach(id -> scheduleService.setIsEnabled(id, true));
+    }
+
+    private void linkDrug(List<UUID> drugIds, UUID groupId) {
+        // associate group_id with drugs
+        List<Drug> updateDrugs = drugService.searchAllDrugByDrugsId(userContext.getUserId(), drugIds)
+                .stream().map(d -> d.setGroupId(groupId)).toList();
+        drugService.saveAllDrugs(userContext.getUserId(), updateDrugs);
+
+        // scheduler
+        drugIds.forEach(id -> scheduleService.setIsEnabled(id, false));
     }
 
     private DrugGroupDTO transformDTO(DrugGroup group) {

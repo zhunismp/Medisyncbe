@@ -13,4 +13,5 @@ public interface ScheduleService {
     void set(DrugGroup drugGroup, List<ScheduleTime> schedules);
     void setIsEnabled(UUID referenceId, Boolean isEnabled);
     List<Schedule> get(UUID referenceId);
+    void remove(UUID referenceId);
 }

@@ -58,7 +58,7 @@ public class HistoryServiceImpl implements HistoryService {
                 )
                 .orElse(histories);
 
-        Map<Boolean, List<History>> partitioned = histories.stream()
+        Map<Boolean, List<History>> partitioned = filteredHistories.stream()
                 .collect(Collectors.partitioningBy(history -> history.getGroupId() != null));
 
         List<DrugHistory> drugHistories = buildDrugHistories(userId, partitioned.get(false));
@@ -115,6 +115,11 @@ public class HistoryServiceImpl implements HistoryService {
 
         historyRepository.saveAll(histories);
         drugService.saveAllDrugs(userId, updateDrugs);
+    }
+
+    @Override
+    public void removeHistoriesByDrugIds(List<UUID> drugIds) {
+        historyRepository.deleteAllByDrugIds(drugIds);
     }
 
     private List<DrugHistory> buildDrugHistories(UUID userId, List<History> drugHistories) {

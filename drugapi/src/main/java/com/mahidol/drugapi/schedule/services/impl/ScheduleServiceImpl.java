@@ -6,6 +6,7 @@ import com.mahidol.drugapi.druggroup.entities.DrugGroup;
 import com.mahidol.drugapi.schedule.models.entities.Schedule;
 import com.mahidol.drugapi.schedule.repositories.ScheduleRepository;
 import com.mahidol.drugapi.schedule.services.ScheduleService;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -26,6 +27,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
+    @Transactional
     public void set(Drug drug, List<ScheduleTime> schedules) {
         scheduleRepository.deleteAllByReferenceId(drug.getId());
 
@@ -45,6 +47,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
+    @Transactional
     public void set(DrugGroup drugGroup, List<ScheduleTime> schedules) {
         scheduleRepository.deleteAllByReferenceId(drugGroup.getId());
 
@@ -74,5 +77,11 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     public List<Schedule> get(UUID referenceId) {
         return scheduleRepository.findAllByReferenceId(referenceId);
+    }
+
+    @Override
+    @Transactional
+    public void remove(UUID referenceId) {
+        scheduleRepository.deleteAllByReferenceId(referenceId);
     }
 }
