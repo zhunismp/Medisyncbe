@@ -1,10 +1,7 @@
 package com.mahidol.drugapi.druggroup.controllers;
 
 import com.mahidol.drugapi.common.exceptions.BindingError;
-import com.mahidol.drugapi.druggroup.dtos.request.AddDrugRequest;
-import com.mahidol.drugapi.druggroup.dtos.request.CreateGroupRequest;
-import com.mahidol.drugapi.druggroup.dtos.request.SearchGroupRequest;
-import com.mahidol.drugapi.druggroup.dtos.request.UpdateGroupRequest;
+import com.mahidol.drugapi.druggroup.dtos.request.*;
 import com.mahidol.drugapi.druggroup.dtos.response.SearchGroupResponse;
 import com.mahidol.drugapi.druggroup.services.DrugGroupService;
 import jakarta.validation.Valid;
@@ -72,5 +69,14 @@ public class DrugGroupController {
         drugGroupService.addDrugsToGroup(request);
 
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/groups/drugs")
+    public ResponseEntity<?> removeDrugs(@RequestBody @Valid RemoveDrugRequest request, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) throw new BindingError(bindingResult.getFieldErrors());
+
+        drugGroupService.removeDrugsFromGroup(request);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

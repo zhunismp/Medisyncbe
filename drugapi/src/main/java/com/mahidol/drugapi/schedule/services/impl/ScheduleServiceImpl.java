@@ -78,4 +78,10 @@ public class ScheduleServiceImpl implements ScheduleService {
     public List<Schedule> get(UUID referenceId) {
         return scheduleRepository.findAllByReferenceId(referenceId);
     }
+
+    @Override
+    @Transactional
+    public void remove(UUID referenceId) {
+        scheduleRepository.deleteAllByReferenceId(referenceId);
+    }
 }
