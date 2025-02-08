@@ -125,7 +125,9 @@ public class HistoryServiceImpl implements HistoryService {
                         drug.getId(),
                         drug.getGenericName(),
                         drug.getDosageForm(),
+                        drug.getStrength(),
                         drug.getUnit(),
+                        drug.getDose(),
                         drug.getAmount(),
                         drug.getAmount() - drug.getTakenAmount(),
                         entry.getValue().stream()
