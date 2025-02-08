@@ -16,7 +16,9 @@ public class DrugHistory {
     private UUID drugId;
     private String drugGenericName;
     private String dosageForm;
+    private String strength;
     private String unit;
+    private Double dose;
     private Double initialAmount;
     private Double remainingAmount;
     private List<History> histories;
