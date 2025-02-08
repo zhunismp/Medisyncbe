@@ -7,9 +7,8 @@ INSERT INTO APP_USER (
 );
 
 -- Insert drug group
-INSERT INTO DRUG_GROUP (id, user_id, group_name, drug_id) VALUES (
-    'c362f634-e49f-44e9-bbe7-49d94488a6ff', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 'Painkillers', 
-    ARRAY['b2876821-1f75-4c1a-999a-46f8f03d7a4c', 'b2876821-1f75-4c1a-999a-46f8f03d7a4d', 'b2876821-1f75-4c1a-999a-46f8f03d7a4e']::uuid[]
+INSERT INTO DRUG_GROUP (id, user_id, group_name) VALUES (
+    'c362f634-e49f-44e9-bbe7-49d94488a6ff', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 'Painkillers'
 );
 
 -- Insert individual drugs for the user
