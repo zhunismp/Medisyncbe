@@ -22,6 +22,6 @@ public interface HistoryRepository extends JpaRepository<History, UUID> {
     List<History> findByUserId(UUID userId);
 
     @Modifying  // Required because it's a modifying query
-    @Query("DELETE FROM History h WHERE h.groupId IN :drugsId")
+    @Query("DELETE FROM History h WHERE h.groupId IN :drugIds")
     void deleteAllByDrugIds(@Param("drugIds") List<UUID> drugsId);
 }
