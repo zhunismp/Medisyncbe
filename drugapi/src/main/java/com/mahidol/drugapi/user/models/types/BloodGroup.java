@@ -1,7 +1,10 @@
 package com.mahidol.drugapi.user.models.types;
 
+import lombok.Getter;
+
 import java.util.Arrays;
 
+@Getter
 public enum BloodGroup {
     A_POSITIVE("A+"),
     A_NEGATIVE("A-"),
@@ -17,6 +20,9 @@ public enum BloodGroup {
     BloodGroup(String value) {
         this.value = value;
     }
+
+    @Override
+    public String toString() { return value; }
 
     public static BloodGroup fromValue(String value) {
         return Arrays.stream(BloodGroup.values()).filter(v -> v.value.equals(value)).findFirst().orElseThrow(() -> new IllegalArgumentException("Invalid value of " + value));

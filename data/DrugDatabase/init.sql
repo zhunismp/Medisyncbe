@@ -24,10 +24,19 @@ CREATE TABLE APP_USER (
     "weight" FLOAT,
     height FLOAT,
     gender CHAR NOT NULL,
-    blood_group VARCHAR(5) NOT NULL,
+    blood_group TEXT NOT NULL,
     health_condition TEXT,
     drug_allergy TEXT,
     food_allergy TEXT
+);
+
+CREATE TABLE RELATIONSHIP (
+    id UUID PRIMARY KEY,
+    user_id UUID NOT NULL,
+    relative_id UUID NOT NULL,
+    relation TEXT,
+    "status" TEXT CHECK (status IN ('pending', 'accepted')) DEFAULT 'pending',
+    create_at TIMESTAMP DEFAULT NOW()
 );
  
 CREATE TABLE DRUG_GROUP (
@@ -73,6 +82,14 @@ CREATE TABLE HISTORY (
     notified_at TIMESTAMP NOT NULL,
     count INT NOT NULL DEFAULT 0
 );
+
+ALTER TABLE RELATIONSHIP
+ADD CONSTRAINT fk_relationship_user_id
+FOREIGN KEY (user_id) REFERENCES APP_USER(id) ON DELETE CASCADE;
+
+ALTER TABLE RELATIONSHIP
+ADD CONSTRAINT fk_relationship_relative_id
+FOREIGN KEY (relative_id) REFERENCES APP_USER(id) ON DELETE CASCADE;
 
 ALTER TABLE DRUG
 ADD CONSTRAINT fk_drug_user_id

@@ -6,9 +6,14 @@ import com.google.firebase.messaging.Message;
 import com.mahidol.drugapi.common.utils.StringUtil;
 import com.mahidol.drugapi.common.ctx.UserContext;
 import com.mahidol.drugapi.external.aws.s3.S3Service;
+import com.mahidol.drugapi.relation.models.RelationResponse;
+import com.mahidol.drugapi.relation.models.entities.Relation;
+import com.mahidol.drugapi.relation.services.RelationService;
 import com.mahidol.drugapi.user.dtos.requests.CreateUserRequest;
 import com.mahidol.drugapi.user.dtos.requests.UpdateUserRequest;
+import com.mahidol.drugapi.user.dtos.responses.GetRelationResponse;
 import com.mahidol.drugapi.user.dtos.responses.GetUserResponse;
+import com.mahidol.drugapi.user.models.RelationInfo;
 import com.mahidol.drugapi.user.models.entities.User;
 import com.mahidol.drugapi.user.models.types.BloodGroup;
 import com.mahidol.drugapi.user.models.types.Gender;
@@ -18,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,17 +32,20 @@ public class UserService {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository userRepository;
+    private final RelationService relationService;
     private final S3Service s3Service;
     private final UserContext userContext;
     private final FirebaseMessaging firebaseMessaging;
 
     public UserService(
             UserRepository userRepository,
+            RelationService relationService,
             S3Service s3Service,
             UserContext userContext,
             FirebaseMessaging firebaseMessaging
     ) {
         this.userRepository = userRepository;
+        this.relationService = relationService;
         this.s3Service = s3Service;
         this.userContext = userContext;
         this.firebaseMessaging = firebaseMessaging;
@@ -68,9 +77,7 @@ public class UserService {
     }
 
     public GetUserResponse getUser() {
-        return userRepository.findById(userContext.getUserId()).map(user -> {
-                    return GetUserResponse.fromUser(user, Optional.empty());
-                })
+        return userRepository.findById(userContext.getUserId()).map(user -> GetUserResponse.fromUser(user, Optional.empty()))
                 .orElseThrow(() -> new EntityNotFoundException("User id not found with id: " + userContext.getUserId()));
     }
 
@@ -94,6 +101,18 @@ public class UserService {
         request.getProfileImage().map(file -> s3Service.uploadFile("medisync-user-profile", userContext.getUserId().toString(), file));
     }
 
+    public GetRelationResponse getUserRelations() {
+        RelationResponse relations = relationService.getRelation(userContext.getUserId());
+        List<RelationInfo> friends = relations.getFriends().stream().map(r -> transformRelationInfo(r, false)).toList();
+        List<RelationInfo> pending = relations.getPending().stream().map(r -> transformRelationInfo(r, false)).toList();
+        List<RelationInfo> requested = relations.getRequested().stream().map(r -> transformRelationInfo(r, true)).toList();
+
+        return new GetRelationResponse()
+                .setFriends(friends)
+                .setPending(pending)
+                .setRequested(requested);
+    }
+
     public void setUpRegisterToken(String token) {
         Message dummy = Message.builder()
                 .setToken(token)
@@ -108,5 +127,19 @@ public class UserService {
             logger.error("Error from cloud messaging: " + ex.getMessage());
             throw new IllegalArgumentException("Firebase thing go wrong");
         }
+    }
+
+    private RelationInfo transformRelationInfo(Relation r, Boolean isRequested) {
+        UUID targetUserId = isRequested ? r.getUserId() : r.getRelativeId();
+        User relative = userRepository.findById(targetUserId)
+                .orElseThrow(() -> new IllegalArgumentException("User id does not exist"));
+
+        return new RelationInfo(
+            r.getId(),
+            r.getRelativeId(),
+            relative.getFirstName(),
+            relative.getLastName(),
+            r.getCreateAt()
+        );
     }
 }
