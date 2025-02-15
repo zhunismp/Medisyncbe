@@ -29,12 +29,19 @@ public class RelationServiceImpl implements RelationService {
                 relationRepository.findByRelativeId(userId).stream()
         ).toList();
 
+        /*
+            friends -> status is ACCEPTED
+            pending -> userId == userId
+            requested -> relativeId == userId
+         */
         List<Relation> friends = relations.stream().filter(r -> (r.getStatus()).equals(Status.ACCEPTED)).toList();
-        List<Relation> pending = relations.stream().filter(r -> (r.getStatus()).equals(Status.PENDING)).toList();
+        List<Relation> pending = relations.stream().filter(r -> (r.getStatus()).equals(Status.PENDING) && r.getUserId().equals(userId)).toList();
+        List<Relation> requested = relations.stream().filter(r -> (r.getStatus()).equals(Status.PENDING) && r.getRelativeId().equals(userId)).toList();
 
         return new RelationResponse(
                 friends,
-                pending
+                pending,
+                requested
         );
     }
 

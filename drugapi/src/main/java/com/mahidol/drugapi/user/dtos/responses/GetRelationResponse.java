@@ -15,4 +15,5 @@ import java.util.List;
 public class GetRelationResponse {
     List<RelationInfo> friends;
     List<RelationInfo> pending;
+    List<RelationInfo> requested;
 }

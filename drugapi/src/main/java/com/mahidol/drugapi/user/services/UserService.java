@@ -77,9 +77,7 @@ public class UserService {
     }
 
     public GetUserResponse getUser() {
-        return userRepository.findById(userContext.getUserId()).map(user -> {
-                    return GetUserResponse.fromUser(user, Optional.empty());
-                })
+        return userRepository.findById(userContext.getUserId()).map(user -> GetUserResponse.fromUser(user, Optional.empty()))
                 .orElseThrow(() -> new EntityNotFoundException("User id not found with id: " + userContext.getUserId()));
     }
 
@@ -105,12 +103,14 @@ public class UserService {
 
     public GetRelationResponse getUserRelations() {
         RelationResponse relations = relationService.getRelation(userContext.getUserId());
-        List<RelationInfo> friends = relations.getFriends().stream().map(this::transformRelationInfo).toList();
-        List<RelationInfo> pending = relations.getPending().stream().map(this::transformRelationInfo).toList();
+        List<RelationInfo> friends = relations.getFriends().stream().map(r -> transformRelationInfo(r, false)).toList();
+        List<RelationInfo> pending = relations.getPending().stream().map(r -> transformRelationInfo(r, false)).toList();
+        List<RelationInfo> requested = relations.getRequested().stream().map(r -> transformRelationInfo(r, true)).toList();
 
         return new GetRelationResponse()
                 .setFriends(friends)
-                .setPending(pending);
+                .setPending(pending)
+                .setRequested(requested);
     }
 
     public void setUpRegisterToken(String token) {
@@ -129,8 +129,10 @@ public class UserService {
         }
     }
 
-    private RelationInfo transformRelationInfo(Relation r) {
-        User relative = userRepository.findById(r.getUserId()).orElseThrow(() -> new IllegalArgumentException("User id does not exists"));
+    private RelationInfo transformRelationInfo(Relation r, Boolean isRequested) {
+        UUID targetUserId = isRequested ? r.getUserId() : r.getRelativeId();
+        User relative = userRepository.findById(targetUserId)
+                .orElseThrow(() -> new IllegalArgumentException("User id does not exist"));
 
         return new RelationInfo(
             r.getId(),

@@ -13,4 +13,5 @@ import java.util.List;
 public class RelationResponse {
     private List<Relation> friends;
     private List<Relation> pending;
+    private List<Relation> requested;
 }
