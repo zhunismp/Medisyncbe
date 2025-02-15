@@ -1,8 +1,7 @@
 package com.mahidol.drugapi.user.controllers;
 
 import com.mahidol.drugapi.common.exceptions.BindingError;
-import com.mahidol.drugapi.user.dtos.requests.CreateUserRequest;
-import com.mahidol.drugapi.user.dtos.requests.UpdateUserRequest;
+import com.mahidol.drugapi.user.dtos.requests.*;
 import com.mahidol.drugapi.user.dtos.responses.GetRelationResponse;
 import com.mahidol.drugapi.user.dtos.responses.GetUserResponse;
 import com.mahidol.drugapi.user.services.UserService;
@@ -36,12 +35,6 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/users/friends")
-    public ResponseEntity<?> getFriends() {
-        GetRelationResponse response = userService.getUserRelations();
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
     @PutMapping(path = "/users", consumes = "multipart/form-data")
     public ResponseEntity<?> updateUser(@ModelAttribute @Valid UpdateUserRequest request, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) throw new BindingError(bindingResult.getFieldErrors());
@@ -53,5 +46,35 @@ public class UserController {
     public ResponseEntity<?> setUp(@RequestParam("registerToken") String RegisterToken) {
         userService.setUpRegisterToken(RegisterToken);
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @GetMapping("/users/friends")
+    public ResponseEntity<?> getFriends() {
+        GetRelationResponse response = userService.getUserRelations();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/users/friends")
+    public ResponseEntity<?> addFriend(@RequestBody @Valid AddFriendRequest request, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) throw new BindingError(bindingResult.getFieldErrors());
+        userService.addFriend(request);
+
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/users/friends")
+    public ResponseEntity<?> removeRelation(@RequestBody @Valid RemoveRelationRequest request, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) throw new BindingError(bindingResult.getFieldErrors());
+        userService.removeRelation(request);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("users/accept")
+    public ResponseEntity<?> accept(@RequestBody @Valid AcceptFriendRequest request, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) throw new BindingError(bindingResult.getFieldErrors());
+        userService.acceptFriend(request);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

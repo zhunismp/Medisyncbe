@@ -5,10 +5,12 @@ import com.mahidol.drugapi.relation.models.entities.Relation;
 import com.mahidol.drugapi.relation.models.types.Status;
 import com.mahidol.drugapi.relation.repositories.RelationRepository;
 import com.mahidol.drugapi.relation.services.RelationService;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -60,22 +62,22 @@ public class RelationServiceImpl implements RelationService {
     }
 
     @Override
-    public void acceptRequest(UUID userId, UUID relativeId) {
+    @Transactional
+    public void acceptRequest(UUID relationId) {
         // check if request created or not
-        if (!relationRepository.existsByUserIdAndRelativeId(userId, relativeId))
-            throw new IllegalArgumentException("Request never been created");
+        Relation pendingRequest = relationRepository.findById(relationId)
+                .map(r -> {
+                    if (r.getStatus().equals(Status.ACCEPTED))
+                        throw new IllegalArgumentException("User are already friend");
 
-        // remove pending request for both way A -> B , B -> A
-        relationRepository.deleteByUserIdAndRelativeId(userId, relativeId);
-        relationRepository.deleteByUserIdAndRelativeId(relativeId, userId);
+                    return r.setStatus(Status.ACCEPTED).setCreateAt(LocalDateTime.now());
+                })
+                .orElseThrow(() -> new IllegalArgumentException("Request never been created"));
 
-        Relation r = new Relation()
-                .setUserId(userId)
-                .setRelativeId(relativeId)
-                .setStatus(Status.ACCEPTED)
-                .setCreateAt(LocalDateTime.now());
+        // remove pending request for B -> A if exists
+        relationRepository.deleteByUserIdAndRelativeId(pendingRequest.getRelativeId(), pendingRequest.getUserId());
 
-        relationRepository.save(r);
+        relationRepository.save(pendingRequest);
     }
 
     @Override
