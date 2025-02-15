@@ -17,6 +17,7 @@ import java.util.UUID;
 @Table(name = "relationship")
 public class Relation {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     @Column(name = "user_id", columnDefinition = "UUID")
     private UUID userId;
