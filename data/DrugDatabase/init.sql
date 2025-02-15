@@ -29,6 +29,15 @@ CREATE TABLE APP_USER (
     drug_allergy TEXT,
     food_allergy TEXT
 );
+
+CREATE TABLE RELATIONSHIP (
+    id UUID PRIMARY KEY,
+    user_id UUID NOT NULL,
+    relative_id UUID NOT NULL,
+    relation TEXT,
+    status VARCHAR(10) CHECK (status IN ('pending', 'accepted', 'rejected')) DEFAULT 'pending',
+    create_at TIMESTAMP DEFAULT NOW()
+);
  
 CREATE TABLE DRUG_GROUP (
     id UUID PRIMARY KEY,
