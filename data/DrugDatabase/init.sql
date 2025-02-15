@@ -35,7 +35,7 @@ CREATE TABLE RELATIONSHIP (
     user_id UUID NOT NULL,
     relative_id UUID NOT NULL,
     relation TEXT,
-    status VARCHAR(10) CHECK (status IN ('pending', 'accepted', 'rejected')) DEFAULT 'pending',
+    status TEXT CHECK (status IN ('pending', 'accepted')) DEFAULT 'pending',
     create_at TIMESTAMP DEFAULT NOW()
 );
  
@@ -82,6 +82,14 @@ CREATE TABLE HISTORY (
     notified_at TIMESTAMP NOT NULL,
     count INT NOT NULL DEFAULT 0
 );
+
+ALTER TABLE RELATIONSHIP
+ADD CONSTRAINT fk_relationship_user_id
+FOREIGN KEY (user_id) REFERENCES APP_USER(id) ON DELETE CASCADE;
+
+ALTER TABLE RELATIONSHIP
+ADD CONSTRAINT fk_relationship_relative_id
+FOREIGN KEY (relative_id) REFERENCES APP_USER(id) ON DELETE CASCADE;
 
 ALTER TABLE DRUG
 ADD CONSTRAINT fk_drug_user_id
