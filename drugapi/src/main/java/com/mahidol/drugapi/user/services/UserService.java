@@ -69,8 +69,7 @@ public class UserService {
 
     public GetUserResponse getUser() {
         return userRepository.findById(userContext.getUserId()).map(user -> {
-                    Optional<String> url = s3Service.getUrl("medisync-user-profile", userContext.getUserId().toString());
-                    return GetUserResponse.fromUser(user, url);
+                    return GetUserResponse.fromUser(user, Optional.empty());
                 })
                 .orElseThrow(() -> new EntityNotFoundException("User id not found with id: " + userContext.getUserId()));
     }
