@@ -9,6 +9,7 @@ import com.mahidol.drugapi.external.aws.s3.S3Service;
 import com.mahidol.drugapi.relation.models.RelationResponse;
 import com.mahidol.drugapi.relation.models.entities.Relation;
 import com.mahidol.drugapi.relation.services.RelationService;
+import com.mahidol.drugapi.user.dtos.requests.AddFriendRequest;
 import com.mahidol.drugapi.user.dtos.requests.CreateUserRequest;
 import com.mahidol.drugapi.user.dtos.requests.UpdateUserRequest;
 import com.mahidol.drugapi.user.dtos.responses.GetRelationResponse;
@@ -112,6 +113,11 @@ public class UserServiceImpl implements UserService {
                 .setFriends(friends)
                 .setPending(pending)
                 .setRequested(requested);
+    }
+
+    @Override
+    public void addFriend(AddFriendRequest request) {
+        relationService.pendingRequest(userContext.getUserId(), request.getRelativeId());
     }
 
     public void setUpRegisterToken(String token) {

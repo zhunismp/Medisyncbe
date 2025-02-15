@@ -1,5 +1,6 @@
 package com.mahidol.drugapi.user.services;
 
+import com.mahidol.drugapi.user.dtos.requests.AddFriendRequest;
 import com.mahidol.drugapi.user.dtos.requests.CreateUserRequest;
 import com.mahidol.drugapi.user.dtos.requests.UpdateUserRequest;
 import com.mahidol.drugapi.user.dtos.responses.GetRelationResponse;
@@ -15,4 +16,5 @@ public interface UserService {
     void setUpRegisterToken(String token);
 
     GetRelationResponse getUserRelations();
+    void addFriend(AddFriendRequest request);
 }
