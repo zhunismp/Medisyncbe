@@ -24,7 +24,7 @@ CREATE TABLE APP_USER (
     "weight" FLOAT,
     height FLOAT,
     gender CHAR NOT NULL,
-    blood_group VARCHAR(5) NOT NULL,
+    blood_group TEXT NOT NULL,
     health_condition TEXT,
     drug_allergy TEXT,
     food_allergy TEXT
@@ -35,7 +35,7 @@ CREATE TABLE RELATIONSHIP (
     user_id UUID NOT NULL,
     relative_id UUID NOT NULL,
     relation TEXT,
-    status TEXT CHECK (status IN ('pending', 'accepted')) DEFAULT 'pending',
+    "status" TEXT CHECK (status IN ('pending', 'accepted')) DEFAULT 'pending',
     create_at TIMESTAMP DEFAULT NOW()
 );
  

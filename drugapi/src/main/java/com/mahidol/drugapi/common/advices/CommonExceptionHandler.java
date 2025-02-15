@@ -45,6 +45,6 @@ public class CommonExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({EntityNotFoundException.class, IllegalArgumentException.class})
     public ResponseEntity<?> runtimeExceptionHandler(RuntimeException e) {
-        return new ResponseEntity<>(Map.of("errorMessages", e.getMessage()), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(Map.of("errorMessages", e), HttpStatus.BAD_REQUEST);
     }
 }
