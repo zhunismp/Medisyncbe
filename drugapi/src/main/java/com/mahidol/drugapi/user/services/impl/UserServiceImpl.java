@@ -9,10 +9,7 @@ import com.mahidol.drugapi.external.aws.s3.S3Service;
 import com.mahidol.drugapi.relation.models.RelationResponse;
 import com.mahidol.drugapi.relation.models.entities.Relation;
 import com.mahidol.drugapi.relation.services.RelationService;
-import com.mahidol.drugapi.user.dtos.requests.AddFriendRequest;
-import com.mahidol.drugapi.user.dtos.requests.CreateUserRequest;
-import com.mahidol.drugapi.user.dtos.requests.RemoveRelationRequest;
-import com.mahidol.drugapi.user.dtos.requests.UpdateUserRequest;
+import com.mahidol.drugapi.user.dtos.requests.*;
 import com.mahidol.drugapi.user.dtos.responses.GetRelationResponse;
 import com.mahidol.drugapi.user.dtos.responses.GetUserResponse;
 import com.mahidol.drugapi.user.models.RelationInfo;
@@ -104,6 +101,22 @@ public class UserServiceImpl implements UserService {
         request.getProfileImage().map(file -> s3Service.uploadFile("medisync-user-profile", userContext.getUserId().toString(), file));
     }
 
+    public void setUpRegisterToken(String token) {
+        Message dummy = Message.builder()
+                .setToken(token)
+                .build();
+
+        try {
+            firebaseMessaging.send(dummy, true);
+            User u = userRepository.getReferenceById(userContext.getUserId());
+
+            userRepository.save(u.setRegisterToken(token));
+        } catch (FirebaseMessagingException ex) {
+            logger.error("Error from cloud messaging: " + ex.getMessage());
+            throw new IllegalArgumentException("Firebase thing go wrong");
+        }
+    }
+
     public GetRelationResponse getUserRelations() {
         RelationResponse relations = relationService.getRelation(userContext.getUserId());
         List<RelationInfo> friends = relations.getFriends().stream().map(r -> transformRelationInfo(r, false)).toList();
@@ -126,20 +139,9 @@ public class UserServiceImpl implements UserService {
         relationService.removeRelation(userContext.getUserId(), request.getRelationId());
     }
 
-    public void setUpRegisterToken(String token) {
-        Message dummy = Message.builder()
-                .setToken(token)
-                .build();
-
-        try {
-            firebaseMessaging.send(dummy, true);
-            User u = userRepository.getReferenceById(userContext.getUserId());
-
-            userRepository.save(u.setRegisterToken(token));
-        } catch (FirebaseMessagingException ex) {
-            logger.error("Error from cloud messaging: " + ex.getMessage());
-            throw new IllegalArgumentException("Firebase thing go wrong");
-        }
+    @Override
+    public void acceptFriend(AcceptFriendRequest request) {
+        relationService.acceptRequest(request.getRelationId());
     }
 
     private RelationInfo transformRelationInfo(Relation r, Boolean isRequested) {
