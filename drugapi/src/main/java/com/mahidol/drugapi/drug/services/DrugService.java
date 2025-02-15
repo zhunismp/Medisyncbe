@@ -13,7 +13,6 @@ import com.mahidol.drugapi.drug.models.entites.Drug;
 import com.mahidol.drugapi.drug.models.type.MealCondition;
 import com.mahidol.drugapi.drug.repositories.DrugRepository;
 import com.mahidol.drugapi.external.aws.s3.S3Service;
-import com.mahidol.drugapi.notification.repositories.DrugScheduleRepository;
 import com.mahidol.drugapi.schedule.services.ScheduleService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
@@ -31,7 +30,6 @@ public class DrugService {
 
     public DrugService(
             DrugRepository drugRepository,
-            DrugScheduleRepository drugScheduleRepository,
             ScheduleService scheduleService,
             PaginationService<DrugDTO> paginationService,
             UserContext userContext,
@@ -51,10 +49,8 @@ public class DrugService {
         List<Drug> filteredDrugs = userDrugs.stream().filter(drug -> request.getGenericName()
                 .map(gname -> drug.getGenericName().contains(gname)).orElse(true)).toList();
 
-        List<DrugDTO> response = filteredDrugs.stream().map(drug -> {
-//            Optional<String> drugImageUrl = s3Service.getUrl("medisync-drug", drug.getId().toString());
-            return transformDTO(drug);
-        }).toList();
+        //            Optional<String> drugImageUrl = s3Service.getUrl("medisync-drug", drug.getId().toString());
+        List<DrugDTO> response = filteredDrugs.stream().map(this::transformDTO).toList();
 
         return new SearchDrugResponse(applyPaginate(response, request.getPagination()), filteredDrugs.size());
     }
