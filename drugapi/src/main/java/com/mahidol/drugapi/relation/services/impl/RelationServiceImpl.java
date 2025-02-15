@@ -47,7 +47,7 @@ public class RelationServiceImpl implements RelationService {
 
     @Override
     public void pendingRequest(UUID userId, UUID relativeId) {
-        if (relationRepository.existsByUserIdAndRelativeId(userId, relativeId))
+        if (relationRepository.existsByUserIdAndRelativeId(userId, relativeId) || relationRepository.existsByUserIdAndRelativeId(relativeId, userId))
             throw new IllegalArgumentException("Can not send duplicate request");
 
         Relation r = new Relation()

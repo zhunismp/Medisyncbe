@@ -2,6 +2,7 @@ package com.mahidol.drugapi.user.services;
 
 import com.mahidol.drugapi.user.dtos.requests.AddFriendRequest;
 import com.mahidol.drugapi.user.dtos.requests.CreateUserRequest;
+import com.mahidol.drugapi.user.dtos.requests.RemoveRelationRequest;
 import com.mahidol.drugapi.user.dtos.requests.UpdateUserRequest;
 import com.mahidol.drugapi.user.dtos.responses.GetRelationResponse;
 import com.mahidol.drugapi.user.dtos.responses.GetUserResponse;
@@ -17,4 +18,5 @@ public interface UserService {
 
     GetRelationResponse getUserRelations();
     void addFriend(AddFriendRequest request);
+    void removeRelation(RemoveRelationRequest request);
 }

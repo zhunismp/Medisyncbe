@@ -3,6 +3,7 @@ package com.mahidol.drugapi.user.controllers;
 import com.mahidol.drugapi.common.exceptions.BindingError;
 import com.mahidol.drugapi.user.dtos.requests.AddFriendRequest;
 import com.mahidol.drugapi.user.dtos.requests.CreateUserRequest;
+import com.mahidol.drugapi.user.dtos.requests.RemoveRelationRequest;
 import com.mahidol.drugapi.user.dtos.requests.UpdateUserRequest;
 import com.mahidol.drugapi.user.dtos.responses.GetRelationResponse;
 import com.mahidol.drugapi.user.dtos.responses.GetUserResponse;
@@ -62,5 +63,13 @@ public class UserController {
         userService.addFriend(request);
 
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/users/friends")
+    public ResponseEntity<?> removeRelation(@RequestBody @Valid RemoveRelationRequest request, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) throw new BindingError(bindingResult.getFieldErrors());
+        userService.removeRelation(request);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

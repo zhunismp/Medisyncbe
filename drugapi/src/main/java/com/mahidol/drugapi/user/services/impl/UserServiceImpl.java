@@ -11,6 +11,7 @@ import com.mahidol.drugapi.relation.models.entities.Relation;
 import com.mahidol.drugapi.relation.services.RelationService;
 import com.mahidol.drugapi.user.dtos.requests.AddFriendRequest;
 import com.mahidol.drugapi.user.dtos.requests.CreateUserRequest;
+import com.mahidol.drugapi.user.dtos.requests.RemoveRelationRequest;
 import com.mahidol.drugapi.user.dtos.requests.UpdateUserRequest;
 import com.mahidol.drugapi.user.dtos.responses.GetRelationResponse;
 import com.mahidol.drugapi.user.dtos.responses.GetUserResponse;
@@ -118,6 +119,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public void addFriend(AddFriendRequest request) {
         relationService.pendingRequest(userContext.getUserId(), request.getRelativeId());
+    }
+
+    @Override
+    public void removeRelation(RemoveRelationRequest request) {
+        relationService.removeRelation(userContext.getUserId(), request.getRelationId());
     }
 
     public void setUpRegisterToken(String token) {
