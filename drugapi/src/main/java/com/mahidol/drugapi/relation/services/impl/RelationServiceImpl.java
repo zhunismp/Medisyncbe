@@ -47,7 +47,7 @@ public class RelationServiceImpl implements RelationService {
 
     @Override
     public void pendingRequest(UUID userId, UUID relativeId) {
-        if (relationRepository.existsByUserIdAndRelativeId(userId, relativeId) || relationRepository.existsByUserIdAndRelativeId(relativeId, userId))
+        if (relationRepository.existsByUserIdAndRelativeId(userId, relativeId))
             throw new IllegalArgumentException("Can not send duplicate request");
 
         Relation r = new Relation()
@@ -60,22 +60,16 @@ public class RelationServiceImpl implements RelationService {
     }
 
     @Override
-    public void acceptRequest(UUID userId, UUID relativeId) {
+    public void acceptRequest(UUID userId, UUID relationId) {
         // check if request created or not
-        if (!relationRepository.existsByUserIdAndRelativeId(userId, relativeId))
-            throw new IllegalArgumentException("Request never been created");
+        Relation pendingRequest = relationRepository.findById(relationId)
+                .map(r -> r.setStatus(Status.ACCEPTED).setCreateAt(LocalDateTime.now()))
+                .orElseThrow(() -> new IllegalArgumentException("Request never been created"));
 
-        // remove pending request for both way A -> B , B -> A
-        relationRepository.deleteByUserIdAndRelativeId(userId, relativeId);
-        relationRepository.deleteByUserIdAndRelativeId(relativeId, userId);
+        // remove pending request for B -> A if exists
+        relationRepository.deleteByUserIdAndRelativeId(pendingRequest.getRelativeId(), pendingRequest.getUserId());
 
-        Relation r = new Relation()
-                .setUserId(userId)
-                .setRelativeId(relativeId)
-                .setStatus(Status.ACCEPTED)
-                .setCreateAt(LocalDateTime.now());
-
-        relationRepository.save(r);
+        relationRepository.save(pendingRequest);
     }
 
     @Override
