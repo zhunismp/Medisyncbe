@@ -3,6 +3,7 @@ package com.mahidol.drugapi.user.controllers;
 import com.mahidol.drugapi.common.exceptions.BindingError;
 import com.mahidol.drugapi.user.dtos.requests.CreateUserRequest;
 import com.mahidol.drugapi.user.dtos.requests.UpdateUserRequest;
+import com.mahidol.drugapi.user.dtos.responses.GetRelationResponse;
 import com.mahidol.drugapi.user.dtos.responses.GetUserResponse;
 import com.mahidol.drugapi.user.services.UserService;
 import jakarta.validation.Valid;
@@ -32,6 +33,12 @@ public class UserController {
     @GetMapping("/users")
     public ResponseEntity<?> getUser() {
         GetUserResponse response = userService.getUser();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/users/friends")
+    public ResponseEntity<?> getFriends() {
+        GetRelationResponse response = userService.getUserRelations();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
