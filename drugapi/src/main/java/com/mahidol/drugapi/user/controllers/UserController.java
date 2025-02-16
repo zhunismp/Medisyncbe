@@ -11,6 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/v1")
 public class UserController {
@@ -29,6 +32,12 @@ public class UserController {
     }
 
     // TODO: Find proper way to handle error and validation
+    @GetMapping("/users/{id}")
+    public ResponseEntity<?> getUser(@PathVariable("id") UUID id) {
+        GetUserResponse response = userService.getUser(id);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     @GetMapping("/users")
     public ResponseEntity<?> getUser() {
         GetUserResponse response = userService.getUser();
@@ -38,6 +47,7 @@ public class UserController {
     @PutMapping(path = "/users", consumes = "multipart/form-data")
     public ResponseEntity<?> updateUser(@ModelAttribute @Valid UpdateUserRequest request, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) throw new BindingError(bindingResult.getFieldErrors());
+
         userService.updateUser(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }

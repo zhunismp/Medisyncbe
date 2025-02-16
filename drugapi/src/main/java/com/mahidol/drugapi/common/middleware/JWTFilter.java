@@ -2,6 +2,7 @@ package com.mahidol.drugapi.common.middleware;
 
 import com.mahidol.drugapi.common.utils.JWTUtil;
 import com.mahidol.drugapi.common.ctx.UserContext;
+import com.mahidol.drugapi.relation.services.RelationService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,7 +24,10 @@ public class JWTFilter extends OncePerRequestFilter {
     private final JWTUtil jwtUtil;
     private final UserContext userContext;
 
-    public JWTFilter(JWTUtil jwtUtil, UserContext userContext) {
+    public JWTFilter(
+            JWTUtil jwtUtil,
+            UserContext userContext
+    ) {
         this.jwtUtil = jwtUtil;
         this.userContext = userContext;
     }
@@ -61,8 +65,10 @@ public class JWTFilter extends OncePerRequestFilter {
             String token = authHeader.split(" ")[1].trim();
             try {
                 if (jwtUtil.isTokenValid(token)) {
+                    // set userId
                     UUID userId = UUID.fromString(jwtUtil.extractClaim(token, "userId"));
                     userContext.setUserId(userId);
+
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                             userId,
                             null,

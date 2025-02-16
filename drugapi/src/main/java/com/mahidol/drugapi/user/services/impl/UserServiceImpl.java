@@ -8,11 +8,13 @@ import com.mahidol.drugapi.common.ctx.UserContext;
 import com.mahidol.drugapi.external.aws.s3.S3Service;
 import com.mahidol.drugapi.relation.models.RelationResponse;
 import com.mahidol.drugapi.relation.models.entities.Relation;
+import com.mahidol.drugapi.relation.models.entities.RelationRequested;
 import com.mahidol.drugapi.relation.services.RelationService;
 import com.mahidol.drugapi.user.dtos.requests.*;
 import com.mahidol.drugapi.user.dtos.responses.GetRelationResponse;
 import com.mahidol.drugapi.user.dtos.responses.GetUserResponse;
 import com.mahidol.drugapi.user.models.RelationInfo;
+import com.mahidol.drugapi.user.models.RelationRequestedInfo;
 import com.mahidol.drugapi.user.models.entities.User;
 import com.mahidol.drugapi.user.models.types.BloodGroup;
 import com.mahidol.drugapi.user.models.types.Gender;
@@ -81,6 +83,14 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new EntityNotFoundException("User id not found with id: " + userContext.getUserId()));
     }
 
+    public GetUserResponse getUser(UUID relativeId) {
+        // Check is user already friend or not
+        relationService.getPermission(relativeId);
+
+        return userRepository.findById(relativeId).map(user -> GetUserResponse.fromUser(user, Optional.empty()))
+                .orElseThrow(() -> new EntityNotFoundException("User id not found with id: " + userContext.getUserId()));
+    }
+
     public void updateUser(UpdateUserRequest request) {
         userRepository.findById(userContext.getUserId()).map(user ->
                 userRepository.save(
@@ -118,10 +128,10 @@ public class UserServiceImpl implements UserService {
     }
 
     public GetRelationResponse getUserRelations() {
-        RelationResponse relations = relationService.getRelation(userContext.getUserId());
-        List<RelationInfo> friends = relations.getFriends().stream().map(r -> transformRelationInfo(r, false)).toList();
-        List<RelationInfo> pending = relations.getPending().stream().map(r -> transformRelationInfo(r, false)).toList();
-        List<RelationInfo> requested = relations.getRequested().stream().map(r -> transformRelationInfo(r, true)).toList();
+        RelationResponse relations = relationService.get();
+        List<RelationInfo> friends = relations.getFriends().stream().map(this::transformRelationInfo).toList();
+        List<RelationRequestedInfo> pending = relations.getPending().stream().map(r -> transformRelationRequestedInfo(r, false)).toList();
+        List<RelationRequestedInfo> requested = relations.getRequested().stream().map(r -> transformRelationRequestedInfo(r, true)).toList();
 
         return new GetRelationResponse()
                 .setFriends(friends)
@@ -131,30 +141,49 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void addFriend(AddFriendRequest request) {
-        relationService.pendingRequest(userContext.getUserId(), request.getRelativeId());
+        if (!userRepository.existsById(request.getRelativeId()))
+            throw new IllegalArgumentException("Friend doesn't exists with id: " + request.getRelativeId().toString());
+
+        relationService.pending(request.getRelativeId());
     }
 
     @Override
     public void removeRelation(RemoveRelationRequest request) {
-        relationService.removeRelation(userContext.getUserId(), request.getRelationId());
+        relationService.unfriend(request.getRelationId());
     }
 
     @Override
     public void acceptFriend(AcceptFriendRequest request) {
-        relationService.acceptRequest(request.getRelationId());
+        relationService.accept(request.getRelationId(), "family", request.getNotifiable(), request.getReadable());
     }
 
-    private RelationInfo transformRelationInfo(Relation r, Boolean isRequested) {
+    private RelationRequestedInfo transformRelationRequestedInfo(RelationRequested r, Boolean isRequested) {
         UUID targetUserId = isRequested ? r.getUserId() : r.getRelativeId();
         User relative = userRepository.findById(targetUserId)
                 .orElseThrow(() -> new IllegalArgumentException("User id does not exist"));
 
-        return new RelationInfo(
+        return new RelationRequestedInfo(
             r.getId(),
             r.getRelativeId(),
             relative.getFirstName(),
             relative.getLastName(),
             r.getCreateAt()
+        );
+    }
+
+    private RelationInfo transformRelationInfo(Relation r) {
+        UUID targetId = r.getUserId().equals(userContext.getUserId()) ? r.getRelativeId() : r.getUserId();
+        User relative = userRepository.findById(targetId)
+                .orElseThrow(() -> new IllegalArgumentException("User id does not exists"));
+
+        return new RelationInfo(
+                r.getId(),
+                r.getRelativeId(),
+                relative.getFirstName(),
+                relative.getLastName(),
+                r.getNotifiable(),
+                r.getReadable(),
+                r.getCreateAt()
         );
     }
 }

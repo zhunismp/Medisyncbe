@@ -12,8 +12,8 @@ import java.util.UUID;
 @Data
 @Accessors(chain = true)
 @NoArgsConstructor
-@Table(name = "relationship")
-public class Relation {
+@Table(name = "relationship_requested")
+public class RelationRequested {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -21,12 +21,6 @@ public class Relation {
     private UUID userId;
     @Column(name = "relative_id", columnDefinition = "UUID")
     private UUID relativeId;
-    @Column(name = "relation", columnDefinition = "TEXT")
-    private String relation;
-    @Column(name = "notifiable", columnDefinition = "BOOLEAN")
-    private Boolean notifiable;
-    @Column(name = "readable", columnDefinition = "BOOLEAN")
-    private Boolean readable;
     @Column(name = "create_at", columnDefinition = "TIMESTAMP")
     private LocalDateTime createAt;
 }

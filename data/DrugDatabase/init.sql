@@ -30,12 +30,20 @@ CREATE TABLE APP_USER (
     food_allergy TEXT
 );
 
+CREATE TABLE RELATIONSHIP_REQUESTED (
+    id UUID PRIMARY KEY,
+    user_id UUID NOT NULL,
+    relative_id UUID NOT NULL,
+    create_at TIMESTAMP DEFAULT NOW()
+);
+
 CREATE TABLE RELATIONSHIP (
     id UUID PRIMARY KEY,
     user_id UUID NOT NULL,
     relative_id UUID NOT NULL,
-    relation TEXT,
-    "status" TEXT CHECK (status IN ('pending', 'accepted')) DEFAULT 'pending',
+    relation TEXT NOT NULL,
+    notifiable BOOLEAN DEFAULT FALSE,
+    readable BOOLEAN DEFAULT FALSE,
     create_at TIMESTAMP DEFAULT NOW()
 );
  

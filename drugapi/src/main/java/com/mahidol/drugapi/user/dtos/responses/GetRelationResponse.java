@@ -1,6 +1,7 @@
 package com.mahidol.drugapi.user.dtos.responses;
 
 import com.mahidol.drugapi.user.models.RelationInfo;
+import com.mahidol.drugapi.user.models.RelationRequestedInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,6 +15,6 @@ import java.util.List;
 @Accessors(chain = true)
 public class GetRelationResponse {
     List<RelationInfo> friends;
-    List<RelationInfo> pending;
-    List<RelationInfo> requested;
+    List<RelationRequestedInfo> pending;
+    List<RelationRequestedInfo> requested;
 }
