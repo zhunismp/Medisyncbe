@@ -1,7 +1,9 @@
 package com.mahidol.drugapi.common.middleware;
 
+import com.mahidol.drugapi.common.ctx.Permission;
 import com.mahidol.drugapi.common.utils.JWTUtil;
 import com.mahidol.drugapi.common.ctx.UserContext;
+import com.mahidol.drugapi.relation.services.RelationService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,6 +17,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -22,10 +25,16 @@ public class JWTFilter extends OncePerRequestFilter {
 
     private final JWTUtil jwtUtil;
     private final UserContext userContext;
+    private final RelationService relationService;
 
-    public JWTFilter(JWTUtil jwtUtil, UserContext userContext) {
+    public JWTFilter(
+            JWTUtil jwtUtil,
+            UserContext userContext,
+            RelationService relationService
+    ) {
         this.jwtUtil = jwtUtil;
         this.userContext = userContext;
+        this.relationService = relationService;
     }
 
     @Override
@@ -63,6 +72,10 @@ public class JWTFilter extends OncePerRequestFilter {
                 if (jwtUtil.isTokenValid(token)) {
                     UUID userId = UUID.fromString(jwtUtil.extractClaim(token, "userId"));
                     userContext.setUserId(userId);
+                    List<Permission> permissions = relationService.get().getFriends().stream()
+                            .map(r -> new Permission(r.getUserId(), r.getNotifiable(), r.getReadable())).toList();
+                    userContext.setPermissions(permissions);
+
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                             userId,
                             null,
