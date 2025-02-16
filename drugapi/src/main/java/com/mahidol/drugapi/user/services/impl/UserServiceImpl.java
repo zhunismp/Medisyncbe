@@ -118,7 +118,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public GetRelationResponse getUserRelations() {
-        RelationResponse relations = relationService.getRelation(userContext.getUserId());
+        RelationResponse relations = relationService.get();
         List<RelationInfo> friends = relations.getFriends().stream().map(r -> transformRelationInfo(r, false)).toList();
         List<RelationInfo> pending = relations.getPending().stream().map(r -> transformRelationInfo(r, false)).toList();
         List<RelationInfo> requested = relations.getRequested().stream().map(r -> transformRelationInfo(r, true)).toList();
@@ -131,17 +131,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void addFriend(AddFriendRequest request) {
-        relationService.pendingRequest(userContext.getUserId(), request.getRelativeId());
+        relationService.pending(request.getRelativeId());
     }
 
     @Override
     public void removeRelation(RemoveRelationRequest request) {
-        relationService.removeRelation(userContext.getUserId(), request.getRelationId());
+        relationService.unfriend(request.getRelationId());
     }
 
     @Override
     public void acceptFriend(AcceptFriendRequest request) {
-        relationService.acceptRequest(request.getRelationId());
+        relationService.accept(request.getRelationId());
     }
 
     private RelationInfo transformRelationInfo(Relation r, Boolean isRequested) {
