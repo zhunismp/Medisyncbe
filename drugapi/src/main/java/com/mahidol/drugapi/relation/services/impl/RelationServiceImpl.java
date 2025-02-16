@@ -1,6 +1,7 @@
 package com.mahidol.drugapi.relation.services.impl;
 
 import com.mahidol.drugapi.common.ctx.UserContext;
+import com.mahidol.drugapi.relation.models.Permission;
 import com.mahidol.drugapi.relation.models.RelationResponse;
 import com.mahidol.drugapi.relation.models.entities.Relation;
 import com.mahidol.drugapi.relation.models.entities.RelationRequested;
@@ -56,14 +57,22 @@ public class RelationServiceImpl implements RelationService {
      */
     @Override
     public RelationResponse get() {
-        List<Relation> friends = Stream.concat(
-                relationRepository.findByUserId(userContext.getUserId()).stream(),
-                relationRepository.findByRelativeId(userContext.getUserId()).stream()
-        ).toList();
+        List<Relation> friends = getFriends();
         List<RelationRequested> pending = relationRequestedRepository.findByUserId(userContext.getUserId());
         List<RelationRequested> requested = relationRequestedRepository.findByRelativeId(userContext.getUserId());
 
         return new RelationResponse(friends, pending, requested);
+    }
+
+    @Override
+    public Permission getPermission(UUID relativeId) {
+        List<Relation> friends = getFriends();
+
+        return friends.stream()
+                .filter(r -> r.getUserId().equals(relativeId) || r.getRelativeId().equals(relativeId))
+                .findFirst()
+                .map(r -> new Permission(r.getNotifiable(), r.getReadable()))
+                .orElseThrow(() -> new IllegalArgumentException("User aren't friend"));
     }
 
     /**
@@ -188,5 +197,12 @@ public class RelationServiceImpl implements RelationService {
             throw new IllegalArgumentException("Request isn't belong to this user");
 
         relationRequestedRepository.deleteById(requestId);
+    }
+
+    private List<Relation> getFriends() {
+        return Stream.concat(
+                relationRepository.findByUserId(userContext.getUserId()).stream(),
+                relationRepository.findByRelativeId(userContext.getUserId()).stream()
+        ).toList();
     }
 }

@@ -10,7 +10,8 @@ import java.util.UUID;
 public interface UserService {
     Boolean isExists(UUID userId);
     void createUser(CreateUserRequest request);
-    GetUserResponse getUser(Optional<UUID> relativeId);
+    GetUserResponse getUser(UUID relativeId);
+    GetUserResponse getUser();
     void updateUser(UpdateUserRequest request);
     void setUpRegisterToken(String token);
 

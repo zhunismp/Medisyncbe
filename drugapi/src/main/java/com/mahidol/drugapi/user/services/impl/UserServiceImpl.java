@@ -78,8 +78,16 @@ public class UserServiceImpl implements UserService {
         request.getProfileImage().map(file -> s3Service.uploadFile("medisync-user-profile", savedUser.getId().toString(), file));
     }
 
-    public GetUserResponse getUser(Optional<UUID> id) {
+    public GetUserResponse getUser() {
         return userRepository.findById(userContext.getUserId()).map(user -> GetUserResponse.fromUser(user, Optional.empty()))
+                .orElseThrow(() -> new EntityNotFoundException("User id not found with id: " + userContext.getUserId()));
+    }
+
+    public GetUserResponse getUser(UUID relativeId) {
+        // Check is user already friend or not
+        relationService.getPermission(relativeId);
+
+        return userRepository.findById(relativeId).map(user -> GetUserResponse.fromUser(user, Optional.empty()))
                 .orElseThrow(() -> new EntityNotFoundException("User id not found with id: " + userContext.getUserId()));
     }
 

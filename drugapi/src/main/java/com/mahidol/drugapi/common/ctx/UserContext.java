@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RequestScope
@@ -12,5 +13,4 @@ import java.util.UUID;
 @Data
 public class UserContext {
     private UUID userId;
-    private List<Permission> permissions;
 }

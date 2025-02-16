@@ -1,14 +1,13 @@
-package com.mahidol.drugapi.common.ctx;
+package com.mahidol.drugapi.relation.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.util.UUID;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class Permission {
-    private UUID userId;
     private Boolean notifiable;
     private Boolean readable;
 }

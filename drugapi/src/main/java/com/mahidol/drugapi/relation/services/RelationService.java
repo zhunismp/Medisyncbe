@@ -1,11 +1,13 @@
 package com.mahidol.drugapi.relation.services;
 
+import com.mahidol.drugapi.relation.models.Permission;
 import com.mahidol.drugapi.relation.models.RelationResponse;
 
 import java.util.UUID;
 
 public interface RelationService {
     RelationResponse get();
+    Permission getPermission(UUID relativeId);
     void unfriend(UUID relationId);
 
     void pending(UUID relativeId);

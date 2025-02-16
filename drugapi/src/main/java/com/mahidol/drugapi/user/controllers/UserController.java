@@ -34,13 +34,20 @@ public class UserController {
     // TODO: Find proper way to handle error and validation
     @GetMapping("/users/{id}")
     public ResponseEntity<?> getUser(@PathVariable("id") UUID id) {
-        GetUserResponse response = userService.getUser(Optional.ofNullable(id));
+        GetUserResponse response = userService.getUser(id);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<?> getUser() {
+        GetUserResponse response = userService.getUser();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PutMapping(path = "/users", consumes = "multipart/form-data")
     public ResponseEntity<?> updateUser(@ModelAttribute @Valid UpdateUserRequest request, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) throw new BindingError(bindingResult.getFieldErrors());
+
         userService.updateUser(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
