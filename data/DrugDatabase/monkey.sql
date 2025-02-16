@@ -7,14 +7,18 @@ INSERT INTO APP_USER (
     ('c2a8dfe2-3b6f-44b0-8f0d-9a1c3505c3f3', 'sample_token_11223', 'Bob', 'Brown', '1985-02-10', 80.0, 175.0, 'M', 'B-', 'Hypertension', 'None', 'None'),
     ('d4e6a1f3-5b7d-4c8e-9f10-2a3b5c6d7e8f', 'sample_token_44556', 'Emma', 'Wilson', '1993-11-25', 62.0, 160.0, 'F', 'AB-', 'Diabetes', 'None', 'Shellfish');
 
-INSERT INTO RELATIONSHIP (
-    id, user_id, relative_id, relation, status, create_at
+INSERT INTO RELATIONSHIP_REQUESTED (
+    id, user_id, relative_id, create_at
 ) VALUES
-    ('d3e72f6a-b50c-43ac-8001-11e9dbd9d861', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 'b7e3adf0-29c9-4ef9-b8d7-55c68e3d3b61', 'friend', 'accepted', '2025-01-19 08:45:00'),
-    ('f1adbb1e-2f9f-4d1c-b8c4-8fa76d31fe13', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 'c2a8dfe2-3b6f-44b0-8f0d-9a1c3505c3f3', 'friend', 'pending', '2025-01-19 08:45:00'),
-    ('f1adbb1e-2f9f-4d1c-b8c4-8fa76d31fe16', 'c2a8dfe2-3b6f-44b0-8f0d-9a1c3505c3f3', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 'friend', 'pending', '2025-01-19 08:45:00'),
-    ('a75d56b8-e1e6-4e45-b6db-1953d4778cfd', 'c2a8dfe2-3b6f-44b0-8f0d-9a1c3505c3f3', 'b7e3adf0-29c9-4ef9-b8d7-55c68e3d3b61', 'friend', 'pending', '2025-01-19 08:45:00'),
-    ('b7a65f7e-fb5d-44d2-82da-6b9a0917c7d7', 'b7e3adf0-29c9-4ef9-b8d7-55c68e3d3b61', 'c2a8dfe2-3b6f-44b0-8f0d-9a1c3505c3f3', 'friend', 'pending', '2025-01-19 08:45:00');
+    ('f1adbb1e-2f9f-4d1c-b8c4-8fa76d31fe13', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 'c2a8dfe2-3b6f-44b0-8f0d-9a1c3505c3f3', '2025-01-19 08:45:00'),
+    ('f1adbb1e-2f9f-4d1c-b8c4-8fa76d31fe16', 'c2a8dfe2-3b6f-44b0-8f0d-9a1c3505c3f3', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', '2025-01-19 08:45:00'),
+    ('a75d56b8-e1e6-4e45-b6db-1953d4778cfd', 'c2a8dfe2-3b6f-44b0-8f0d-9a1c3505c3f3', 'b7e3adf0-29c9-4ef9-b8d7-55c68e3d3b61', '2025-01-19 08:45:00'),
+    ('b7a65f7e-fb5d-44d2-82da-6b9a0917c7d7', 'b7e3adf0-29c9-4ef9-b8d7-55c68e3d3b61', 'c2a8dfe2-3b6f-44b0-8f0d-9a1c3505c3f3', '2025-01-19 08:45:00');
+
+INSERT INTO RELATIONSHIP (
+    id, user_id, relative_id, relation, notifiable, readable, create_at
+) VALUES
+    ('d3e72f6a-b50c-43ac-8001-11e9dbd9d861', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 'b7e3adf0-29c9-4ef9-b8d7-55c68e3d3b61', 'friend', TRUE, TRUE, '2025-01-19 08:45:00');
 
 -- Insert drug group
 INSERT INTO DRUG_GROUP (id, user_id, group_name) VALUES 
