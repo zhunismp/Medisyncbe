@@ -12,12 +12,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-public class RelationInfo {
+public class RelationRequestedInfo {
     private UUID id;
     private UUID relativeId;
     private String firstName;
     private String lastName;
-    private Boolean notifiable;
-    private Boolean readable;
     private LocalDateTime createAt;
 }
