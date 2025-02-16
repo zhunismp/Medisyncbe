@@ -11,7 +11,6 @@ INSERT INTO RELATIONSHIP_REQUESTED (
     id, user_id, relative_id, create_at
 ) VALUES
     ('f1adbb1e-2f9f-4d1c-b8c4-8fa76d31fe13', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 'c2a8dfe2-3b6f-44b0-8f0d-9a1c3505c3f3', '2025-01-19 08:45:00'),
-    ('f1adbb1e-2f9f-4d1c-b8c4-8fa76d31fe16', 'c2a8dfe2-3b6f-44b0-8f0d-9a1c3505c3f3', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', '2025-01-19 08:45:00'),
     ('a75d56b8-e1e6-4e45-b6db-1953d4778cfd', 'c2a8dfe2-3b6f-44b0-8f0d-9a1c3505c3f3', 'b7e3adf0-29c9-4ef9-b8d7-55c68e3d3b61', '2025-01-19 08:45:00'),
     ('b7a65f7e-fb5d-44d2-82da-6b9a0917c7d7', 'b7e3adf0-29c9-4ef9-b8d7-55c68e3d3b61', 'c2a8dfe2-3b6f-44b0-8f0d-9a1c3505c3f3', '2025-01-19 08:45:00');
 
