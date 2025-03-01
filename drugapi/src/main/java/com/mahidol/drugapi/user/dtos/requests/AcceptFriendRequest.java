@@ -12,11 +12,13 @@ import java.util.UUID;
 @AllArgsConstructor
 public class AcceptFriendRequest {
     @NotNull
-    private UUID relationId;
-    @Deprecated
+    private UUID requestId;
+
     private String relation;
+
     @NotNull
     private Boolean notifiable;
+
     @NotNull
     private Boolean readable;
 }

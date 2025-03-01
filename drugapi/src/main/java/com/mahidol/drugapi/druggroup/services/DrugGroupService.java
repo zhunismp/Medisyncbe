@@ -11,6 +11,7 @@ import com.mahidol.drugapi.druggroup.dtos.response.DrugGroupDTO;
 import com.mahidol.drugapi.druggroup.dtos.response.SearchGroupResponse;
 import com.mahidol.drugapi.druggroup.entities.DrugGroup;
 import com.mahidol.drugapi.druggroup.repositories.DrugGroupRepository;
+import com.mahidol.drugapi.relation.services.RelationService;
 import com.mahidol.drugapi.schedule.services.ScheduleService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ public class DrugGroupService {
     private final DrugGroupRepository drugGroupRepository;
     private final DrugService drugService;
     private final ScheduleService scheduleService;
+    private final RelationService relationService;
     private final PaginationService<DrugGroupDTO> paginationService;
     private final UserContext userContext;
 
@@ -29,12 +31,14 @@ public class DrugGroupService {
             DrugGroupRepository drugGroupRepository,
             DrugService drugService,
             ScheduleService scheduleService,
+            RelationService relationService,
             PaginationService<DrugGroupDTO> paginationService,
             UserContext userContext
     ) {
         this.drugGroupRepository = drugGroupRepository;
         this.drugService = drugService;
         this.scheduleService = scheduleService;
+        this.relationService = relationService;
         this.paginationService = paginationService;
         this.userContext = userContext;
     }
@@ -74,7 +78,14 @@ public class DrugGroupService {
     }
 
     public SearchGroupResponse search(SearchGroupRequest request) {
-        List<DrugGroup> drugGroups = drugGroupRepository.findByUserId(userContext.getUserId());
+        UUID id = request.getRelativeId().map(i -> {
+            if (!relationService.getIncomingPermission(i).getReadable())
+                throw new IllegalArgumentException("Access denied from your friend");
+
+            return i;
+        }).orElse(userContext.getUserId());
+
+        List<DrugGroup> drugGroups = drugGroupRepository.findByUserId(id);
         List<DrugGroupDTO> drugGroupWithDrugInfos = drugGroups.stream()
                 .map(this::transformDTO)
                 .toList();

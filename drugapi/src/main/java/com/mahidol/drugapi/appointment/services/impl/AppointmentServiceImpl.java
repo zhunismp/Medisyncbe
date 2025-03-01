@@ -9,6 +9,7 @@ import com.mahidol.drugapi.appointment.models.entities.Appointment;
 import com.mahidol.drugapi.appointment.repositories.AppointmentRepository;
 import com.mahidol.drugapi.appointment.services.AppointmentService;
 import com.mahidol.drugapi.common.ctx.UserContext;
+import com.mahidol.drugapi.relation.services.RelationService;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -17,15 +18,29 @@ import java.util.*;
 public class AppointmentServiceImpl implements AppointmentService {
     private final AppointmentRepository appointmentRepository;
     private final UserContext userContext;
+    private final RelationService relationService;
 
-    public AppointmentServiceImpl(AppointmentRepository appointmentRepository, UserContext userContext) {
+    public AppointmentServiceImpl(
+            AppointmentRepository appointmentRepository,
+            UserContext userContext,
+            RelationService relationService
+    ) {
         this.appointmentRepository = appointmentRepository;
         this.userContext = userContext;
+        this.relationService = relationService;
     }
+
     @Override
     public SearchAppointmentResponse searchAppointment(SearchAppointmentRequest request) {
+        UUID id = request.getRelativeId().map(i -> {
+            if (!relationService.getIncomingPermission(i).getReadable())
+                throw new IllegalArgumentException("Access denied from your friend");
+
+            return i;
+        }).orElse(userContext.getUserId());
+
         boolean isFilter = request.getDate().isPresent() || request.getTitle().isPresent();
-        List<Appointment> allAppointments = appointmentRepository.findByUserId(userContext.getUserId());
+        List<Appointment> allAppointments = appointmentRepository.findByUserId(id);
         List<Appointment> filteredAppointment = allAppointments;
 
         if (isFilter) {

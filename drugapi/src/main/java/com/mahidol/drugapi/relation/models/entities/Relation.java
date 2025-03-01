@@ -29,4 +29,7 @@ public class Relation {
     private Boolean readable;
     @Column(name = "create_at", columnDefinition = "TIMESTAMP")
     private LocalDateTime createAt;
+
+    public static Boolean DEFAULT_NOTIFIABLE = true;
+    public static Boolean DEFAULT_READABLE = true;
 }

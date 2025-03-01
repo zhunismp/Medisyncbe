@@ -13,6 +13,7 @@ import com.mahidol.drugapi.drug.models.entites.Drug;
 import com.mahidol.drugapi.drug.models.type.MealCondition;
 import com.mahidol.drugapi.drug.repositories.DrugRepository;
 import com.mahidol.drugapi.external.aws.s3.S3Service;
+import com.mahidol.drugapi.relation.services.RelationService;
 import com.mahidol.drugapi.schedule.services.ScheduleService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ public class DrugService {
 
     private final DrugRepository drugRepository;
     private final ScheduleService scheduleService;
+    private final RelationService relationService;
     private final PaginationService<DrugDTO> paginationService;
     private final UserContext userContext;
     private final S3Service s3Service;
@@ -31,19 +33,28 @@ public class DrugService {
     public DrugService(
             DrugRepository drugRepository,
             ScheduleService scheduleService,
+            RelationService relationService,
             PaginationService<DrugDTO> paginationService,
             UserContext userContext,
             S3Service s3Service
     ) {
         this.drugRepository = drugRepository;
         this.scheduleService = scheduleService;
+        this.relationService = relationService;
         this.paginationService = paginationService;
         this.userContext = userContext;
         this.s3Service = s3Service;
     }
 
     public SearchDrugResponse search(SearchDrugRequest request) {
-        List<Drug> userDrugs = searchDrugByUserId(userContext.getUserId());
+        UUID id = request.getRelativeId().map(i -> {
+            if (!relationService.getIncomingPermission(i).getReadable())
+                throw new IllegalArgumentException("Access denied from your friend");
+
+            return i;
+        }).orElse(userContext.getUserId());
+
+        List<Drug> userDrugs = searchDrugByUserId(id);
 
         // TODO: Add applyFilter method
         List<Drug> filteredDrugs = userDrugs.stream().filter(drug -> request.getGenericName()

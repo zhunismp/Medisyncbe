@@ -15,9 +15,11 @@ import java.util.UUID;
 @Accessors(chain = true)
 @Data
 public class SearchAppointmentRequest {
+    private UUID relativeId;
     private LocalDate date;
     private String title;
 
     public Optional<LocalDate> getDate() { return Optional.ofNullable(date); }
     public Optional<String> getTitle() { return Optional.ofNullable(title); }
+    public Optional<UUID> getRelativeId() { return Optional.ofNullable(relativeId); }
 }

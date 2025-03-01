@@ -85,7 +85,8 @@ public class UserServiceImpl implements UserService {
 
     public GetUserResponse getUser(UUID relativeId) {
         // Check is user already friend or not
-        relationService.getPermission(relativeId);
+        // Wrong usage
+        relationService.getIncomingPermission(relativeId);
 
         return userRepository.findById(relativeId).map(user -> GetUserResponse.fromUser(user, Optional.empty()))
                 .orElseThrow(() -> new EntityNotFoundException("User id not found with id: " + userContext.getUserId()));
@@ -148,13 +149,33 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void removeRelation(RemoveRelationRequest request) {
-        relationService.unfriend(request.getRelationId());
+    public void unpending(UnpendingRequest request) {
+        relationService.unpending(request.getRequestId());
+    }
+
+    @Override
+    public void removeFriend(RemoveRelationRequest request) {
+        relationService.unfriend(request.getRelativeId());
     }
 
     @Override
     public void acceptFriend(AcceptFriendRequest request) {
-        relationService.accept(request.getRelationId(), "family", request.getNotifiable(), request.getReadable());
+        relationService.accept(request.getRequestId(), request.getRelation(), request.getNotifiable(), request.getReadable());
+    }
+
+    @Override
+    public void rejectFriend(RejectFriendRequest request) {
+        relationService.reject(request.getRequestId());
+    }
+
+    @Override
+    public void updateFriend(UpdateFriendRequest request) {
+        relationService.update(
+                request.getRelativeId(),
+                request.getRelation(),
+                request.getNotifiable(),
+                request.getReadable()
+        );
     }
 
     private RelationRequestedInfo transformRelationRequestedInfo(RelationRequested r, Boolean isRequested) {

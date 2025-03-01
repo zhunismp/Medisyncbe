@@ -12,5 +12,6 @@ import java.util.UUID;
 public interface RelationRepository extends JpaRepository<Relation, UUID> {
     List<Relation> findByUserId(UUID userId);
     List<Relation> findByRelativeId(UUID relativeId);
+    List<Relation> findByUserIdAndRelativeId(UUID userId, UUID relativeId);
     Boolean existsByUserIdAndRelativeId(UUID userId, UUID relativeId);
 }
