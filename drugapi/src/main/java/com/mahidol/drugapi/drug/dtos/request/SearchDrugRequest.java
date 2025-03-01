@@ -16,6 +16,7 @@ import java.util.UUID;
 @Accessors(chain = true)
 @Data
 public class SearchDrugRequest {
+    private UUID relativeId;
 
     private Pagination pagination;
 
@@ -31,4 +32,7 @@ public class SearchDrugRequest {
         return Optional.ofNullable(pagination);
     }
 
+    public Optional<UUID> getRelativeId() {
+        return Optional.ofNullable(relativeId);
+    }
 }

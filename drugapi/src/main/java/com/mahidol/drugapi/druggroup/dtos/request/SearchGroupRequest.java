@@ -15,9 +15,14 @@ import java.util.UUID;
 @Data
 public class SearchGroupRequest {
 
+    private UUID relativeId;
     private Pagination pagination;
 
     public Optional<Pagination> getPagination() {
         return Optional.ofNullable(pagination);
+    }
+
+    public Optional<UUID> getRelativeId() {
+        return Optional.ofNullable(relativeId);
     }
 }

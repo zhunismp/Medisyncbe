@@ -85,7 +85,8 @@ public class UserServiceImpl implements UserService {
 
     public GetUserResponse getUser(UUID relativeId) {
         // Check is user already friend or not
-        relationService.getPermission(relativeId);
+        // Wrong usage
+        relationService.getIncomingPermission(relativeId);
 
         return userRepository.findById(relativeId).map(user -> GetUserResponse.fromUser(user, Optional.empty()))
                 .orElseThrow(() -> new EntityNotFoundException("User id not found with id: " + userContext.getUserId()));

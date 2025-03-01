@@ -65,11 +65,8 @@ public class RelationServiceImpl implements RelationService {
     }
 
     @Override
-    public Permission getPermission(UUID relativeId) {
-        List<Relation> friends = getRelations();
-
-        return friends.stream()
-                .filter(r -> r.getUserId().equals(relativeId) || r.getRelativeId().equals(relativeId))
+    public Permission getIncomingPermission(UUID relativeId) {
+        return relationRepository.findByUserIdAndRelativeId(relativeId, userContext.getUserId()).stream()
                 .findFirst()
                 .map(r -> new Permission(r.getNotifiable(), r.getReadable()))
                 .orElseThrow(() -> new IllegalArgumentException("User aren't friend"));

@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public interface RelationService {
     RelationResponse get();
-    Permission getPermission(UUID relativeId);
+    Permission getIncomingPermission(UUID relativeId);
     Relation getFriend(UUID relativeId);
     void update(UUID relativeId, String relation, Boolean notifiable, Boolean readable);
     void unfriend(UUID relativeId);
