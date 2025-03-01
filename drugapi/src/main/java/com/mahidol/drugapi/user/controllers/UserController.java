@@ -58,12 +58,28 @@ public class UserController {
     }
 
     @GetMapping("/users/friends")
-    public ResponseEntity<?> getFriends() {
+    public ResponseEntity<?> getRelations() {
         GetRelationResponse response = userService.getUserRelations();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping("/users/friends")
+    @DeleteMapping("/users/friends")
+    public ResponseEntity<?> removeFriend(@RequestBody @Valid RemoveRelationRequest request, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) throw new BindingError(bindingResult.getFieldErrors());
+        userService.removeFriend(request);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping("/users/friends")
+    public ResponseEntity<?> updateFriend(@RequestBody @Valid UpdateFriendRequest request, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) throw new BindingError(bindingResult.getFieldErrors());
+        userService.updateFriend(request);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/users/pending")
     public ResponseEntity<?> addFriend(@RequestBody @Valid AddFriendRequest request, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) throw new BindingError(bindingResult.getFieldErrors());
         userService.addFriend(request);
@@ -71,18 +87,18 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/users/friends")
-    public ResponseEntity<?> removeRelation(@RequestBody @Valid RemoveRelationRequest request, BindingResult bindingResult) {
+    @PostMapping("/users/accept")
+    public ResponseEntity<?> accept(@RequestBody @Valid AcceptFriendRequest request, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) throw new BindingError(bindingResult.getFieldErrors());
-        userService.removeFriend(request);
+        userService.acceptFriend(request);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("users/accept")
-    public ResponseEntity<?> accept(@RequestBody @Valid AcceptFriendRequest request, BindingResult bindingResult) {
+    @PostMapping("/users/reject")
+    public ResponseEntity<?> reject(@RequestBody @Valid RejectFriendRequest request, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) throw new BindingError(bindingResult.getFieldErrors());
-        userService.acceptFriend(request);
+        userService.rejectFriend(request);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
