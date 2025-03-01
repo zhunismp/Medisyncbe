@@ -15,6 +15,7 @@ import com.mahidol.drugapi.history.models.entities.History;
 import com.mahidol.drugapi.history.models.types.TakenStatus;
 import com.mahidol.drugapi.history.repositories.HistoryRepository;
 import com.mahidol.drugapi.history.services.HistoryService;
+import com.mahidol.drugapi.relation.services.RelationService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -26,17 +27,20 @@ public class HistoryServiceImpl implements HistoryService {
     private final HistoryRepository historyRepository;
     private final DrugService drugService;
     private final DrugGroupService drugGroupService;
+    private final RelationService relationService;
     private final UserContext userContext;
 
     public HistoryServiceImpl(
             HistoryRepository historyRepository,
             DrugService drugService,
             DrugGroupService drugGroupService,
+            RelationService relationService,
             UserContext userContext
     ) {
         this.historyRepository = historyRepository;
         this.drugService = drugService;
         this.drugGroupService = drugGroupService;
+        this.relationService = relationService;
         this.userContext = userContext;
     }
 
@@ -46,7 +50,13 @@ public class HistoryServiceImpl implements HistoryService {
      */
     @Override
     public SearchHistoryResponse search(SearchHistoryRequest request) {
-        UUID userId = userContext.getUserId();
+        UUID userId = request.getRelativeId().map(i -> {
+            if (!relationService.getIncomingPermission(i).getReadable())
+                throw new IllegalArgumentException("Access denied from your friend");
+
+            return i;
+        }).orElse(userContext.getUserId());
+
         List<History> histories = request.getPreferredDate()
                 .map(d -> historyRepository.findByUserIdAndDate(userId, LocalDate.of(request.getYear(), request.getMonth(), d)))
                 .orElseGet(() -> historyRepository.findByUserIdAndMonth(userId, request.getMonth(), request.getYear()));
