@@ -198,10 +198,11 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new IllegalArgumentException("User id does not exists"));
 
         return new RelationInfo(
-                r.getId(),
                 r.getRelativeId(),
                 relative.getFirstName(),
                 relative.getLastName(),
+                relative.getBirthDate(),
+                relative.getGender(),
                 r.getNotifiable(),
                 r.getReadable(),
                 r.getCreateAt()
