@@ -8,13 +8,13 @@ import com.mahidol.drugapi.relation.models.entities.RelationRequested;
 import com.mahidol.drugapi.relation.repositories.RelationRepository;
 import com.mahidol.drugapi.relation.repositories.RelationRequestedRepository;
 import com.mahidol.drugapi.relation.services.RelationService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 /**
  * Implementation of the RelationService that manages user relationships,
@@ -57,7 +57,7 @@ public class RelationServiceImpl implements RelationService {
      */
     @Override
     public RelationResponse get() {
-        List<Relation> friends = getFriends();
+        List<Relation> friends = getRelations();
         List<RelationRequested> pending = relationRequestedRepository.findByUserId(userContext.getUserId());
         List<RelationRequested> requested = relationRequestedRepository.findByRelativeId(userContext.getUserId());
 
@@ -66,7 +66,7 @@ public class RelationServiceImpl implements RelationService {
 
     @Override
     public Permission getPermission(UUID relativeId) {
-        List<Relation> friends = getFriends();
+        List<Relation> friends = getRelations();
 
         return friends.stream()
                 .filter(r -> r.getUserId().equals(relativeId) || r.getRelativeId().equals(relativeId))
@@ -75,24 +75,36 @@ public class RelationServiceImpl implements RelationService {
                 .orElseThrow(() -> new IllegalArgumentException("User aren't friend"));
     }
 
+    @Override
+    public Relation getFriend(UUID relativeId) {
+        return getRelation(userContext.getUserId(), relativeId);
+    }
+
+    @Override
+    public void update(UUID relativeId, String relation, Boolean notifiable, Boolean readable) {
+        Relation r = getRelation(userContext.getUserId(), relativeId)
+                .setRelation(relation)
+                .setNotifiable(notifiable)
+                .setReadable(readable);
+
+        relationRepository.save(r);
+    }
+
     /**
      * Removes a friend by deleting the relation.
      * <p>
      * The operation is only allowed if the current user initiated the friendship.
      * </p>
      *
-     * @param relationId The ID of the relation to remove.
+     * @param relativeId The ID of the friend to remove.
      * @throws IllegalArgumentException If the relation does not exist or was not created by the user.
      */
     @Override
-    public void unfriend(UUID relationId) {
-        Relation r = relationRepository.findById(relationId)
-                .orElseThrow(() -> new IllegalArgumentException("Request never been created"));
+    public void unfriend(UUID relativeId) {
+        Relation out = getRelation(userContext.getUserId(), relativeId);
+        Relation in = getRelation(relativeId, userContext.getUserId());
 
-        if (!r.getUserId().equals(userContext.getUserId()))
-            throw new IllegalArgumentException("Request isn't created by this user");
-
-        relationRepository.delete(r);
+        relationRepository.deleteAllById(List.of(out.getId(), in.getId()));
     }
 
     /**
@@ -111,9 +123,7 @@ public class RelationServiceImpl implements RelationService {
         if (relationRequestedRepository.existsByUserIdAndRelativeId(userContext.getUserId(), relativeId))
             throw new IllegalArgumentException("Cannot send duplicate request. Or your friend has sent a request to you.");
 
-        if (relationRepository.existsByUserIdAndRelativeId(userContext.getUserId(), relativeId) ||
-                relationRepository.existsByUserIdAndRelativeId(relativeId, userContext.getUserId())
-        ) {
+        if (relationRepository.existsByUserIdAndRelativeId(userContext.getUserId(), relativeId)) {
             throw new IllegalArgumentException("Users are already friends");
         }
 
@@ -134,7 +144,7 @@ public class RelationServiceImpl implements RelationService {
      * - Creates a new confirmed relation.
      * </p>
      *
-     * @param relationId  The ID of the friend request.
+     * @param requestId  The ID of the friend request.
      * @param relation    The type of relation.
      * @param notifiable  Whether the user should receive notifications from the friend.
      * @param readable    Whether the user can read information from the friend.
@@ -142,21 +152,27 @@ public class RelationServiceImpl implements RelationService {
      */
     @Override
     @Transactional
-    public void accept(UUID relationId, String relation, Boolean notifiable, Boolean readable) {
-        RelationRequested pendingRequest = relationRequestedRepository.findById(relationId)
+    public void accept(UUID requestId, String relation, Boolean notifiable, Boolean readable) {
+        RelationRequested pendingRequest = relationRequestedRepository.findById(requestId)
                 .orElseThrow(() -> new IllegalArgumentException("Request never been created"));
 
         relationRequestedRepository.deleteById(pendingRequest.getId());
 
-        Relation r = new Relation()
+        Relation outgoing = new Relation()
                 .setUserId(pendingRequest.getUserId())
                 .setRelativeId(pendingRequest.getRelativeId())
                 .setCreateAt(LocalDateTime.now())
                 .setRelation(relation)
                 .setNotifiable(notifiable)
                 .setReadable(readable);
+        Relation incoming = new Relation()
+                .setUserId(pendingRequest.getRelativeId())
+                .setRelativeId(pendingRequest.getUserId())
+                .setCreateAt(LocalDateTime.now())
+                .setNotifiable(Relation.DEFAULT_NOTIFIABLE)
+                .setReadable(Relation.DEFAULT_READABLE);
 
-        relationRepository.save(r);
+        relationRepository.saveAll(List.of(outgoing, incoming));
     }
 
     /**
@@ -199,10 +215,13 @@ public class RelationServiceImpl implements RelationService {
         relationRequestedRepository.deleteById(requestId);
     }
 
-    private List<Relation> getFriends() {
-        return Stream.concat(
-                relationRepository.findByUserId(userContext.getUserId()).stream(),
-                relationRepository.findByRelativeId(userContext.getUserId()).stream()
-        ).toList();
+    private List<Relation> getRelations() {
+        return relationRepository.findByUserId(userContext.getUserId()).stream().toList();
+    }
+
+    private Relation getRelation(UUID userId, UUID relativeId) {
+        return relationRepository.findByUserIdAndRelativeId(userId, relativeId)
+                .stream().findFirst()
+                .orElseThrow(() -> new EntityNotFoundException("Relation not found"));
     }
 }
