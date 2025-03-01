@@ -149,6 +149,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void unpending(UnpendingRequest request) {
+        relationService.unpending(request.getRequestId());
+    }
+
+    @Override
     public void removeFriend(RemoveRelationRequest request) {
         relationService.unfriend(request.getRelativeId());
     }

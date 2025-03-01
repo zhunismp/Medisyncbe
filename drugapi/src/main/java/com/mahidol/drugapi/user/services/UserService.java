@@ -16,6 +16,7 @@ public interface UserService {
 
     GetRelationResponse getUserRelations();
     void addFriend(AddFriendRequest request);
+    void unpending(UnpendingRequest request);
     void removeFriend(RemoveRelationRequest request);
     void acceptFriend(AcceptFriendRequest request);
     void rejectFriend(RejectFriendRequest request);

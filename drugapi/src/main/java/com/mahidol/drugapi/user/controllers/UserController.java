@@ -87,6 +87,14 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    @PostMapping("/users/unpending")
+    public ResponseEntity<?> unpending(@RequestBody @Valid UnpendingRequest request, BindingResult bindingResult ) {
+        if (bindingResult.hasErrors()) throw new BindingError(bindingResult.getFieldErrors());
+        userService.unpending(request);
+
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
     @PostMapping("/users/accept")
     public ResponseEntity<?> accept(@RequestBody @Valid AcceptFriendRequest request, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) throw new BindingError(bindingResult.getFieldErrors());
