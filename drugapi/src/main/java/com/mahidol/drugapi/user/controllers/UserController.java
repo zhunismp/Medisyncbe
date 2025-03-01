@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -75,7 +74,7 @@ public class UserController {
     @DeleteMapping("/users/friends")
     public ResponseEntity<?> removeRelation(@RequestBody @Valid RemoveRelationRequest request, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) throw new BindingError(bindingResult.getFieldErrors());
-        userService.removeRelation(request);
+        userService.removeFriend(request);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

@@ -4,7 +4,6 @@ import com.mahidol.drugapi.user.dtos.requests.*;
 import com.mahidol.drugapi.user.dtos.responses.GetRelationResponse;
 import com.mahidol.drugapi.user.dtos.responses.GetUserResponse;
 
-import java.util.Optional;
 import java.util.UUID;
 
 public interface UserService {
@@ -17,6 +16,8 @@ public interface UserService {
 
     GetRelationResponse getUserRelations();
     void addFriend(AddFriendRequest request);
-    void removeRelation(RemoveRelationRequest request);
+    void removeFriend(RemoveRelationRequest request);
     void acceptFriend(AcceptFriendRequest request);
+    void rejectFriend(RejectFriendRequest request);
+    void updateFriend(UpdateFriendRequest request);
 }

@@ -148,13 +148,28 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void removeRelation(RemoveRelationRequest request) {
-        relationService.unfriend(request.getRelationId());
+    public void removeFriend(RemoveRelationRequest request) {
+        relationService.unfriend(request.getRelativeId());
     }
 
     @Override
     public void acceptFriend(AcceptFriendRequest request) {
-        relationService.accept(request.getRelationId(), "family", request.getNotifiable(), request.getReadable());
+        relationService.accept(request.getRequestId(), request.getRelation(), request.getNotifiable(), request.getReadable());
+    }
+
+    @Override
+    public void rejectFriend(RejectFriendRequest request) {
+        relationService.reject(request.getRequestId());
+    }
+
+    @Override
+    public void updateFriend(UpdateFriendRequest request) {
+        relationService.update(
+                request.getRelativeId(),
+                request.getRelation(),
+                request.getNotifiable(),
+                request.getReadable()
+        );
     }
 
     private RelationRequestedInfo transformRelationRequestedInfo(RelationRequested r, Boolean isRequested) {
