@@ -15,6 +15,7 @@ import java.util.UUID;
 @Data
 @Accessors(chain = true)
 public class SearchHistoryRequest {
+    private UUID relativeId;
     @Min(value = 1, message = "Please specify valid month")
     @Max(value = 12, message = "Please specify valid month")
     private Integer month;
@@ -35,6 +36,10 @@ public class SearchHistoryRequest {
 
     public Optional<Pagination> getPagination() {
         return Optional.ofNullable(pagination);
+    }
+
+    public Optional<UUID> getRelativeId() {
+        return Optional.ofNullable(relativeId);
     }
 
     @AssertTrue(message = "Year must not be greater than the current year")
