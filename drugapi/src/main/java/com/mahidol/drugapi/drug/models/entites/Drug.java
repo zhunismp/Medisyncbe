@@ -56,4 +56,15 @@ public class Drug {
 
     @ManyToMany(mappedBy = "drugs")
     private List<DrugGroup> groups;
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Drug d) return d.getId().equals(this.id);
+        else return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
+    }
 }
