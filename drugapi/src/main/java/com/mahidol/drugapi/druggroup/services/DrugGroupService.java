@@ -109,7 +109,7 @@ public class DrugGroupService {
             return;
         }
 
-        unlinkDrug(drugIds);
+        unlinkDrug(drugIds, request.getGroupId());
     }
 
     public void remove(UUID drugGroupId, Boolean isRemoveDrug) {
@@ -118,7 +118,7 @@ public class DrugGroupService {
         if (isRemoveDrug)
             drugService.deleteAllByDrugIds(userContext.getUserId(), drugIds);
         else
-            unlinkDrug(drugIds);
+            unlinkDrug(drugIds, drugGroupId);
 
         drugGroupRepository.deleteById(drugGroupId);
     }
@@ -160,18 +160,29 @@ public class DrugGroupService {
 
     // After remove drug from the drug group, we need to set isEnabled to true again
     // This is for make old notification of drug behavior the same as before.
-    private void unlinkDrug(List<UUID> drugIds) {
+    private void unlinkDrug(List<UUID> drugIds, UUID groupId) {
+        DrugGroup target = drugGroupRepository.findById(groupId).orElseThrow(() -> new EntityNotFoundException("Group not found"));
         List<Drug> drugs = drugService.searchAllDrugByDrugsId(userContext.getUserId(), drugIds);
 
-        drugService.saveAllDrugs(userContext.getUserId(), drugs.stream().map(d -> d.setGroupId(null)).toList());
+        // Remove all drug from group
+        List<Drug> initial = target.getDrugs();
+        initial.removeAll(drugs);
+        drugGroupRepository.save(target.setDrugs(initial));
+
+        // scheduler
         drugIds.forEach(id -> scheduleService.setIsEnabled(id, true));
     }
 
     private void linkDrug(List<UUID> drugIds, UUID groupId) {
-        // associate group_id with drugs
-        List<Drug> updateDrugs = drugService.searchAllDrugByDrugsId(userContext.getUserId(), drugIds)
-                .stream().map(d -> d.setGroupId(groupId)).toList();
-        drugService.saveAllDrugs(userContext.getUserId(), updateDrugs);
+        DrugGroup target = drugGroupRepository.findById(groupId).orElseThrow(() -> new EntityNotFoundException("Group not found"));
+        List<Drug> drugs = drugService.searchAllDrugByDrugsId(userContext.getUserId(), drugIds);
+
+        // Add all current drugs in group
+        drugs.addAll(target.getDrugs());
+
+        // Deduplicated
+        List<Drug> deduplicated = drugs.stream().distinct().toList();
+        drugGroupRepository.save(target.setDrugs(deduplicated));
 
         // scheduler
         drugIds.forEach(id -> scheduleService.setIsEnabled(id, false));

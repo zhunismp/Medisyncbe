@@ -1,6 +1,7 @@
 package com.mahidol.drugapi.drug.models.entites;
 
 import com.mahidol.drugapi.drug.models.type.MealCondition;
+import com.mahidol.drugapi.druggroup.entities.DrugGroup;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,8 +24,8 @@ public class Drug {
     @Column(name = "user_id", columnDefinition = "UUID")
     private UUID userId;
 
-    @Column(name = "group_id", columnDefinition = "UUID")
-    private UUID groupId;
+//    @Column(name = "group_id", columnDefinition = "UUID")
+//    private UUID groupId;
 
     @Column(name = "generic_name", columnDefinition = "TEXT")
     private String genericName;
@@ -52,4 +53,7 @@ public class Drug {
 
     @Column(name = "is_internal_drug", columnDefinition = "BOOLEAN")
     private Boolean isInternalDrug = false;
+
+    @ManyToMany(mappedBy = "drugs")
+    private List<DrugGroup> groups;
 }
