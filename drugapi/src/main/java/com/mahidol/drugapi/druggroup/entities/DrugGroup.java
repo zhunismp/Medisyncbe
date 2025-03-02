@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,8 +25,12 @@ public class DrugGroup {
     @Column(name = "group_name", columnDefinition = "TEXT")
     private String groupName;
 
-    @OneToMany
-    @JoinColumn(name = "group_id")
+    @ManyToMany
+    @JoinTable(
+            name = "drug_group_drug",
+            joinColumns = @JoinColumn(name = "group_id"),
+            inverseJoinColumns = @JoinColumn(name = "drug_id")
+    )
     private List<Drug> drugs;
 
 }

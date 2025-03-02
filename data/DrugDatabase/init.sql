@@ -1,7 +1,6 @@
 CREATE TABLE DRUG (
     id UUID PRIMARY KEY,
     user_id UUID NOT NULL,
-    group_id UUID,
     generic_name TEXT NOT NULL,
     dosage_form TEXT,
     unit TEXT NOT NULL,
@@ -51,6 +50,12 @@ CREATE TABLE DRUG_GROUP (
     id UUID PRIMARY KEY,
     user_id UUID NOT NULL,
     group_name TEXT NOT NULL
+);
+
+CREATE TABLE DRUG_GROUP_DRUG (
+    id UUID PRIMARY KEY,
+    drug_id UUID NOT NULL,
+    group_id UUID NOT NULL
 );
 
 CREATE INDEX idx_drug_group_user_id ON drug_group (user_id);
