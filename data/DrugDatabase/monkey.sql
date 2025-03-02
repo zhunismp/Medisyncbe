@@ -24,11 +24,16 @@ INSERT INTO DRUG_GROUP (id, user_id, group_name) VALUES
     ('c362f634-e49f-44e9-bbe7-49d94488a6ff', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 'Painkillers');
 
 -- Insert individual drugs for the user
-INSERT INTO DRUG (id, user_id, group_id, generic_name, dosage_form, unit, strength, amount, dose, taken_amount, usage_time, is_internal_drug) VALUES
-    ('b2876821-1f75-4c1a-999a-46f8f03d7a4b', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', NULL, 'Paracetamol', 'Tablet', 'mg', '500mg', 20.0, 1.0, 0.0, 1, TRUE),
-    ('b2876821-1f75-4c1a-999a-46f8f03d7a4c', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 'c362f634-e49f-44e9-bbe7-49d94488a6ff', 'Ibuprofen', 'Tablet', 'mg', '200mg', 30.0, 2.0, 0.0, 1, TRUE),
-    ('b2876821-1f75-4c1a-999a-46f8f03d7a4d', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 'c362f634-e49f-44e9-bbe7-49d94488a6ff', 'Aspirin', 'Tablet', 'mg', '100mg', 15.0, 1.0, 0.0, 1, TRUE),
-    ('b2876821-1f75-4c1a-999a-46f8f03d7a4e', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 'c362f634-e49f-44e9-bbe7-49d94488a6ff', 'Diclofenac', 'Tablet', 'mg', '50mg', 25.0, 1.0, 0.0, 1, TRUE);
+INSERT INTO DRUG (id, user_id, generic_name, dosage_form, unit, strength, amount, dose, taken_amount, usage_time, is_internal_drug) VALUES
+    ('b2876821-1f75-4c1a-999a-46f8f03d7a4b', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 'Paracetamol', 'Tablet', 'mg', '500mg', 20.0, 1.0, 0.0, 1, TRUE),
+    ('b2876821-1f75-4c1a-999a-46f8f03d7a4c', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 'Ibuprofen', 'Tablet', 'mg', '200mg', 30.0, 2.0, 0.0, 1, TRUE),
+    ('b2876821-1f75-4c1a-999a-46f8f03d7a4d', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 'Aspirin', 'Tablet', 'mg', '100mg', 15.0, 1.0, 0.0, 1, TRUE),
+    ('b2876821-1f75-4c1a-999a-46f8f03d7a4e', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 'Diclofenac', 'Tablet', 'mg', '50mg', 25.0, 1.0, 0.0, 1, TRUE);
+
+INSERT INTO DRUG_GROUP_DRUG (id, group_id, drug_id) VALUES
+    ('b2876821-1f75-4c1a-999a-46f8f03d7bbc', 'c362f634-e49f-44e9-bbe7-49d94488a6ff', 'b2876821-1f75-4c1a-999a-46f8f03d7a4c'),
+    ('b2876821-1f75-4c1a-999a-46f8f03d7bbd', 'c362f634-e49f-44e9-bbe7-49d94488a6ff', 'b2876821-1f75-4c1a-999a-46f8f03d7a4d'),
+    ('b2876821-1f75-4c1a-999a-46f8f03d7bbe', 'c362f634-e49f-44e9-bbe7-49d94488a6ff', 'b2876821-1f75-4c1a-999a-46f8f03d7a4e');
 
 -- Insert schedules for individual drug and drug group
 -- For schedule_time, there is timestamp with dummy date. Need to resolved gorm issue with TIME.
