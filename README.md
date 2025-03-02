@@ -24,7 +24,7 @@
     - User = `$POSTGRES_USER`
     - Password = `$POSTGRES_PASSWORD`
 5. Start querying
-![alt text](image.png)
+![image](/docs/image.png)
 > **Server name** can typically be any name. **User** and **Password** can found in .env file
 
 ## API documentation 🗃️
