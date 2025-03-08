@@ -14,8 +14,6 @@ import (
 )
 
 func main() {
-	firebaseConfigPath := getFirebaseConfigPath()
-
 	// Load configuration
 	cfg, err := config.LoadConfig()
 	if err != nil {
@@ -32,7 +30,7 @@ func main() {
 	schedulerService := services.NewSchedulerService(db)
 	historyService := services.NewHistoryService(db)
 	userService := services.NewUserService(db)
-	notificationService, err := services.NewNotificationService(firebaseConfigPath)
+	notificationService, err := services.NewNotificationService(cfg.FirebaseClientOption)
 	if err != nil {
 		fmt.Println("Error initiate notification service: ", err)
 	}
@@ -55,14 +53,4 @@ func main() {
 
 	<-sigChan
 	log.Println("\nInterrupt signal received. Shutting down...")
-}
-
-func getFirebaseConfigPath() string {
-	env := os.Getenv("ENV")
-
-	if env == "prod" {
-		return "/app/firebase-config.json"
-	}
-
-	return "./configs/firebase-config.json"
 }

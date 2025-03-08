@@ -17,8 +17,6 @@ func Connect(cfg *amodels.Config) error {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
 		cfg.DBHost, cfg.DBUser, cfg.DBPassword, cfg.DBName, cfg.DBPort)
 	
-	fmt.Print(dsn)
-
 	maxRetries := 5
 	retryDelay := 2 * time.Second
 
