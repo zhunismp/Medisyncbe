@@ -13,6 +13,7 @@ func Initialize(
 	schedulerService *services.SchedulerService,
 	historyService *services.HistoryService,
 	notificationService *services.NotificationService,
+	userService *services.UserService,
 ) gocron.Scheduler {
 	drugNotificationJob := drug_jobs.NewDrugNotificationJob(
 		schedulerService,

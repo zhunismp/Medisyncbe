@@ -31,13 +31,19 @@ func main() {
 	db := connections.DB
 	schedulerService := services.NewSchedulerService(db)
 	historyService := services.NewHistoryService(db)	
+	userService := services.NewUserService(db)
 	notificationService, err := services.NewNotificationService(firebaseConfigPath)
 	if err != nil {
 		fmt.Println("Error initiate notification service: ", err)
 	}
 
 	// Initialize jobs
-	s := jobs.Initialize(schedulerService, historyService, notificationService)
+	s := jobs.Initialize(
+		schedulerService, 
+		historyService, 
+		notificationService,
+		userService,
+	)
 
 	s.Start()
 

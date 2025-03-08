@@ -20,6 +20,7 @@ type AppUser struct {
 	HealthCondition string        `gorm:"type:text"`
 	DrugAllergy    string         `gorm:"type:text"`
 	FoodAllergy    string         `gorm:"type:text"`
+	Streak         int            `gorm:"type:int;default:0"`
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 	DeletedAt      gorm.DeletedAt `gorm:"index"`
