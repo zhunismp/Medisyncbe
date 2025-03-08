@@ -27,7 +27,7 @@ func NewUserStreakJob(
 func (j *UserStreakJob) JobAttributes() coreModels.JobAttributes {
 	return coreModels.JobAttributes {
 		Name: "UserStreakJob",
-		Interval: "*/1 * * * *",
+		Interval: "*0 1 * * *",
 	}
 }
 
