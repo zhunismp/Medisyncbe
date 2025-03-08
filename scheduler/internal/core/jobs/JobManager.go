@@ -5,6 +5,7 @@ import (
 
 	"github.com/go-co-op/gocron/v2"
 	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/jobs/drug_jobs"
+	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/jobs/user_jobs"
 	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/models"
 	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/services"
 )
@@ -20,9 +21,14 @@ func Initialize(
 		historyService,
 		notificationService,
 	)
+	userStreakJob := user_jobs.NewUserStreakJob(
+		historyService,
+		userService,
+	)
 
 	jobs := []models.BaseJob{
 		drugNotificationJob,
+		userStreakJob,
 	}
 
 	return schedule(jobs)

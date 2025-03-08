@@ -46,12 +46,7 @@ func (j *UserStreakJob) Task(start time.Time, parameters ...interface{}) {
 			continue
 		}
 
-		var updatedStreak int
-		if isContinued(yesterdayHistories) {
-			updatedStreak = user.Streak + 1
-		} else {
-			updatedStreak = 0
-		}
+		updatedStreak := calculateStreak(user.Streak, yesterdayHistories)
 
 		if err := j.userService.UpdateUserStreak(user.ID, updatedStreak); err != nil {
 			log.Println("Error updating user streak:", err)
@@ -59,12 +54,16 @@ func (j *UserStreakJob) Task(start time.Time, parameters ...interface{}) {
 	}
 }
 
-func isContinued(histories []models.History) bool {
+func calculateStreak(oldStreak int, histories []models.History) int {
+	if len(histories) == 0 {
+		return oldStreak
+	}
+
 	for _, history := range histories {
 		if history.Status != "taken" {
-			return false
+			return 0
 		}
 	}
 
-	return true
+	return oldStreak + 1
 }
