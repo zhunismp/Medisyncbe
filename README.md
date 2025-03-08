@@ -8,9 +8,10 @@
     - **.env**, **backend.env**, and **cron.env** inside **/docker**
     - **.env** for Java application inside **Medisyncbe\drugapi\src\main\resources** 
 3. Running these command to start application
-    - `make build` for running application with fresh build.
-    - `make up` for running application without build.
+    - `make build` for freshly build application.
+    - `make up` for running application.
     - `make down` for stop application.
+    - `make reset` restart application.
 
 ## Inspect data in database
 1. Checkout `http://localhost:8080` 

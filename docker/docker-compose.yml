@@ -1,6 +1,8 @@
 services:
   drugdb:
-    image: postgres
+    build:
+      context: ../data/DrugDatabase
+      dockerfile: ./drugdb.dockerfile
     restart: on-failure
     env_file:
       - .env
