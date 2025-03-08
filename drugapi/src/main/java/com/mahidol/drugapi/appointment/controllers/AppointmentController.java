@@ -51,7 +51,7 @@ public class AppointmentController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/appointments")
     public ResponseEntity<Void> cancelAppointment(
             @RequestParam @NotNull(message = "userId must not be null") UUID userId,
             @RequestParam @NotNull(message = "appointment must not be null") UUID appointmentId
