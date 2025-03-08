@@ -1,22 +1,20 @@
-.PHONY: up down restart logs build
+.PHONY: up down restart logs build build-drugapi build-scheduler build-drugdb
 
-# DOCKER_COMPOSE=docker compose -f docker/docker-compose.yml
 DOCKER_COMPOSE= docker compose
 COMPOSE_PATH=./docker/docker-compose.yml
 
 start:
-	$(DOCKER_COMPOSE) up -d
+	$(DOCKER_COMPOSE) -f ${COMPOSE_PATH} up -d
 
-stop:
-	$(DOCKER_COMPOSE) down
+stop: 
+	$(DOCKER_COMPOSE) -f ${COMPOSE_PATH} down
 
 reset: down up
 
 logs:
-	$(DOCKER_COMPOSE) logs -f
+	$(DOCKER_COMPOSE) -f ${COMPOSE_PATH} logs -f
 
-build:
-	build-drugapi build-scheduler build-drug-db
+build: build-drugapi build-scheduler build-drugdb
 
 build-drugapi:
 	$(DOCKER_COMPOSE) -f ${COMPOSE_PATH} build be
