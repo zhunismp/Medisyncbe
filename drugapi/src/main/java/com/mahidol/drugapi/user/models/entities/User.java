@@ -56,4 +56,7 @@ public class User {
 
     @Column(name = "food_allergy", columnDefinition = "TEXT")
     private String foodAllergy;
+
+    @Column(name = "streak", columnDefinition = "INT")
+    private Integer streak;
 }
