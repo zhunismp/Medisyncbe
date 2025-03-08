@@ -17,7 +17,8 @@ INSERT INTO RELATIONSHIP_REQUESTED (
 INSERT INTO RELATIONSHIP (
     id, user_id, relative_id, relation, notifiable, readable, create_at
 ) VALUES
-    ('d3e72f6a-b50c-43ac-8001-11e9dbd9d861', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 'b7e3adf0-29c9-4ef9-b8d7-55c68e3d3b61', 'friend', TRUE, TRUE, '2025-01-19 08:45:00');
+    ('d3e72f6a-b50c-43ac-8001-11e9dbd9d861', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 'b7e3adf0-29c9-4ef9-b8d7-55c68e3d3b61', 'friend', TRUE, TRUE, '2025-01-19 08:45:00'),
+    ('a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 'd3e72f6a-b50c-43ac-8001-11e9dbd9d861', 'b7e3adf0-29c9-4ef9-b8d7-55c68e3d3b61', 'friend', TRUE, TRUE, '2025-01-19 08:45:00');
 
 -- Insert drug group
 INSERT INTO DRUG_GROUP (id, user_id, group_name) VALUES 
