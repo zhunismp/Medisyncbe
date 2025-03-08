@@ -9,7 +9,6 @@ services:
       - .env
     volumes:
       - ../data/DrugDatabase:/docker-entrypoint-initdb.d
-      - drugdb_data:/var/lib/postgresql/data
 
   pgadmin:
     image: dpage/pgadmin4

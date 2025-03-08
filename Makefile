@@ -9,7 +9,7 @@ start:
 stop: 
 	$(DOCKER_COMPOSE) -f ${COMPOSE_PATH} down
 
-reset: down up
+reset: stop start
 
 logs:
 	$(DOCKER_COMPOSE) -f ${COMPOSE_PATH} logs -f

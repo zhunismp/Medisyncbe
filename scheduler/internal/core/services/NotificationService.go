@@ -14,10 +14,12 @@ type NotificationService struct {
 	client *messaging.Client
 }
 
-func NewNotificationService(firebaseCredentialsPath string) (*NotificationService, error) {
+func NewNotificationService(opt option.ClientOption) (*NotificationService, error) {
 
-	opt := option.WithCredentialsFile(firebaseCredentialsPath)
-	app, err := firebase.NewApp(context.Background(), nil, opt)
+	// TODO: Remove hardcoded project ID
+	app, err := firebase.NewApp(context.Background(), &firebase.Config{
+		ProjectID: "mdbe-79bbd",
+	}, opt)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing Firebase app: %v", err)
 	}
