@@ -72,6 +72,7 @@ public class UserServiceImpl implements UserService {
                 .setHealthCondition(StringUtil.arrayToString(request.getHealthCondition().orElse(null)))
                 .setDrugAllergy(StringUtil.arrayToString(request.getDrugAllergy().orElse(null)))
                 .setFoodAllergy(StringUtil.arrayToString(request.getFoodAllergy().orElse(null)))
+                .setStreak(0)
         );
 
         // Upload user profile to s3 bucket
