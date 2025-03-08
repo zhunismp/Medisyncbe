@@ -26,3 +26,14 @@ func (s *UserService) GetRegisterTokenByID(id uuid.UUID) (string, error) {
 
 	return user.RegisterToken, nil
 }
+
+func (s *UserService) GetAllUsers(id uuid.UUID) ([]models.AppUser, error) {
+	var users []models.AppUser
+
+	result := s.DB.Find(&users)
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to fetch users: %w", result.Error)
+	}
+
+	return users, nil
+}
