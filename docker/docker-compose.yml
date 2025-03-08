@@ -1,11 +1,15 @@
 services:
   drugdb:
-    image: postgres
+    build:
+      context: ../data/DrugDatabase
+      dockerfile: ./drugdb.dockerfile
+    image: medisyncbe/db
     restart: on-failure
     env_file:
       - .env
     volumes:
       - ../data/DrugDatabase:/docker-entrypoint-initdb.d
+      - drugdb_data:/var/lib/postgresql/data
 
   pgadmin:
     image: dpage/pgadmin4
@@ -27,6 +31,7 @@ services:
     build: 
       context: ../scheduler
       dockerfile: ../scheduler/cron.dockerfile
+    image: medisyncbe/scheduler
     volumes:
       - ./firebase-config.json:/app/firebase-config.json
 
@@ -39,6 +44,7 @@ services:
     build:
       context: ../drugapi
       dockerfile: ../drugapi/backend.dockerfile
+    image: medisyncbe/drugapi
     ports:
       - "8080:8080"
 
