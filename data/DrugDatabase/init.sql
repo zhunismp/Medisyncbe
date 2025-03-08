@@ -26,7 +26,8 @@ CREATE TABLE APP_USER (
     blood_group TEXT NOT NULL,
     health_condition TEXT,
     drug_allergy TEXT,
-    food_allergy TEXT
+    food_allergy TEXT,
+    streak INT DEFAULT 0,
 );
 
 CREATE TABLE RELATIONSHIP_REQUESTED (

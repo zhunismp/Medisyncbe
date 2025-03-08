@@ -6,13 +6,11 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
-	"github.com/go-co-op/gocron/v2"
 	"github.com/zhunismp/Medisyncbe/scheduler/internal/app/repositories/connections"
 	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/config"
+	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/jobs"
 	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/services"
-	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/services/jobs"
 )
 
 func main() {
@@ -39,33 +37,7 @@ func main() {
 	}
 
 	// Initialize jobs
-	drugNotificationJob := jobs.NewDrugNotificationJob(
-		schedulerService, 
-		historyService,
-		notificationService,
-	)
-
-	// Initialize scheduler
-	s, err := gocron.NewScheduler()
-	if err != nil {
-		log.Println("Error creating scheduler:", err)
-		return
-	}
-
-	// Add DrugNotificationJob 
-	s.NewJob(
-		gocron.CronJob(
-			"*/15 * * * *",
-			true,
-		),
-		gocron.NewTask(
-			func() {
-				now := time.Now().Truncate(time.Minute) 
-    			drugNotificationJob.Task(now)
-			},
-		),
-		gocron.WithName("DrugNotificationJob"),
-	)
+	s := jobs.Initialize(schedulerService, historyService, notificationService)
 
 	s.Start()
 

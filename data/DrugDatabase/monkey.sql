@@ -1,11 +1,11 @@
 -- Insert user
 INSERT INTO APP_USER (
-    id, register_token, first_name, last_name, birth_date, weight, height, gender, blood_group, health_condition, drug_allergy, food_allergy
+    id, register_token, first_name, last_name, birth_date, weight, height, gender, blood_group, health_condition, drug_allergy, food_allergy, streak
 ) VALUES 
-    ('a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68','sample_token_12345', 'John', 'Dang', '1990-05-15', 75.0, 180.0, 'M', 'O+', 'None', 'Penicillin', 'Peanuts'),
-    ('b7e3adf0-29c9-4ef9-b8d7-55c68e3d3b61', 'sample_token_67890', 'Alice', 'Smith', '1992-08-20', 68.0, 165.0, 'F', 'A+', 'Asthma', 'Sulfa drugs', 'Gluten'),
-    ('c2a8dfe2-3b6f-44b0-8f0d-9a1c3505c3f3', 'sample_token_11223', 'Bob', 'Brown', '1985-02-10', 80.0, 175.0, 'M', 'B-', 'Hypertension', 'None', 'None'),
-    ('d4e6a1f3-5b7d-4c8e-9f10-2a3b5c6d7e8f', 'sample_token_44556', 'Emma', 'Wilson', '1993-11-25', 62.0, 160.0, 'F', 'AB-', 'Diabetes', 'None', 'Shellfish');
+    ('a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68','sample_token_12345', 'John', 'Dang', '1990-05-15', 75.0, 180.0, 'M', 'O+', 'None', 'Penicillin', 'Peanuts', 2),
+    ('b7e3adf0-29c9-4ef9-b8d7-55c68e3d3b61', 'sample_token_67890', 'Alice', 'Smith', '1992-08-20', 68.0, 165.0, 'F', 'A+', 'Asthma', 'Sulfa drugs', 'Gluten', 13),
+    ('c2a8dfe2-3b6f-44b0-8f0d-9a1c3505c3f3', 'sample_token_11223', 'Bob', 'Brown', '1985-02-10', 80.0, 175.0, 'M', 'B-', 'Hypertension', 'None', 'None', 0),
+    ('d4e6a1f3-5b7d-4c8e-9f10-2a3b5c6d7e8f', 'sample_token_44556', 'Emma', 'Wilson', '1993-11-25', 62.0, 160.0, 'F', 'AB-', 'Diabetes', 'None', 'Shellfish', 0);
 
 INSERT INTO RELATIONSHIP_REQUESTED (
     id, user_id, relative_id, create_at
