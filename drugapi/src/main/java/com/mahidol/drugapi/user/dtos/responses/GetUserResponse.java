@@ -43,6 +43,8 @@ public class GetUserResponse {
 
     private List<String> foodAllergy;
 
+    private Integer streak;
+
     public static GetUserResponse fromUser(User u, Optional<String> url) {
         return new GetUserResponse()
                 .setProfileImage(url.orElse(null))
@@ -56,6 +58,7 @@ public class GetUserResponse {
                 .setBloodGroup(u.getBloodGroup())
                 .setHealthCondition(StringUtil.stringToArray(u.getHealthCondition()))
                 .setDrugAllergy(StringUtil.stringToArray(u.getDrugAllergy()))
-                .setFoodAllergy(StringUtil.stringToArray(u.getFoodAllergy()));
+                .setFoodAllergy(StringUtil.stringToArray(u.getFoodAllergy()))
+                .setStreak(u.getStreak());
     }
 }
