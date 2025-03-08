@@ -26,3 +26,27 @@ func (s *UserService) GetRegisterTokenByID(id uuid.UUID) (string, error) {
 
 	return user.RegisterToken, nil
 }
+
+func (s *UserService) GetAllUsers() ([]models.AppUser, error) {
+	var users []models.AppUser
+
+	result := s.DB.Find(&users)
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to fetch users: %w", result.Error)
+	}
+
+	return users, nil
+}
+
+func (s *UserService) UpdateUserStreak( userID uuid.UUID, streak int) error {
+	result := s.DB.Model(&models.AppUser{}).Where("id = ?", userID).Update("streak", streak)
+	
+	if result.Error != nil {
+		return fmt.Errorf("failed to update streak for user ID %s: %w", userID, result.Error)
+	}
+
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("no user found with ID %s or no change in streak value", userID)
+	}
+	return nil
+}

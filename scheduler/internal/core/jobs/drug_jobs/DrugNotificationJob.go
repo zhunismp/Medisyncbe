@@ -1,4 +1,4 @@
-package jobs
+package drug_jobs
 
 import (
 	"fmt"
@@ -6,7 +6,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/zhunismp/Medisyncbe/scheduler/internal/app/repositories/models"
+	repoModels "github.com/zhunismp/Medisyncbe/scheduler/internal/app/repositories/models"
+	coreModels "github.com/zhunismp/Medisyncbe/scheduler/internal/core/models"
+
 	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/services"
 	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/utils"
 )
@@ -29,11 +31,18 @@ func NewDrugNotificationJob(
 	}
 }
 
+func (j *DrugNotificationJob) JobAttributes() coreModels.JobAttributes {
+	return coreModels.JobAttributes {
+		Name: "DrugNotificationJob",
+		Interval: "*/15 * * * *",
+	}
+}
 
-func (j *DrugNotificationJob) Task(time time.Time) {
-	fmt.Println("Job run at: ", time)
 
-    schedules, err := j.scheduleService.GetScheduleWithTime(time)
+func (j *DrugNotificationJob) Task(start time.Time, parameters ...interface{}) {
+	fmt.Println("Job run at: ", start)
+
+    schedules, err := j.scheduleService.GetScheduleWithTime(start)
     if err != nil {
         log.Println("Error fetching schedules:", err)
         return
@@ -47,7 +56,7 @@ func (j *DrugNotificationJob) Task(time time.Time) {
 
     for _, schedule := range schedules {
         wg.Add(1)
-        go func(schedule models.Schedule) {
+        go func(schedule repoModels.Schedule) {
             defer wg.Done() 
 
             err := j.notificationService.SendNotification(

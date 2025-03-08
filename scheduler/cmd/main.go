@@ -6,13 +6,11 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
-	"github.com/go-co-op/gocron/v2"
 	"github.com/zhunismp/Medisyncbe/scheduler/internal/app/repositories/connections"
 	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/config"
+	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/jobs"
 	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/services"
-	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/services/jobs"
 )
 
 func main() {
@@ -32,62 +30,39 @@ func main() {
 	// Initialize services
 	db := connections.DB
 	schedulerService := services.NewSchedulerService(db)
-	historyService := services.NewHistoryService(db)	
+	historyService := services.NewHistoryService(db)
+	userService := services.NewUserService(db)
 	notificationService, err := services.NewNotificationService(firebaseConfigPath)
 	if err != nil {
 		fmt.Println("Error initiate notification service: ", err)
 	}
 
-	// Initialize jobs
-	drugNotificationJob := jobs.NewDrugNotificationJob(
-		schedulerService, 
+	// Initialize Jobs
+	s, err := jobs.Initialize(
+		schedulerService,
 		historyService,
 		notificationService,
+		userService,
 	)
-
-	// Initialize scheduler
-	s, err := gocron.NewScheduler()
 	if err != nil {
-		log.Println("Error creating scheduler:", err)
-		return
+		log.Println("Error initializing jobs:", err)
 	}
-
-	// Add DrugNotificationJob 
-	s.NewJob(
-		gocron.CronJob(
-			"*/15 * * * *",
-			true,
-		),
-		gocron.NewTask(
-			func() {
-				now := time.Now().Truncate(time.Minute) 
-    			drugNotificationJob.Task(now)
-			},
-		),
-		gocron.WithName("DrugNotificationJob"),
-	)
 
 	s.Start()
 
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
-	go func() {
-		<- sigChan 
-		log.Println("\nInterrupt signal received. Shutting down...")
-		os.Exit(0)
-	}()
 
-	for {
-
-	}
+	<-sigChan
+	log.Println("\nInterrupt signal received. Shutting down...")
 }
 
 func getFirebaseConfigPath() string {
-    env := os.Getenv("ENV") 
+	env := os.Getenv("ENV")
 
-    if env == "prod" {
-        return "/app/firebase-config.json"
-    }
+	if env == "prod" {
+		return "/app/firebase-config.json"
+	}
 
-    return "./configs/firebase-config.json"
+	return "./configs/firebase-config.json"
 }

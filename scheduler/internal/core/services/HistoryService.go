@@ -99,3 +99,13 @@ func (h *HistoryService) createHistoryRecord(userID, drugID uuid.UUID, groupID *
 
     return nil
 }
+
+func (h *HistoryService) GetHistoryByUserIDAndDate(userID uuid.UUID, date time.Time) ([]models.History, error) {
+    var histories []models.History
+
+    if err := h.DB.Where("user_id = ?", userID).Where("DATE(notified_at) = ?", date.Format("2006-01-02")).Find(&histories).Error; err != nil {
+        return nil, err
+    }
+
+    return histories, nil
+}
