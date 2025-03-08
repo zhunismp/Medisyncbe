@@ -48,7 +48,7 @@ INSERT INTO HISTORY (id, user_id, drug_id, group_id, status, taken_at, notified_
 
 INSERT INTO HISTORY (id, user_id, drug_id, group_id, status, taken_at, notified_at, count) VALUES 
     ('9c77574b-b1ab-49a4-8bb3-bddff16718db', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 
-        'b2876821-1f75-4c1a-999a-46f8f03d7a4b', NULL, 'taken', '2025-01-18 09:00:00', '2025-01-18 08:45:00', 1),
+        'b2876821-1f75-4c1a-999a-46f8f03d7a4b', NULL, 'taken', '2025-01-18 09:00:00', '2025-03-07 08:45:00', 1),
     ('9c77574b-b1ab-49a4-8bb3-bddff16718dc', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 
         'b2876821-1f75-4c1a-999a-46f8f03d7a4c', NULL, 'taken', '2025-01-18 10:00:00', '2025-01-18 09:45:00', 2),
     ('9c77574b-b1ab-49a4-8bb3-bddff16718dd', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 
@@ -62,4 +62,6 @@ INSERT INTO HISTORY (id, user_id, drug_id, group_id, status, taken_at, notified_
     ('9c77574b-b1ab-49a4-8bb3-bddff16718e1', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 
         'b2876821-1f75-4c1a-999a-46f8f03d7a4d', NULL, 'missed', '2025-01-19 11:00:00', '2025-01-19 10:45:00', 0),
     ('9c77574b-b1ab-49a4-8bb3-bddff16718e2', 'a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68', 
-        'b2876821-1f75-4c1a-999a-46f8f03d7a4e', NULL, 'taken', '2025-01-19 12:00:00', '2025-01-19 11:45:00', 1);
+        'b2876821-1f75-4c1a-999a-46f8f03d7a4e', NULL, 'taken', '2025-01-19 12:00:00', '2025-01-19 11:45:00', 1),
+    ('9c77574b-b1ab-49a4-8bb3-bddff16718e3', 'b7e3adf0-29c9-4ef9-b8d7-55c68e3d3b61', 
+        'b2876821-1f75-4c1a-999a-46f8f03d7a4e', NULL, 'missed', '2025-01-19 12:00:00', '2025-03-07 11:45:00', 1);

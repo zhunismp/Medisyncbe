@@ -30,42 +30,39 @@ func main() {
 	// Initialize services
 	db := connections.DB
 	schedulerService := services.NewSchedulerService(db)
-	historyService := services.NewHistoryService(db)	
+	historyService := services.NewHistoryService(db)
 	userService := services.NewUserService(db)
 	notificationService, err := services.NewNotificationService(firebaseConfigPath)
 	if err != nil {
 		fmt.Println("Error initiate notification service: ", err)
 	}
 
-	// Initialize jobs
-	s := jobs.Initialize(
-		schedulerService, 
-		historyService, 
+	// Initialize Jobs
+	s, err := jobs.Initialize(
+		schedulerService,
+		historyService,
 		notificationService,
 		userService,
 	)
+	if err != nil {
+		log.Println("Error initializing jobs:", err)
+	}
 
 	s.Start()
 
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
-	go func() {
-		<- sigChan 
-		log.Println("\nInterrupt signal received. Shutting down...")
-		os.Exit(0)
-	}()
 
-	for {
-
-	}
+	<-sigChan
+	log.Println("\nInterrupt signal received. Shutting down...")
 }
 
 func getFirebaseConfigPath() string {
-    env := os.Getenv("ENV") 
+	env := os.Getenv("ENV")
 
-    if env == "prod" {
-        return "/app/firebase-config.json"
-    }
+	if env == "prod" {
+		return "/app/firebase-config.json"
+	}
 
-    return "./configs/firebase-config.json"
+	return "./configs/firebase-config.json"
 }

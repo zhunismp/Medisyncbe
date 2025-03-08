@@ -1,6 +1,7 @@
 package jobs
 
 import (
+	"log"
 	"time"
 
 	"github.com/go-co-op/gocron/v2"
@@ -15,7 +16,7 @@ func Initialize(
 	historyService *services.HistoryService,
 	notificationService *services.NotificationService,
 	userService *services.UserService,
-) gocron.Scheduler {
+) (gocron.Scheduler, error) {
 	drugNotificationJob := drug_jobs.NewDrugNotificationJob(
 		schedulerService,
 		historyService,
@@ -34,8 +35,12 @@ func Initialize(
 	return schedule(jobs)
 }
 
-func schedule(jobs []models.BaseJob) gocron.Scheduler {
-	s, _ := gocron.NewScheduler()
+func schedule(jobs []models.BaseJob) (gocron.Scheduler, error) {
+	s, err := gocron.NewScheduler()
+	if err != nil {
+		log.Println("Error creating scheduler:", err)
+		return nil, err
+	}
 
 	for _, job := range jobs {
 		attributes := job.JobAttributes()
@@ -44,10 +49,12 @@ func schedule(jobs []models.BaseJob) gocron.Scheduler {
 				attributes.Interval,
 				true,
 			),
-			gocron.NewTask(job.Task, time.Now().Truncate(time.Minute)),
+			gocron.NewTask(func() {
+				job.Task(time.Now().Truncate(time.Minute))
+			}),
 			gocron.WithName(attributes.Name),
 		)
 	}
 
-	return s
+	return s, nil
 }

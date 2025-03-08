@@ -27,11 +27,13 @@ func NewUserStreakJob(
 func (j *UserStreakJob) JobAttributes() coreModels.JobAttributes {
 	return coreModels.JobAttributes {
 		Name: "UserStreakJob",
-		Interval: "0 0 * * *",
+		Interval: "*/1 * * * *",
 	}
 }
 
 func (j *UserStreakJob) Task(start time.Time, parameters ...interface{}) {
+	log.Println("UserStreakJob started at:", start)
+	
 	users, err := j.userService.GetAllUsers()
 	if err != nil {
 		log.Println("Error fetching users:", err)
