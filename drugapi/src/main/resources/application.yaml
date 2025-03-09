@@ -12,6 +12,10 @@ spring:
     username: ${SQL_USERNAME}
     password: ${SQL_PASSWORD}
 
+logging:
+  level:
+    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
+
 jwt:
   secret: ${JWT_SECRET}
 
