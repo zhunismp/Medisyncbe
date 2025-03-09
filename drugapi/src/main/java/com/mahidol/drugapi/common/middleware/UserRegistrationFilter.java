@@ -38,21 +38,25 @@ public class UserRegistrationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        // After passing JWT Filter it will guarantee to have Auth header
         String authHeader = request.getHeader("Authorization");
-        String token = authHeader.split(" ")[1].trim();
-        UUID userId = UUID.fromString(jwtUtil.extractClaim(token, "userId"));
 
-        if (!userService.isExists(userId)) {
-            String errorResp = "{\"errorMessage\": \"User not registered\"}";
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.split(" ")[1].trim();
+            UUID userId = UUID.fromString(jwtUtil.extractClaim(token, "userId"));
 
-            response.setContentType("application/json");
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.getWriter().write(errorResp);
+            if (!userService.isExists(userId)) {
+                String errorResp = "{\"errorMessage\": \"User not registered\"}";
 
-            return;
+                response.setContentType("application/json");
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                response.getWriter().write(errorResp);
+
+                return;
+            }
         }
 
+        // Request without header will decline. Because context didn't set properly.
+        // Request with allow endpoint will pass through.
         filterChain.doFilter(request, response);
     }
 }
