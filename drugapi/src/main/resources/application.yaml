@@ -27,4 +27,4 @@ salt:
 
 firebase:
   config:
-    path: classpath:firebase-config.json
+    base64: ${FIREBASE_CONFIG_BASE64}
