@@ -41,7 +41,7 @@ CREATE TABLE RELATIONSHIP (
     id UUID PRIMARY KEY,
     user_id UUID NOT NULL,
     relative_id UUID NOT NULL,
-    relation TEXT NOT NULL,
+    relation TEXT,
     notifiable BOOLEAN DEFAULT FALSE,
     readable BOOLEAN DEFAULT FALSE,
     create_at TIMESTAMP DEFAULT NOW()
