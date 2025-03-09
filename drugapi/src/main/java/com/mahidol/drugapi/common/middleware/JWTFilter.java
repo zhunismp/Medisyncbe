@@ -33,55 +33,35 @@ public class JWTFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        String authHeader = request.getHeader("Authorization");
 
-        // TODO: Remove before go live
-        String skipJwtHeader = request.getHeader("X-Skip-JWT");
-
-        if (skipJwtHeader != null && skipJwtHeader.equalsIgnoreCase("true")) {
-            logger.info("Skipping JWT validation due to X-Skip-JWT header");
-
-            UUID mockUserId = UUID.fromString("a6f730d8-8f72-4a9f-bf9c-5a6f9f4b7d68");
-            userContext.setUserId(mockUserId);
-
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    mockUserId,
-                    null,
-                    Collections.emptyList()
-            );
-
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            filterChain.doFilter(request, response);
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            sendErrorResponse(response, "Missing or invalid Authorization header", HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
-        String authHeader = request.getHeader("Authorization");
+        String token = authHeader.split(" ")[1].trim();
+        try {
+            if (jwtUtil.isTokenValid(token)) {
+                UUID userId = UUID.fromString(jwtUtil.extractClaim(token, "userId"));
+                userContext.setUserId(userId);
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.split(" ")[1].trim();
-            try {
-                if (jwtUtil.isTokenValid(token)) {
-                    // set userId
-                    UUID userId = UUID.fromString(jwtUtil.extractClaim(token, "userId"));
-                    userContext.setUserId(userId);
-
-                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                            userId,
-                            null,
-                            Collections.emptyList()
-                    );
-                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                }
-            } catch (Exception ex) {
-                logger.error("JWT validation failed: ", ex);
+                SecurityContextHolder.getContext().setAuthentication(
+                        new UsernamePasswordAuthenticationToken(userId, null, Collections.emptyList())
+                );
             }
+        } catch (Exception ex) {
+            sendErrorResponse(response, "JWT validation failed. Please ensure your credentials.", HttpServletResponse.SC_FORBIDDEN);
+            return;
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private void sendErrorResponse(HttpServletResponse response, String message, int status) throws IOException {
+        response.setContentType("application/json");
+        response.setStatus(status);
+        response.getWriter().write("{\"errorMessage\": \"" + message + "\"}");
     }
 }

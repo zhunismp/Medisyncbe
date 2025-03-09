@@ -37,22 +37,20 @@ public class UserRegistrationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+
+        // After passing JWT Filter it will guarantee to have Auth header
         String authHeader = request.getHeader("Authorization");
+        String token = authHeader.split(" ")[1].trim();
+        UUID userId = UUID.fromString(jwtUtil.extractClaim(token, "userId"));
 
-        // TODO: Remove this if, to check no matter what.
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.split(" ")[1].trim();
-            UUID userId = UUID.fromString(jwtUtil.extractClaim(token, "userId"));
+        if (!userService.isExists(userId)) {
+            String errorResp = "{\"errorMessage\": \"User not registered\"}";
 
-            if (!userService.isExists(userId)) {
-                String errorResp = "{\"errorMessage\": \"User not registered\"}";
+            response.setContentType("application/json");
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.getWriter().write(errorResp);
 
-                response.setContentType("application/json");
-                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                response.getWriter().write(errorResp);
-
-                return;
-            }
+            return;
         }
 
         filterChain.doFilter(request, response);
