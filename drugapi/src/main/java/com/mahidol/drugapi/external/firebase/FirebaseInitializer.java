@@ -25,7 +25,7 @@ public class FirebaseInitializer {
     @Bean
     GoogleCredentials googleCredentials() {
         try {
-            byte[] decodedBytes = Base64.getDecoder().decode(firebaseConfigBase64);
+            byte[] decodedBytes = Base64.getDecoder().decode(firebaseConfigBase64.replaceAll("\\s+", ""));
             return GoogleCredentials.fromStream(new ByteArrayInputStream(decodedBytes));
         } catch (IOException e) {
             throw new InternalServerError("Can not resolve firebase configuration path");

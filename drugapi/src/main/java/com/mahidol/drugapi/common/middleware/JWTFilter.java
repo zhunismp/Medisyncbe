@@ -35,27 +35,25 @@ public class JWTFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.split(" ")[1].trim();
+            try {
+                if (jwtUtil.isTokenValid(token)) {
+                    UUID userId = UUID.fromString(jwtUtil.extractClaim(token, "userId"));
+                    userContext.setUserId(userId);
 
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            sendErrorResponse(response, "Missing or invalid Authorization header", HttpServletResponse.SC_UNAUTHORIZED);
-            return;
-        }
-
-        String token = authHeader.split(" ")[1].trim();
-        try {
-            if (jwtUtil.isTokenValid(token)) {
-                UUID userId = UUID.fromString(jwtUtil.extractClaim(token, "userId"));
-                userContext.setUserId(userId);
-
-                SecurityContextHolder.getContext().setAuthentication(
-                        new UsernamePasswordAuthenticationToken(userId, null, Collections.emptyList())
-                );
+                    SecurityContextHolder.getContext().setAuthentication(
+                            new UsernamePasswordAuthenticationToken(userId, null, Collections.emptyList())
+                    );
+                }
+            } catch (Exception ex) {
+                sendErrorResponse(response, "JWT validation failed. Please ensure your credentials.", HttpServletResponse.SC_FORBIDDEN);
+                return;
             }
-        } catch (Exception ex) {
-            sendErrorResponse(response, "JWT validation failed. Please ensure your credentials.", HttpServletResponse.SC_FORBIDDEN);
-            return;
         }
 
+        // Request without header will decline. Because context didn't set properly.
+        // Request with allow endpoint will pass through.
         filterChain.doFilter(request, response);
     }
 
