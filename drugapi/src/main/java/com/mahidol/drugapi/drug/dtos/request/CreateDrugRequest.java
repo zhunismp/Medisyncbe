@@ -47,6 +47,7 @@ public class CreateDrugRequest {
     private int usageTime;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
+    @NotNull
     private List<ScheduleTime> scheduleTimes;
 
     private Boolean isInternalDrug;
