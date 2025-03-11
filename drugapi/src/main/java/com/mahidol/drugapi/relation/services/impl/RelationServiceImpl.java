@@ -157,14 +157,14 @@ public class RelationServiceImpl implements RelationService {
 
         Relation outgoing = new Relation()
                 .setUserId(pendingRequest.getRelativeId())
-                .setRelativeId(pendingRequest.getRelativeId())
+                .setRelativeId(pendingRequest.getUserId())
                 .setCreateAt(LocalDateTime.now())
                 .setRelation(relation)
                 .setNotifiable(notifiable)
                 .setReadable(readable);
         Relation incoming = new Relation()
                 .setUserId(pendingRequest.getUserId())
-                .setRelativeId(pendingRequest.getUserId())
+                .setRelativeId(pendingRequest.getRelativeId())
                 .setCreateAt(LocalDateTime.now())
                 .setNotifiable(Relation.DEFAULT_NOTIFIABLE)
                 .setReadable(Relation.DEFAULT_READABLE);
