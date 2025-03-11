@@ -176,6 +176,10 @@ public class DrugGroupService {
     }
 
     private void linkDrug(List<UUID> drugIds, UUID groupId) {
+        // skip link is drugIds is empty
+        if (drugIds.isEmpty())
+            return;
+
         DrugGroup target = drugGroupRepository.findById(groupId).orElseThrow(() -> new EntityNotFoundException("Group not found"));
         List<Drug> drugs = drugService.searchAllDrugByDrugsId(userContext.getUserId(), drugIds);
 
