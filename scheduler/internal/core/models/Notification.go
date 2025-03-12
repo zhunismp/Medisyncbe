@@ -9,7 +9,7 @@ type Notification struct {
 type NotificationTopic string
 
 const (
-	Drug 		NotificationTopic = "DRUG"
+	Drug NotificationTopic = "DRUG"
 	Appointment NotificationTopic = "APPOINTMENT"
 )
 
