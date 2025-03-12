@@ -34,7 +34,7 @@ func NewDrugNotificationJob(
 func (j *DrugNotificationJob) JobAttributes() coreModels.JobAttributes {
 	return coreModels.JobAttributes {
 		Name: "DrugNotificationJob",
-		Interval: "*/15 * * * *",
+		Interval: "*/1 * * * *",
 	}
 }
 
