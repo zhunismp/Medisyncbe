@@ -54,7 +54,7 @@ CREATE TABLE DRUG_GROUP (
 );
 
 CREATE TABLE DRUG_GROUP_DRUG (
-    id UUID PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     drug_id UUID NOT NULL,
     group_id UUID NOT NULL
 );
