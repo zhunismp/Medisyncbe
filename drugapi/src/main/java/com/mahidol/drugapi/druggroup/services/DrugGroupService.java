@@ -163,13 +163,15 @@ public class DrugGroupService {
     // After remove drug from the drug group, we need to set isEnabled to true again
     // This is for make old notification of drug behavior the same as before.
     private void unlinkDrug(List<UUID> drugIds, UUID groupId) {
+        // skip link is drugIds is empty
+        if (drugIds.isEmpty())
+            return;
+
         DrugGroup target = drugGroupRepository.findById(groupId).orElseThrow(() -> new EntityNotFoundException("Group not found"));
         List<Drug> drugs = drugService.searchAllDrugByDrugsId(userContext.getUserId(), drugIds);
+        drugs.forEach(target.getDrugs()::remove);
 
-        // Remove all drug from group
-        List<Drug> initial = target.getDrugs();
-        initial.removeAll(drugs);
-        drugGroupRepository.save(target.setDrugs(initial));
+        drugGroupRepository.save(target);
 
         // scheduler
         drugIds.forEach(id -> scheduleService.setIsEnabled(id, true));
@@ -182,13 +184,9 @@ public class DrugGroupService {
 
         DrugGroup target = drugGroupRepository.findById(groupId).orElseThrow(() -> new EntityNotFoundException("Group not found"));
         List<Drug> drugs = drugService.searchAllDrugByDrugsId(userContext.getUserId(), drugIds);
+        target.getDrugs().addAll(drugs);
 
-        // Add all current drugs in group
-        drugs.addAll(target.getDrugs());
-
-        // Deduplicated
-        List<Drug> deduplicated = drugs.stream().distinct().toList();
-        drugGroupRepository.save(target.setDrugs(deduplicated));
+        drugGroupRepository.save(target);
 
         // scheduler
         drugIds.forEach(id -> scheduleService.setIsEnabled(id, false));
