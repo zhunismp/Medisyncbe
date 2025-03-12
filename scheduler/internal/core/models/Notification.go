@@ -5,3 +5,14 @@ type Notification struct {
 	Body  string
 	RegisterToken string
 }
+
+type NotificationTopic string
+
+const (
+	Drug NotificationTopic = "DRUG"
+	Appointment NotificationTopic = "APPOINTMENT"
+)
+
+func (n NotificationTopic) String() string {
+	return string(n)
+}

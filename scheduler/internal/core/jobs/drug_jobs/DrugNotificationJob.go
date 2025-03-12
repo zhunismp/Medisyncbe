@@ -61,6 +61,7 @@ func (j *DrugNotificationJob) Task(start time.Time, parameters ...interface{}) {
 
             err := j.notificationService.SendNotification(
                 schedule.User.RegisterToken,
+				coreModels.Drug,
                 "Time to take medicine",
                 fmt.Sprintf("Your %s is ready for you to finish it", schedule.Name),
             )

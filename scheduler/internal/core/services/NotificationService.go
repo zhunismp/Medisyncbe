@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"log"
 
-	"google.golang.org/api/option"
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/messaging"
+	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/models"
+	"google.golang.org/api/option"
 )
 
 type NotificationService struct {
@@ -34,9 +35,10 @@ func NewNotificationService(opt option.ClientOption) (*NotificationService, erro
 	}, nil
 }
 
-func (ns *NotificationService) SendNotification(token string, title string, body string) error {
+func (ns *NotificationService) SendNotification(token string, topic models.NotificationTopic, title string, body string) error {
 	message := &messaging.Message{
 		Token: token,
+		Topic: topic.String(),
 		Notification: &messaging.Notification{
 			Title: title,
 			Body:  body,
