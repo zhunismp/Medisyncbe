@@ -38,10 +38,12 @@ func NewNotificationService(opt option.ClientOption) (*NotificationService, erro
 func (ns *NotificationService) SendNotification(token string, topic models.NotificationTopic, title string, body string) error {
 	message := &messaging.Message{
 		Token: token,
-		Topic: topic.String(),
 		Notification: &messaging.Notification{
 			Title: title,
 			Body:  body,
+		},
+		Data: map[string]string{
+			"topic": topic.String(),
 		},
 		APNS: &messaging.APNSConfig{
             Headers: map[string]string{
