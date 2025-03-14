@@ -7,11 +7,10 @@ import (
 	"strings"
 
 	"github.com/joho/godotenv"
-	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/models"
 	"google.golang.org/api/option"
 )
 
-func LoadConfig() (*models.Config, error) {
+func LoadConfig() (*Config, error) {
 	var clientOption option.ClientOption
 
 	if os.Getenv("ENV") != "prod" {
@@ -25,7 +24,7 @@ func LoadConfig() (*models.Config, error) {
 		return nil, fmt.Errorf("failed to load client option: %w", err)
 	}
 
-	return &models.Config{
+	return &Config{
 		DBUser:     os.Getenv("POSTGRES_USER"),
 		DBPassword: os.Getenv("POSTGRES_PASSWORD"),
 		DBName:     os.Getenv("POSTGRES_DB"),
