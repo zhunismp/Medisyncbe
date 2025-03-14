@@ -1,5 +1,6 @@
 package com.mahidol.drugapi.appointment.dtos.request;
 
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -7,9 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.UUID;
+import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,11 +17,14 @@ import java.util.UUID;
 public class CreateAppointmentRequest {
     @NotBlank(message = "title is mandatory")
     private String title;
+
     private String medicName;
-    @NotNull(message = "date must not be null")
-    private LocalDate date;
-    @NotNull(message = "time must not be null")
-    private LocalTime time;
+
+    @NotNull(message = "datetime is mandatory")
+    @Future(message = "datetime must not be in the past")
+    private LocalDateTime datetime;
+
     private String destination;
+
     private String remark;
 }

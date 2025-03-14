@@ -66,8 +66,7 @@ CREATE TABLE APPOINTMENT (
     user_id UUID NOT NULL,
     title TEXT NOT NULL,
     medic_name TEXT,
-    "date" DATE NOT NULL,
-    "time" TIME NOT NULL,
+    "datetime" TIMESTAMP NOT NULL,
     destination TEXT,
     remark TEXT
 );
