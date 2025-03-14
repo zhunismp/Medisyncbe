@@ -7,6 +7,7 @@ import (
 	"time"
 
 	repoModels "github.com/zhunismp/Medisyncbe/scheduler/internal/app/repositories/models"
+	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/config"
 	coreModels "github.com/zhunismp/Medisyncbe/scheduler/internal/core/models"
 
 	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/services"
@@ -17,24 +18,27 @@ type DrugNotificationJob struct {
 	scheduleService *services.SchedulerService
 	historyService *services.HistoryService
 	notificationService *services.NotificationService
+	config *config.Config
 }
 
 func NewDrugNotificationJob(
 	scheduleService *services.SchedulerService, 
 	historyService *services.HistoryService,
 	notificationService *services.NotificationService,
+	config *config.Config,
 ) *DrugNotificationJob {
 	return &DrugNotificationJob{
 		scheduleService: scheduleService,
 		historyService: historyService,
 		notificationService: notificationService,
+		config: config,
 	}
 }
 
 func (j *DrugNotificationJob) JobAttributes() coreModels.JobAttributes {
 	return coreModels.JobAttributes {
 		Name: "DrugNotificationJob",
-		Interval: "*/1 * * * *",
+		Interval: j.config.DrugNotificationInterval,
 	}
 }
 

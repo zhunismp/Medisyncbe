@@ -43,6 +43,7 @@ func main() {
 		notificationService,
 		appointmentService,
 		userService,
+		cfg,
 	)
 	if err != nil {
 		log.Println("Error initializing jobs:", err)

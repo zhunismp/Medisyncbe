@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/zhunismp/Medisyncbe/scheduler/internal/app/repositories/models"
+	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/config"
 	coreModels "github.com/zhunismp/Medisyncbe/scheduler/internal/core/models"
 	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/services"
 )
@@ -12,22 +13,25 @@ import (
 type UserStreakJob struct {
 	historyService *services.HistoryService
 	userService *services.UserService
+	config *config.Config
 }
 
 func NewUserStreakJob(
 	hisotrySerivce *services.HistoryService,
 	userService *services.UserService,
+	config *config.Config,
 ) *UserStreakJob {
 	return &UserStreakJob{
 		historyService: hisotrySerivce,
 		userService: userService,
+		config: config,
 	}
 }
 
 func (j *UserStreakJob) JobAttributes() coreModels.JobAttributes {
 	return coreModels.JobAttributes {
 		Name: "UserStreakJob",
-		Interval: "*0 1 * * *",
+		Interval: j.config.UserStreakInterval,
 	}
 }
 

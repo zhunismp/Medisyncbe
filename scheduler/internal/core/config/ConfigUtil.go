@@ -17,7 +17,7 @@ func LoadConfig() (*Config, error) {
 		if err := godotenv.Load("./configs/.env"); err != nil {
 			return nil, fmt.Errorf("failed to load .env file: %w", err)
 		}
-	} 
+	}
 
 	clientOption, err := loadClientOption()
 	if err != nil {
@@ -25,12 +25,15 @@ func LoadConfig() (*Config, error) {
 	}
 
 	return &Config{
-		DBUser:     os.Getenv("POSTGRES_USER"),
-		DBPassword: os.Getenv("POSTGRES_PASSWORD"),
-		DBName:     os.Getenv("POSTGRES_DB"),
-		DBHost:     os.Getenv("POSTGRES_HOST"),
-		DBPort:     os.Getenv("POSTGRES_PORT"),
-		FirebaseClientOption: clientOption,
+		DBUser:                          os.Getenv("POSTGRES_USER"),
+		DBPassword:                      os.Getenv("POSTGRES_PASSWORD"),
+		DBName:                          os.Getenv("POSTGRES_DB"),
+		DBHost:                          os.Getenv("POSTGRES_HOST"),
+		DBPort:                          os.Getenv("POSTGRES_PORT"),
+		DrugNotificationInterval:        getOrFallback("DRUG_NOTIFICATION_INTERVAL", "*/1 * * * *"),
+		AppointmentNotificationInterval: getOrFallback("APPOINTMENT_NOTIFICATION_INTERVAL", "0 0 * * *"),
+		UserStreakInterval:              getOrFallback("USER_STREAK_INTERVAL", "0 1 * * *"),
+		FirebaseClientOption:            clientOption,
 	}, nil
 }
 
@@ -51,4 +54,12 @@ func loadClientOption() (option.ClientOption, error) {
 	}
 
 	return option.WithCredentialsJSON(firebaseConfigJSON), nil
+}
+
+func getOrFallback(key string, defaultValue string) string {
+	value := os.Getenv(key)
+	if value == "" {
+		return defaultValue
+	}
+	return value
 }
