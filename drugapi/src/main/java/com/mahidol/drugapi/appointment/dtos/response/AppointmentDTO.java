@@ -6,8 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
@@ -18,16 +17,14 @@ public class AppointmentDTO {
     private UUID id;
     private String title;
     private String medicName;
-    private LocalDate date;
-    private LocalTime time;
+    private LocalDateTime datetime;
     private String destination;
     private String remark;
 
     public static AppointmentDTO fromAppointment(Appointment appointment) {
         return new AppointmentDTO()
                 .setId(appointment.getId())
-                .setTime(appointment.getTime())
-                .setDate(appointment.getDate())
+                .setDatetime(appointment.getDatetime())
                 .setTitle(appointment.getTitle())
                 .setMedicName(appointment.getMedicName())
                 .setDestination(appointment.getDestination())

@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -16,10 +16,13 @@ import java.util.UUID;
 @Data
 public class SearchAppointmentRequest {
     private UUID relativeId;
-    private LocalDate date;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
     private String title;
 
-    public Optional<LocalDate> getDate() { return Optional.ofNullable(date); }
+    public LocalDateTime getStartDate() { return Optional.ofNullable(startDate).orElse(LocalDateTime.now()); }
+    public Optional<LocalDateTime> getEndDate() { return Optional.ofNullable(endDate); }
+
     public Optional<String> getTitle() { return Optional.ofNullable(title); }
     public Optional<UUID> getRelativeId() { return Optional.ofNullable(relativeId); }
 }

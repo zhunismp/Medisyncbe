@@ -39,28 +39,20 @@ public class AppointmentServiceImpl implements AppointmentService {
             return i;
         }).orElse(userContext.getUserId());
 
-        boolean isFilter = request.getDate().isPresent() || request.getTitle().isPresent();
-        List<Appointment> allAppointments = appointmentRepository.findByUserId(id);
-        List<Appointment> filteredAppointment = allAppointments;
+        List<Appointment> boundedAppointment =
+                request.getEndDate().map(end -> appointmentRepository.findByUserIdAndDatetimeBetween(userContext.getUserId(), request.getStartDate(), end))
+                .orElse(appointmentRepository.findByUserIdAndDatetimeAfter(userContext.getUserId(), request.getStartDate()));
 
-        if (isFilter) {
-            List<Appointment> appointmentsByDrug = request.getDate()
-                    .map(date -> allAppointments.stream().filter(a -> a.getDate().equals(date)).toList()).orElse(Collections.emptyList());
-            List<Appointment> appointmentsByTitle = request.getTitle()
-                    .map(title -> allAppointments.stream().filter(a -> a.getTitle().equals(title)).toList()).orElse(Collections.emptyList());
+        List<Appointment> filteredByTitle =
+                request.getTitle()
+                        .map(title -> boundedAppointment.stream().filter(a -> a.getTitle().equals(title)).toList())
+                        .orElse(boundedAppointment);
 
-            Set<Appointment> mergedAppointments = new HashSet<>();
-            mergedAppointments.addAll(appointmentsByDrug);
-            mergedAppointments.addAll(appointmentsByTitle);
-
-            filteredAppointment = new ArrayList<>(mergedAppointments);
-        }
-
-        List<AppointmentDTO> appointmentDTOS = filteredAppointment.stream().map(AppointmentDTO::fromAppointment).toList();
+        List<AppointmentDTO> result = filteredByTitle.stream().map(AppointmentDTO::fromAppointment).toList();
 
         return new SearchAppointmentResponse(
-                appointmentDTOS,
-                appointmentDTOS.size()
+                result,
+                result.size()
         );
     }
 
@@ -70,8 +62,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .setUserId(userContext.getUserId())
                 .setTitle(request.getTitle())
                 .setMedicName(request.getMedicName())
-                .setDate(request.getDate())
-                .setTime(request.getTime())
+                .setDatetime(request.getDatetime())
                 .setDestination(request.getDestination())
                 .setRemark(request.getRemark());
 
@@ -95,13 +86,13 @@ public class AppointmentServiceImpl implements AppointmentService {
         if (!validateOwner(userContext.getUserId(), request.getAppointmentId()))
             throw new IllegalArgumentException("User is not the owner of the appointment");
 
+        // TODO: this might not safe
         Appointment target = appointmentRepository.findById(request.getAppointmentId()).get();
 
         appointmentRepository.save(
                 target
                         .setTitle(request.getTitle().orElse(target.getTitle()))
-                        .setDate(request.getDate().orElse(target.getDate()))
-                        .setTime(request.getTime().orElse(target.getTime()))
+                        .setDatetime(request.getDateTime().orElse(target.getDatetime()))
                         .setMedicName(request.getMedicName().orElse(target.getMedicName()))
                         .setDestination(request.getDestination().orElse(target.getDestination()))
                         .setRemark(request.getRemark().orElse(target.getRemark()))
