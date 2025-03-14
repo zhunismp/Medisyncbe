@@ -8,7 +8,7 @@ import (
 
 type Appointment struct {
 	ID 		    uuid.UUID      `gorm:"type:uuid;primaryKey"`
-	UserId	    uuid.UUID      `gorm:"type:uuid;not null"`
+	UserID	    uuid.UUID      `gorm:"type:uuid;not null"`
 	Title	    string         `gorm:"type:text;not null"`
 	MedicName   string         `gorm:"type:text"`
 	Datetime    time.Time      `gorm:"type:timestamp;not null"`

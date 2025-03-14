@@ -43,3 +43,18 @@ func LogHistories(histories []models.History) {
 		fmt.Println("-----------------------------------")
 	}
 }
+
+func LogAppointment(appointments []models.Appointment) {
+	if len(appointments) == 0 {
+		fmt.Println("No appointments to log.")
+		return
+	}
+
+	for _, appointment := range appointments {
+		fmt.Printf("Appointment ID: %s\n", appointment.ID)
+		fmt.Printf("User ID: %s\n", appointment.UserID)
+		fmt.Printf("Title: %s\n", appointment.Title)
+		fmt.Printf("Datetime: %v\n", appointment.Datetime)
+		fmt.Println("-----------------------------------")
+	}
+}

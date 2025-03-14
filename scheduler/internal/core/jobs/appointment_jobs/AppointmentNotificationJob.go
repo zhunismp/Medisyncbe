@@ -9,6 +9,7 @@ import (
 	repoModels "github.com/zhunismp/Medisyncbe/scheduler/internal/app/repositories/models"
 	coreModels "github.com/zhunismp/Medisyncbe/scheduler/internal/core/models"
 	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/services"
+	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/utils"
 )
 
 type AppointmentNotificationJob struct {
@@ -28,17 +29,20 @@ func NewAppointmentNotificationJob(
 
 func (j *AppointmentNotificationJob) JobAttributes() coreModels.JobAttributes {
 	return coreModels.JobAttributes {
-		Name: "DayBeforeAppointment",
+		Name: "AppointmentNotificationJob",
 		Interval: "0 0 * * *",
 	}
 }
 
-func (j *AppointmentNotificationJob) Tas(start time.Time, parameters ...interface{}) {
+func (j *AppointmentNotificationJob) Task(start time.Time, parameters ...interface{}) {
 	appointments, err := j.appointmemtService.GetAppointmentsAfterTomorrow()
 	if err != nil {
 		log.Println("Error fetching appointments:", err)
 		return
 	}
+
+	// Log appointments
+	utils.LogAppointment(appointments)
 
 	var wg sync.WaitGroup
 
