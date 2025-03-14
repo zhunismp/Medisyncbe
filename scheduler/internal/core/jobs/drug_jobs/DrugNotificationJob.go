@@ -76,5 +76,5 @@ func (j *DrugNotificationJob) Task(start time.Time, parameters ...interface{}) {
     }
 
     wg.Wait()
-    log.Println("All notifications sent")
+    log.Println("All drugs notifications sent")
 }

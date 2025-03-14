@@ -68,5 +68,5 @@ func (j *AppointmentNotificationJob) Task(start time.Time, parameters ...interfa
 	}
 
 	wg.Wait()
-	log.Println("All notifications sent")
+	log.Println("All appointment notifications sent")
 }

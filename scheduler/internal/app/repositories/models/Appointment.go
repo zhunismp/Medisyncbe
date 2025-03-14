@@ -16,3 +16,7 @@ type Appointment struct {
 	Remarks     string    `gorm:"type:text"`
 	User        AppUser   `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
 }
+
+func (Appointment) TableName() string {
+	return `appointment`
+}
