@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/go-co-op/gocron/v2"
+	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/config"
 	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/jobs/appointment_jobs"
 	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/jobs/drug_jobs"
 	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/jobs/user_jobs"
@@ -18,19 +19,23 @@ func Initialize(
 	notificationService *services.NotificationService,
 	appointmentService *services.AppointmentService,
 	userService *services.UserService,
+	config *config.Config,
 ) (gocron.Scheduler, error) {
 	drugNotificationJob := drug_jobs.NewDrugNotificationJob(
 		schedulerService,
 		historyService,
 		notificationService,
+		config,
 	)
 	appointmentNotificationJob := appointment_jobs.NewAppointmentNotificationJob(
 		appointmentService,
 		notificationService,
+		config,
 	)
 	userStreakJob := user_jobs.NewUserStreakJob(
 		historyService,
 		userService,
+		config,
 	)
 
 	jobs := []models.BaseJob{

@@ -5,15 +5,15 @@ import (
 	"log"
 	"time"
 
-	dbmodels "github.com/zhunismp/Medisyncbe/scheduler/internal/app/repositories/models"
-	amodels "github.com/zhunismp/Medisyncbe/scheduler/internal/core/models"
+	"github.com/zhunismp/Medisyncbe/scheduler/internal/app/repositories/models"
+	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 var DB *gorm.DB
 
-func Connect(cfg *amodels.Config) error {
+func Connect(cfg *config.Config) error {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
 		cfg.DBHost, cfg.DBUser, cfg.DBPassword, cfg.DBName, cfg.DBPort)
 	
@@ -37,10 +37,10 @@ func Connect(cfg *amodels.Config) error {
 	}
 
 	if err := db.AutoMigrate(
-		&dbmodels.AppUser{},
-		&dbmodels.DrugGroup{},
-		&dbmodels.Schedule{},
-		&dbmodels.History{},
+		&models.AppUser{},
+		&models.DrugGroup{},
+		&models.Schedule{},
+		&models.History{},
 	); err != nil {
 		return fmt.Errorf("failed to migrate models: %w", err)
 	}
