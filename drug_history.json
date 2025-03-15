@@ -1,0 +1,42 @@
+{
+    "drugId": "e9a7c116-b7ed-466a-adf2-bb38f90e21e6",
+    "drugName": "Drug 1",
+    "dosageForm": "Tablet",
+    "strength": "500mg",
+    "unit": "mg",
+    "dose": 1,
+    "histories": [
+        {
+            "id": "594bd80a-1c5b-4619-8114-de81d402f55c",
+            "status": "TAKEN",
+            "datatime": "2021-01-01T10:00:00"
+        },
+        {
+            "id": "30af6b12-6547-469a-8d6a-a48ce503c49b",
+            "status": "TAKEN",
+            "datetime": "2021-01-02T10:00:00"
+        },
+        {
+            "id": "f3b3b3b3-1c5b-4619-8114-de81d402f55c",
+            "status": "MISSED",
+            "datetime": "2021-01-03T10:00:00"
+        },
+        {
+            "id": "f3b3b3b3-1c5b-4619-8114-de81d402f55c",
+            "status": "SKIPPED",
+            "datetime": "2021-01-04T10:00:00"
+        }
+    ],
+    "stats": {
+        "total": 4,
+        "taken": 2,
+        "missed": 1,
+        "skipped": 1
+    },
+    "graphs": [
+        100,
+        100,
+        75,
+        50
+    ]
+}

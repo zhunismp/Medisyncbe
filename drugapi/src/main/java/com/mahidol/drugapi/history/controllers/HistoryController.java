@@ -23,6 +23,9 @@ public class HistoryController {
     @PostMapping("/searchhistories")
     public ResponseEntity<?> search(@RequestBody @Valid SearchHistoryRequest request, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) throw new BindingError(bindingResult.getFieldErrors());
+
+
+
         SearchHistoryResponse response = historyService.search(request);
 
         return new ResponseEntity<>(response, HttpStatus.OK);

@@ -1,7 +1,6 @@
 package com.mahidol.drugapi.history.services.impl;
 
 import com.mahidol.drugapi.common.ctx.UserContext;
-import com.mahidol.drugapi.common.models.Pagination;
 import com.mahidol.drugapi.drug.models.entites.Drug;
 import com.mahidol.drugapi.drug.services.DrugService;
 import com.mahidol.drugapi.druggroup.services.DrugGroupService;
@@ -11,6 +10,7 @@ import com.mahidol.drugapi.history.dtos.request.SearchHistoryRequest;
 import com.mahidol.drugapi.history.dtos.response.SearchHistoryResponse;
 import com.mahidol.drugapi.history.models.DrugHistory;
 import com.mahidol.drugapi.history.models.GroupHistory;
+import com.mahidol.drugapi.history.models.GroupHistoryEntry;
 import com.mahidol.drugapi.history.models.entities.History;
 import com.mahidol.drugapi.history.models.types.TakenStatus;
 import com.mahidol.drugapi.history.repositories.HistoryRepository;
@@ -57,31 +57,31 @@ public class HistoryServiceImpl implements HistoryService {
             return i;
         }).orElse(userContext.getUserId());
 
+        // Validate only drug group id or drug id should be specified.
+        if (request.getDrugId().isPresent() ^ request.getGroupId().isPresent())
+            throw new IllegalArgumentException("Invalid request. Please specify exactly one identification.");
+
         List<History> histories = request.getPreferredDate()
                 .map(d -> historyRepository.findByUserIdAndDate(userId, LocalDate.of(request.getYear(), request.getMonth(), d)))
-                .orElseGet(() -> historyRepository.findByUserIdAndMonth(userId, request.getMonth(), request.getYear()));
+                .orElseGet(() -> historyRepository.findByUserIdAndMonthAndYear(userId, request.getMonth(), request.getYear()));
 
-        List<History> filteredHistories = request.getReferenceId()
-                .map(id -> histories.stream()
-                        .filter(x -> id.equals(x.getDrugId()) || id.equals(x.getGroupId()))
-                        .toList()
-                )
-                .orElse(histories);
 
-        Map<Boolean, List<History>> partitioned = filteredHistories.stream()
-                .collect(Collectors.partitioningBy(history -> history.getGroupId() != null));
 
-        List<DrugHistory> drugHistories = buildDrugHistories(userId, partitioned.get(false));
-        List<GroupHistory> groupHistories = buildDrugGroupHistories(userId, partitioned.get(true));
 
-        Pagination pagination = request.getPagination().orElse(null);
-        if (pagination != null) {
-            int pageNumber = pagination.getNumber();
-            int pageSize = pagination.getSize();
+//        Map<Boolean, List<History>> partitioned = histories.stream()
+//                .collect(Collectors.partitioningBy(history -> history.getGroupId() != null));
+//
+//        List<DrugHistory> drugHistories = buildDrugHistories(userId, partitioned.get(false));
+//        List<GroupHistory> groupHistories = buildDrugGroupHistories(userId, partitioned.get(true));
 
-            drugHistories = paginate(drugHistories, pageNumber, pageSize);
-            groupHistories = paginate(groupHistories, pageNumber, pageSize);
-        }
+//        Pagination pagination = request.getPagination().orElse(null);
+//        if (pagination != null) {
+//            int pageNumber = pagination.getNumber();
+//            int pageSize = pagination.getSize();
+//
+//            drugHistories = paginate(drugHistories, pageNumber, pageSize);
+//            groupHistories = paginate(groupHistories, pageNumber, pageSize);
+//        }
 
         return new SearchHistoryResponse(
                 groupHistories,
@@ -89,6 +89,8 @@ public class HistoryServiceImpl implements HistoryService {
                 pagination
         );
     }
+
+    private List<>
 
     @Override
     public void editHistory(EditHistoryRequest request) {
@@ -146,8 +148,8 @@ public class HistoryServiceImpl implements HistoryService {
                         drug.getAmount(),
                         drug.getAmount() - drug.getTakenAmount(),
                         entry.getValue().stream()
-                                .map(com.mahidol.drugapi.history.models.History::fromH)
-                                .sorted(Comparator.comparing(com.mahidol.drugapi.history.models.History::getNotifiedAt))
+                                .map(GroupHistoryEntry::fromH)
+                                .sorted(Comparator.comparing(GroupHistoryEntry::getNotifiedAt))
                                 .toList()
                 )))
                 .toList();

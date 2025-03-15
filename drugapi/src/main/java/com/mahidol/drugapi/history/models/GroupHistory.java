@@ -15,5 +15,7 @@ import java.util.UUID;
 public class GroupHistory {
     private UUID groupId;
     private String groupName;
-    private List<DrugHistory> drugs;
+    private List<GroupHistoryEntry> histories;
+    private GroupHistoryStat stats;
+    private List<Integer> graph;
 }

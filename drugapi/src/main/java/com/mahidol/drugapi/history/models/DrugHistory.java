@@ -21,5 +21,7 @@ public class DrugHistory {
     private Double dose;
     private Double initialAmount;
     private Double remainingAmount;
-    private List<History> histories;
+    private List<DrugHistoryEntry> histories;
+    private DrugHistoryStat stats;
+    private List<Integer> graphs;
 }
