@@ -3,8 +3,6 @@ package com.mahidol.drugapi.history.controllers;
 import com.mahidol.drugapi.common.exceptions.BindingError;
 import com.mahidol.drugapi.history.dtos.request.EditHistoryRequest;
 import com.mahidol.drugapi.history.dtos.request.SearchHistoryRequest;
-import com.mahidol.drugapi.history.dtos.response.GroupHistoryResponse;
-import com.mahidol.drugapi.history.dtos.response.SearchHistoryResponse;
 import com.mahidol.drugapi.history.services.HistoryService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
