@@ -1,5 +1,6 @@
 package com.mahidol.drugapi.history.dtos.response;
 
+import com.mahidol.drugapi.common.models.ScheduleTime;
 import com.mahidol.drugapi.history.models.DrugHistoryEntry;
 import com.mahidol.drugapi.history.models.DrugHistoryStat;
 import lombok.AllArgsConstructor;
@@ -21,6 +22,7 @@ public class DrugHistoryResponse {
     private String strength;
     private String unit;
     private Double dose;
+    private List<ScheduleTime> scheduleTimes;
     private List<DrugHistoryEntry> histories;
     private DrugHistoryStat stats;
     private List<Integer> graphs;

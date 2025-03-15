@@ -1,6 +1,7 @@
 package com.mahidol.drugapi.history.services.impl;
 
 import com.mahidol.drugapi.common.ctx.UserContext;
+import com.mahidol.drugapi.common.models.ScheduleTime;
 import com.mahidol.drugapi.drug.models.entites.Drug;
 import com.mahidol.drugapi.drug.services.DrugService;
 import com.mahidol.drugapi.druggroup.services.DrugGroupService;
@@ -18,6 +19,7 @@ import com.mahidol.drugapi.history.models.types.TakenStatus;
 import com.mahidol.drugapi.history.repositories.HistoryRepository;
 import com.mahidol.drugapi.history.services.HistoryService;
 import com.mahidol.drugapi.relation.services.RelationService;
+import com.mahidol.drugapi.schedule.services.ScheduleService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -31,6 +33,7 @@ public class HistoryServiceImpl implements HistoryService {
     private final DrugService drugService;
     private final DrugGroupService drugGroupService;
     private final RelationService relationService;
+    private final ScheduleService scheduleService;
     private final UserContext userContext;
 
     public HistoryServiceImpl(
@@ -38,12 +41,14 @@ public class HistoryServiceImpl implements HistoryService {
             DrugService drugService,
             DrugGroupService drugGroupService,
             RelationService relationService,
+            ScheduleService scheduleService,
             UserContext userContext
     ) {
         this.historyRepository = historyRepository;
         this.drugService = drugService;
         this.drugGroupService = drugGroupService;
         this.relationService = relationService;
+        this.scheduleService = scheduleService;
         this.userContext = userContext;
     }
 
@@ -60,10 +65,12 @@ public class HistoryServiceImpl implements HistoryService {
         return drugGroupService.getDrugGroupByGroupIdOpt(userId, request.getGroupId().get()).map(g -> {
             List<History> rawHistories = getRawHistories(userId, request.getPreferredDate(), request.getYear(), request.getMonth());
             List<GroupHistoryEntry> histories = buildGroupHistories(rawHistories);
+            List<ScheduleTime> scheduleTimes = scheduleService.get(g.getId()).stream().map(ScheduleTime::fromSchedule).toList();
 
             return new GroupHistoryResponse(
                     g.getId(),
                     g.getGroupName(),
+                    scheduleTimes,
                     g.getDrugs().stream().map(Drug::getId).toList(),
                     histories,
                     HistoryStatsCalculator.calculateDrugGroupHistories(histories),
@@ -88,6 +95,7 @@ public class HistoryServiceImpl implements HistoryService {
                     .filter(h -> h.getDrugId().equals(drug.getId()))
                     .map(DrugHistoryEntry::fromH)
                     .toList();
+            List<ScheduleTime> scheduleTimes = scheduleService.get(drug.getId()).stream().map(ScheduleTime::fromSchedule).toList();
 
             return new DrugHistoryResponse(
                     drug.getId(),
@@ -96,6 +104,7 @@ public class HistoryServiceImpl implements HistoryService {
                     drug.getStrength(),
                     drug.getUnit(),
                     drug.getDose(),
+                    scheduleTimes,
                     histories,
                     HistoryStatsCalculator.calculateDrugHistories(histories),
                     HistoryStatsCalculator.generateDrugGraph(histories)

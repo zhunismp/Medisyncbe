@@ -1,5 +1,6 @@
 package com.mahidol.drugapi.history.dtos.response;
 
+import com.mahidol.drugapi.common.models.ScheduleTime;
 import com.mahidol.drugapi.history.models.GroupHistoryEntry;
 import com.mahidol.drugapi.history.models.GroupHistoryStat;
 import lombok.AllArgsConstructor;
@@ -17,6 +18,7 @@ import java.util.UUID;
 public class GroupHistoryResponse {
     private UUID groupId;
     private String groupName;
+    private List<ScheduleTime> scheduleTimes;
     private List<UUID> drugIds;
     private List<GroupHistoryEntry> histories;
     private GroupHistoryStat stats;
