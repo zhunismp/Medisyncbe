@@ -1,6 +1,8 @@
 package com.mahidol.drugapi.history.helper;
 
+import com.mahidol.drugapi.history.models.DrugHistoryEntry;
 import com.mahidol.drugapi.history.models.DrugHistoryStat;
+import com.mahidol.drugapi.history.models.GroupHistoryEntry;
 import com.mahidol.drugapi.history.models.GroupHistoryStat;
 import com.mahidol.drugapi.history.models.entities.History;
 import com.mahidol.drugapi.history.models.types.TakenStatus;
@@ -11,9 +13,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class HistoryStatsCalculator {
-    public static DrugHistoryStat calculateDrugHistories(List<History> histories) {
+    public static DrugHistoryStat calculateDrugHistories(List<DrugHistoryEntry> histories) {
         Map<TakenStatus, Long> statusCount = histories.stream()
-                .collect(Collectors.groupingBy(History::getStatus, Collectors.counting()));
+                .collect(Collectors.groupingBy(DrugHistoryEntry::getStatus, Collectors.counting()));
 
         int total = histories.size();
         int taken = statusCount.getOrDefault(TakenStatus.TAKEN, 0L).intValue();
@@ -24,10 +26,7 @@ public class HistoryStatsCalculator {
         return new DrugHistoryStat(taken, skipped, missed, total, takenPercentage);
     }
 
-    public static GroupHistoryStat calculateDrugGroupHistories(List<History> histories) {
-        Map<LocalDateTime, List<History>> groupedByDateTime = histories.stream()
-                .collect(Collectors.groupingBy(History::getNotifiedAt));
-
+    public static GroupHistoryStat calculateDrugGroupHistories(List<GroupHistoryEntry> histories) {
 
 
         return null;

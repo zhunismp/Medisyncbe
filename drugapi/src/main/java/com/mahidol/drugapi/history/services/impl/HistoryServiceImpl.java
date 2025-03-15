@@ -10,7 +10,10 @@ import com.mahidol.drugapi.history.dtos.request.SearchHistoryRequest;
 import com.mahidol.drugapi.history.dtos.response.DrugHistoryResponse;
 import com.mahidol.drugapi.history.helper.HistoryStatsCalculator;
 import com.mahidol.drugapi.history.dtos.response.GroupHistoryResponse;
+import com.mahidol.drugapi.history.models.DrugHistoryEntry;
+import com.mahidol.drugapi.history.models.GroupHistoryEntry;
 import com.mahidol.drugapi.history.models.entities.History;
+import com.mahidol.drugapi.history.models.types.GroupTakenStatus;
 import com.mahidol.drugapi.history.models.types.TakenStatus;
 import com.mahidol.drugapi.history.repositories.HistoryRepository;
 import com.mahidol.drugapi.history.services.HistoryService;
@@ -18,7 +21,9 @@ import com.mahidol.drugapi.relation.services.RelationService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class HistoryServiceImpl implements HistoryService {
@@ -54,12 +59,14 @@ public class HistoryServiceImpl implements HistoryService {
         // safe get here, since controller already validated.
         return drugGroupService.getDrugGroupByGroupIdOpt(userId, request.getGroupId().get()).map(g -> {
             List<History> rawHistories = getRawHistories(userId, request.getPreferredDate(), request.getYear(), request.getMonth());
+            List<GroupHistoryEntry> histories = buildGroupHistories(rawHistories);
 
             return new GroupHistoryResponse(
                     g.getId(),
                     g.getGroupName(),
-                    List.of(),
-                    HistoryStatsCalculator.calculateDrugGroupHistories(rawHistories),
+                    g.getDrugs().stream().map(Drug::getId).toList(),
+                    histories,
+                    HistoryStatsCalculator.calculateDrugGroupHistories(histories),
                     HistoryStatsCalculator.generateGraphs()
             );
         }).orElseThrow(() -> new IllegalArgumentException("User might not own this group or group not exists"));
@@ -77,6 +84,10 @@ public class HistoryServiceImpl implements HistoryService {
         // safe get here, since controller already validated.
         return drugService.searchDrugByDrugId(userId, request.getDrugId().get()).map(drug -> {
             List<History> rawHistories = getRawHistories(userId, request.getPreferredDate(), request.getYear(), request.getMonth());
+            List<DrugHistoryEntry> histories = rawHistories.stream()
+                    .filter(h -> h.getDrugId().equals(drug.getId()))
+                    .map(DrugHistoryEntry::fromH)
+                    .toList();
 
             return new DrugHistoryResponse(
                     drug.getId(),
@@ -85,8 +96,8 @@ public class HistoryServiceImpl implements HistoryService {
                     drug.getStrength(),
                     drug.getUnit(),
                     drug.getDose(),
-                    List.of(),
-                    HistoryStatsCalculator.calculateDrugHistories(rawHistories),
+                    histories,
+                    HistoryStatsCalculator.calculateDrugHistories(histories),
                     HistoryStatsCalculator.generateGraphs()
             );
         }).orElseThrow(() -> new IllegalArgumentException("User might not own this group or group not exists"));
@@ -135,38 +146,6 @@ public class HistoryServiceImpl implements HistoryService {
         historyRepository.deleteAllByDrugIds(drugIds);
     }
 
-//    private List<DrugHistoryResponse> buildDrugHistories(UUID userId, List<History> drugHistories) {
-//        return drugHistories.stream()
-//                .collect(Collectors.groupingBy(History::getDrugId))
-//                .entrySet().stream()
-//                .flatMap(entry -> drugService.searchDrugByDrugId(userId, entry.getKey()).stream().map(drug -> new DrugHistoryResponse(
-//                        drug.getId(),
-//                        drug.getGenericName(),
-//                        drug.getDosageForm(),
-//                        drug.getStrength(),
-//                        drug.getUnit(),
-//                        drug.getDose(),
-//                        drug.getAmount(),
-//                        drug.getAmount() - drug.getTakenAmount(),
-//                        entry.getValue().stream()
-//                                .map(DrugHistoryEntry::fromH)
-//                                .sorted(Comparator.comparing(DrugHistoryEntry::getNotifiedAt))
-//                                .toList()
-//                )))
-//                .toList();
-//    }
-//
-//    private List<GroupHistoryResponse> buildDrugGroupHistories(UUID userId, List<History> drugHistories) {
-//        return drugHistories.stream()
-//                .collect(Collectors.groupingBy(History::getGroupId))
-//                .entrySet().stream()
-//                .flatMap(entry -> drugGroupService.getDrugGroupByGroupIdOpt(userId, entry.getKey()).stream().map(dg -> new GroupHistoryResponse(
-//                        dg.getId(),
-//                        dg.getGroupName(),
-//                        buildDrugHistories(userId, entry.getValue())
-//                )))
-//                .toList();
-//    }
 //
 //    private <T> List<T> paginate(List<T> items, int pageNumber, int pageSize) {
 //        int start = (pageNumber - 1) * pageSize;
@@ -185,5 +164,24 @@ public class HistoryServiceImpl implements HistoryService {
         return preferredDate
                 .map(date -> historyRepository.findByUserIdAndDate(userId, LocalDate.of(year, month, date)))
                 .orElseGet(() -> historyRepository.findByUserIdAndMonthAndYear(userId, month, year));
+    }
+
+    private List<GroupHistoryEntry> buildGroupHistories(List<History> histories) {
+        return histories.stream()
+                .collect(Collectors.groupingBy(History::getNotifiedAt))
+                .entrySet().stream()
+                .map(entry -> transformGroupEntry(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+    }
+
+    private GroupHistoryEntry transformGroupEntry(LocalDateTime dt, List<History> histories) {
+        int takenAmt = (int) histories.stream().filter(h -> h.getStatus() == TakenStatus.TAKEN).count();
+        int total = histories.size();
+        int takenPercentage = (total == 0) ? 0 : (takenAmt * 100 / total);
+        GroupTakenStatus status = (takenPercentage == 100) ? GroupTakenStatus.ALL_TAKEN
+                : (takenPercentage > 50) ? GroupTakenStatus.PARTIALLY_TAKEN
+                : GroupTakenStatus.MISSED;
+
+        return new GroupHistoryEntry(status, dt, takenAmt);
     }
 }
