@@ -17,7 +17,7 @@ import java.util.UUID;
 public class DrugHistoryEntry {
     private UUID id;
     private TakenStatus status;
-    private LocalDateTime notifiedAt;
+    private LocalDateTime datetime;
 
     public static DrugHistoryEntry fromH(History h) {
         return new DrugHistoryEntry(

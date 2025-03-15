@@ -67,7 +67,7 @@ public class HistoryServiceImpl implements HistoryService {
                     g.getDrugs().stream().map(Drug::getId).toList(),
                     histories,
                     HistoryStatsCalculator.calculateDrugGroupHistories(histories),
-                    HistoryStatsCalculator.generateGraphs()
+                    HistoryStatsCalculator.generateGroupGraph(histories)
             );
         }).orElseThrow(() -> new IllegalArgumentException("User might not own this group or group not exists"));
     }
@@ -98,7 +98,7 @@ public class HistoryServiceImpl implements HistoryService {
                     drug.getDose(),
                     histories,
                     HistoryStatsCalculator.calculateDrugHistories(histories),
-                    HistoryStatsCalculator.generateGraphs()
+                    HistoryStatsCalculator.generateDrugGraph(histories)
             );
         }).orElseThrow(() -> new IllegalArgumentException("User might not own this group or group not exists"));
     }

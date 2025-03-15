@@ -10,7 +10,9 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @Accessors(chain = true)
 public class GroupHistoryStat {
-    private Integer takenAmount; // each time need to be greater than 60% to consider group taken.
-    private Integer totalAmount;
+    private Integer total;
+    private Integer allTaken;
+    private Integer partiallyTaken;
+    private Integer missed;
     private Double takenPercent;
 }

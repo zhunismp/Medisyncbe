@@ -15,6 +15,6 @@ import java.util.UUID;
 @Accessors(chain = true)
 public class GroupHistoryEntry {
     private GroupTakenStatus status;
-    private LocalDateTime notifiedAt;
+    private LocalDateTime datetime;
     private Integer takenAmount;
 }
