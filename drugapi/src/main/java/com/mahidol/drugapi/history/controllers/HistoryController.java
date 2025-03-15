@@ -3,6 +3,7 @@ package com.mahidol.drugapi.history.controllers;
 import com.mahidol.drugapi.common.exceptions.BindingError;
 import com.mahidol.drugapi.history.dtos.request.EditHistoryRequest;
 import com.mahidol.drugapi.history.dtos.request.SearchHistoryRequest;
+import com.mahidol.drugapi.history.dtos.response.GroupHistoryResponse;
 import com.mahidol.drugapi.history.dtos.response.SearchHistoryResponse;
 import com.mahidol.drugapi.history.services.HistoryService;
 import jakarta.validation.Valid;
@@ -24,11 +25,12 @@ public class HistoryController {
     public ResponseEntity<?> search(@RequestBody @Valid SearchHistoryRequest request, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) throw new BindingError(bindingResult.getFieldErrors());
 
+        if (request.getGroupId().isPresent())
+            return new ResponseEntity<>(historyService.searchGroupHistory(request), HttpStatus.OK);
+        else if (request.getDrugId().isPresent())
+            return new ResponseEntity<>(historyService.searchDrugHistory(request), HttpStatus.OK);
 
-
-        SearchHistoryResponse response = historyService.search(request);
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        throw new IllegalArgumentException("You must specify exactly either drug group id or drug id");
     }
 
     @PostMapping("/edithistories")

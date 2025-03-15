@@ -1,5 +1,7 @@
-package com.mahidol.drugapi.history.models;
+package com.mahidol.drugapi.history.dtos.response;
 
+import com.mahidol.drugapi.history.models.GroupHistoryEntry;
+import com.mahidol.drugapi.history.models.GroupHistoryStat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,7 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
-public class GroupHistory {
+public class GroupHistoryResponse {
     private UUID groupId;
     private String groupName;
     private List<GroupHistoryEntry> histories;

@@ -1,5 +1,7 @@
-package com.mahidol.drugapi.history.models;
+package com.mahidol.drugapi.history.dtos.response;
 
+import com.mahidol.drugapi.history.models.DrugHistoryEntry;
+import com.mahidol.drugapi.history.models.DrugHistoryStat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,15 +14,13 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
-public class DrugHistory {
+public class DrugHistoryResponse {
     private UUID drugId;
     private String drugGenericName;
     private String dosageForm;
     private String strength;
     private String unit;
     private Double dose;
-    private Double initialAmount;
-    private Double remainingAmount;
     private List<DrugHistoryEntry> histories;
     private DrugHistoryStat stats;
     private List<Integer> graphs;
