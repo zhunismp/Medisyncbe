@@ -15,23 +15,34 @@ import java.util.UUID;
 @Data
 @Accessors(chain = true)
 public class SearchHistoryRequest {
+
     private UUID relativeId;
     @Min(value = 1, message = "Please specify valid month")
     @Max(value = 12, message = "Please specify valid month")
     private Integer month;
+
     private Integer year;
+
     @Min(value = 1, message = "Please specify valid date")
     @Max(value = 31, message = "Please specify valid date")
     private Integer preferredDate;
-    private UUID referenceId; // Either drugId or groupId
+
+    private UUID drugId;
+
+    private UUID groupId;
+
     private Pagination pagination;
 
     public Optional<Integer> getPreferredDate() {
         return Optional.ofNullable(preferredDate);
     }
 
-    public Optional<UUID> getReferenceId() {
-        return Optional.ofNullable(referenceId);
+    public Optional<UUID> getDrugId() {
+        return Optional.ofNullable(drugId);
+    }
+
+    public Optional<UUID> getGroupId() {
+        return Optional.ofNullable(groupId);
     }
 
     public Optional<Pagination> getPagination() {

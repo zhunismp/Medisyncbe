@@ -1,11 +1,12 @@
 package com.mahidol.drugapi.history.models;
 
+import com.mahidol.drugapi.history.models.entities.History;
+import com.mahidol.drugapi.history.models.types.TakenStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -13,15 +14,15 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
-public class History {
+public class DrugHistoryEntry {
     private UUID id;
-    private String status;
-    private LocalDateTime notifiedAt;
+    private TakenStatus status;
+    private LocalDateTime datetime;
 
-    public static History fromH(com.mahidol.drugapi.history.models.entities.History h) {
-        return new History(
+    public static DrugHistoryEntry fromH(History h) {
+        return new DrugHistoryEntry(
                 h.getId(),
-                h.getStatus().toString(),
+                h.getStatus(),
                 h.getNotifiedAt()
         );
     }

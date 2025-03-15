@@ -5,15 +5,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import java.util.List;
-import java.util.UUID;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
-public class GroupHistory {
-    private UUID groupId;
-    private String groupName;
-    private List<DrugHistory> drugs;
+public class GroupHistoryStat {
+    private Integer total;
+    private Integer allTaken;
+    private Integer partiallyTaken;
+    private Integer missed;
+    private Double takenPercent;
 }
