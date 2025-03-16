@@ -1,9 +1,6 @@
 package com.mahidol.drugapi.drug.dtos.response;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonView;
 import com.mahidol.drugapi.common.models.ScheduleTime;
-import com.mahidol.drugapi.drug.models.entites.Drug;
 import com.mahidol.drugapi.drug.models.type.MealCondition;
 import com.mahidol.drugapi.druggroup.dtos.response.DrugGroupDTO;
 import lombok.AllArgsConstructor;
