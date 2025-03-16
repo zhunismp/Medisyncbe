@@ -7,14 +7,20 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
 public class GroupHistoryEntry {
+
     private GroupTakenStatus status;
+
     private LocalDateTime datetime;
+
+    // If and only if preferred date was set
+    private List<DrugHistoryEntry> drugs;
+
     private Integer takenAmount;
 }

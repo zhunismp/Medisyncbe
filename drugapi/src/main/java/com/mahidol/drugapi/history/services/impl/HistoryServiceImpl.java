@@ -63,8 +63,9 @@ public class HistoryServiceImpl implements HistoryService {
 
         // safe get here, since controller already validated.
         return drugGroupService.getDrugGroupByGroupIdOpt(userId, request.getGroupId().get()).map(g -> {
-            List<History> rawHistories = getRawHistories(userId, request.getPreferredDate(), request.getYear(), request.getMonth());
-            List<GroupHistoryEntry> histories = buildGroupHistories(rawHistories);
+            List<History> rawHistories = getRawHistories(userId, request.getPreferredDate(), request.getYear(), request.getMonth())
+                    .stream().filter(group -> group.getId() == g.getId()).toList();
+            List<GroupHistoryEntry> histories = buildGroupHistories(rawHistories, request.getPreferredDate());
             List<ScheduleTime> scheduleTimes = scheduleService.get(g.getId()).stream().map(ScheduleTime::fromSchedule).toList();
 
             return new GroupHistoryResponse(
@@ -90,11 +91,9 @@ public class HistoryServiceImpl implements HistoryService {
 
         // safe get here, since controller already validated.
         return drugService.searchDrugByDrugId(userId, request.getDrugId().get()).map(drug -> {
-            List<History> rawHistories = getRawHistories(userId, request.getPreferredDate(), request.getYear(), request.getMonth());
-            List<DrugHistoryEntry> histories = rawHistories.stream()
-                    .filter(h -> h.getDrugId().equals(drug.getId()))
-                    .map(DrugHistoryEntry::fromH)
-                    .toList();
+            List<History> rawHistories = getRawHistories(userId, request.getPreferredDate(), request.getYear(), request.getMonth())
+                    .stream().filter(d -> d.getId() == drug.getId()).toList();
+            List<DrugHistoryEntry> histories = buildDrugHistories(rawHistories);
             List<ScheduleTime> scheduleTimes = scheduleService.get(drug.getId()).stream().map(ScheduleTime::fromSchedule).toList();
 
             return new DrugHistoryResponse(
@@ -175,15 +174,21 @@ public class HistoryServiceImpl implements HistoryService {
                 .orElseGet(() -> historyRepository.findByUserIdAndMonthAndYear(userId, month, year));
     }
 
-    private List<GroupHistoryEntry> buildGroupHistories(List<History> histories) {
+    private List<DrugHistoryEntry> buildDrugHistories(List<History> histories) {
+        return histories.stream()
+                .map(DrugHistoryEntry::fromH)
+                .toList();
+    }
+
+    private List<GroupHistoryEntry> buildGroupHistories(List<History> histories, Optional<Integer> preferredDate) {
         return histories.stream()
                 .collect(Collectors.groupingBy(History::getNotifiedAt))
                 .entrySet().stream()
-                .map(entry -> transformGroupEntry(entry.getKey(), entry.getValue()))
+                .map(entry -> transformGroupEntry(entry.getKey(), entry.getValue(), preferredDate))
                 .collect(Collectors.toList());
     }
 
-    private GroupHistoryEntry transformGroupEntry(LocalDateTime dt, List<History> histories) {
+    private GroupHistoryEntry transformGroupEntry(LocalDateTime dt, List<History> histories, Optional<Integer> preferredDate) {
         int takenAmt = (int) histories.stream().filter(h -> h.getStatus() == TakenStatus.TAKEN).count();
         int total = histories.size();
         int takenPercentage = (total == 0) ? 0 : (takenAmt * 100 / total);
@@ -191,6 +196,9 @@ public class HistoryServiceImpl implements HistoryService {
                 : (takenPercentage > 50) ? GroupTakenStatus.PARTIALLY_TAKEN
                 : GroupTakenStatus.MISSED;
 
-        return new GroupHistoryEntry(status, dt, takenAmt);
+        if (preferredDate.isPresent())
+            return new GroupHistoryEntry(status, dt, buildDrugHistories(histories), takenAmt);
+        else
+            return new GroupHistoryEntry(status, dt, null, takenAmt);
     }
 }
