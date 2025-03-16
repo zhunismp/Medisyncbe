@@ -64,7 +64,7 @@ public class HistoryServiceImpl implements HistoryService {
         // safe get here, since controller already validated.
         return drugGroupService.getDrugGroupByGroupIdOpt(userId, request.getGroupId().get()).map(g -> {
             List<History> rawHistories = getRawHistories(userId, request.getPreferredDate(), request.getYear(), request.getMonth())
-                    .stream().filter(group -> group.getId() == g.getId()).toList();
+                    .stream().filter(group -> group.getId().equals(g.getId())).toList();
             List<GroupHistoryEntry> histories = buildGroupHistories(rawHistories, request.getPreferredDate());
             List<ScheduleTime> scheduleTimes = scheduleService.get(g.getId()).stream().map(ScheduleTime::fromSchedule).toList();
 
@@ -92,7 +92,7 @@ public class HistoryServiceImpl implements HistoryService {
         // safe get here, since controller already validated.
         return drugService.searchDrugByDrugId(userId, request.getDrugId().get()).map(drug -> {
             List<History> rawHistories = getRawHistories(userId, request.getPreferredDate(), request.getYear(), request.getMonth())
-                    .stream().filter(d -> d.getId() == drug.getId()).toList();
+                    .stream().filter(d -> d.getId().equals(drug.getId())).toList();
             List<DrugHistoryEntry> histories = buildDrugHistories(rawHistories);
             List<ScheduleTime> scheduleTimes = scheduleService.get(drug.getId()).stream().map(ScheduleTime::fromSchedule).toList();
 
@@ -188,6 +188,7 @@ public class HistoryServiceImpl implements HistoryService {
                 .collect(Collectors.toList());
     }
 
+    // TODO: Find the better way to hide drug histories
     private GroupHistoryEntry transformGroupEntry(LocalDateTime dt, List<History> histories, Optional<Integer> preferredDate) {
         int takenAmt = (int) histories.stream().filter(h -> h.getStatus() == TakenStatus.TAKEN).count();
         int total = histories.size();
