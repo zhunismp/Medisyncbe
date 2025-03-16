@@ -5,10 +5,14 @@ import com.mahidol.drugapi.history.dtos.request.EditHistoryRequest;
 import com.mahidol.drugapi.history.dtos.request.SearchHistoryRequest;
 import com.mahidol.drugapi.history.services.HistoryService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.PastOrPresent;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -29,6 +33,13 @@ public class HistoryController {
             return new ResponseEntity<>(historyService.searchDrugHistory(request), HttpStatus.OK);
 
         throw new IllegalArgumentException("You must specify exactly either drug group id or drug id");
+    }
+
+    @GetMapping("/searchhistories/noti")
+    public ResponseEntity<?> searchAllWithPreferredDate(
+            @RequestParam("preferredDate") @Valid @PastOrPresent LocalDateTime preferredDate
+    ) {
+        
     }
 
     @PostMapping("/edithistories")
