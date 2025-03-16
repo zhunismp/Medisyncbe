@@ -1,15 +1,36 @@
 package com.mahidol.drugapi.drug.dtos;
 
+import com.mahidol.drugapi.common.models.ScheduleTime;
 import com.mahidol.drugapi.drug.dtos.response.DrugDTO;
 import com.mahidol.drugapi.drug.models.entites.Drug;
+import com.mahidol.drugapi.druggroup.dtos.DrugGroupDTOMapper;
+
+import java.util.List;
 
 public class DrugDTOMapper {
 
-    /*
-     *  return DTO without schedule
-     */
-    public static DrugDTO toDTO(Drug d) {
+    // For Drug
+    public static DrugDTO toDTO(Drug d, List<ScheduleTime> scheduleTimes) {
+        return new DrugDTO(
+                d.getId(),
+                null,
+                d.getUserId(),
+                d.getGenericName(),
+                d.getDosageForm(),
+                d.getUnit(),
+                d.getStrength(),
+                d.getAmount(),
+                d.getDose(),
+                d.getTakenAmount(),
+                d.getUsageTime(),
+                scheduleTimes,
+                d.getGroups().stream().map(DrugGroupDTOMapper::toDTO).toList(),
+                d.getIsInternalDrug()
+        );
+    }
 
+    // For Drug group
+    public static DrugDTO toDTO(Drug d) {
         return new DrugDTO()
                 .setId(d.getId())
                 .setUserId(d.getUserId())

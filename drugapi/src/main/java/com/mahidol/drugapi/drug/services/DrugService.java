@@ -4,6 +4,7 @@ import com.mahidol.drugapi.common.models.Pagination;
 import com.mahidol.drugapi.common.models.ScheduleTime;
 import com.mahidol.drugapi.common.services.PaginationService;
 import com.mahidol.drugapi.common.ctx.UserContext;
+import com.mahidol.drugapi.drug.dtos.DrugDTOMapper;
 import com.mahidol.drugapi.drug.dtos.request.CreateDrugRequest;
 import com.mahidol.drugapi.drug.dtos.request.SearchDrugRequest;
 import com.mahidol.drugapi.drug.dtos.request.UpdateDrugRequest;
@@ -150,20 +151,7 @@ public class DrugService {
         List<ScheduleTime> scheduleTimes = scheduleService.get(drug.getId()).stream()
                 .map(s -> new ScheduleTime(s.getScheduleTime().toLocalTime(), s.getIsEnabled())).toList();
 
-        return new DrugDTO()
-                .setId(drug.getId())
-//                .setDrugImageUrl(drugImageUrl.orElse(""))
-                .setUserId(drug.getUserId())
-                .setGenericName(drug.getGenericName())
-                .setDosageForm(drug.getDosageForm())
-                .setUnit(drug.getUnit())
-                .setStrength(drug.getStrength())
-                .setAmount(drug.getAmount())
-                .setDose(drug.getDose())
-                .setTakenAmount(drug.getTakenAmount())
-                .setUsageTime(drug.getUsageTime())
-                .setIsInternalDrug(drug.getIsInternalDrug())
-                .setScheduleTimes(scheduleTimes);
+        return DrugDTOMapper.toDTO(drug, scheduleTimes);
     }
 
     private Boolean validateOwner(UUID userId, List<UUID> drugIds) {
