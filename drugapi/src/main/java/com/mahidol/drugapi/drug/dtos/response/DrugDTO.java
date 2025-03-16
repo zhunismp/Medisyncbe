@@ -1,8 +1,11 @@
 package com.mahidol.drugapi.drug.dtos.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.mahidol.drugapi.common.models.ScheduleTime;
 import com.mahidol.drugapi.drug.models.entites.Drug;
 import com.mahidol.drugapi.drug.models.type.MealCondition;
+import com.mahidol.drugapi.druggroup.dtos.response.DrugGroupDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -41,21 +44,7 @@ public class DrugDTO {
 
     private List<ScheduleTime> scheduleTimes;
 
-    private Boolean isInternalDrug = false;
+    private List<DrugGroupDTO> groups;
 
-    public static DrugDTO fromDrug(Drug drug, Optional<String> drugImageUrl) {
-        return new DrugDTO()
-                .setId(drug.getId())
-                .setDrugImageUrl(drugImageUrl.orElse(""))
-                .setUserId(drug.getUserId())
-                .setGenericName(drug.getGenericName())
-                .setDosageForm(drug.getDosageForm())
-                .setUnit(drug.getUnit())
-                .setStrength(drug.getStrength())
-                .setAmount(drug.getAmount())
-                .setDose(drug.getDose())
-                .setTakenAmount(drug.getTakenAmount())
-                .setUsageTime(drug.getUsageTime())
-                .setIsInternalDrug(drug.getIsInternalDrug());
-    }
+    private Boolean isInternalDrug = false;
 }

@@ -4,10 +4,9 @@ import com.mahidol.drugapi.common.models.Pagination;
 import com.mahidol.drugapi.common.models.ScheduleTime;
 import com.mahidol.drugapi.common.services.PaginationService;
 import com.mahidol.drugapi.common.ctx.UserContext;
-import com.mahidol.drugapi.drug.dtos.DrugDTOMapper;
-import com.mahidol.drugapi.drug.dtos.response.DrugDTO;
 import com.mahidol.drugapi.drug.models.entites.Drug;
 import com.mahidol.drugapi.drug.services.DrugService;
+import com.mahidol.drugapi.druggroup.dtos.DrugGroupDTOMapper;
 import com.mahidol.drugapi.druggroup.dtos.request.*;
 import com.mahidol.drugapi.druggroup.dtos.response.DrugGroupDTO;
 import com.mahidol.drugapi.druggroup.dtos.response.SearchGroupResponse;
@@ -193,17 +192,10 @@ public class DrugGroupService {
     }
 
     private DrugGroupDTO transformDTO(DrugGroup group) {
-        List<DrugDTO> drugs = group.getDrugs().stream().map(DrugDTOMapper::toDTO).toList();
         List<ScheduleTime> scheduleTimes = scheduleService.get(group.getId()).stream().map(s ->
                 new ScheduleTime(s.getScheduleTime().toLocalTime(), s.getIsEnabled())
         ).toList();
 
-        return new DrugGroupDTO(
-                group.getId(),
-                userContext.getUserId(),
-                group.getGroupName(),
-                scheduleTimes,
-                drugs
-        );
+        return DrugGroupDTOMapper.toDTO(group, scheduleTimes);
     }
 }
