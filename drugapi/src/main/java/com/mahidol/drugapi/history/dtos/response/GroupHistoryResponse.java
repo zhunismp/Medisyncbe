@@ -16,10 +16,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @Accessors(chain = true)
 public class GroupHistoryResponse {
-//    private UUID groupId;
-//    private String groupName;
-//    private List<ScheduleTime> scheduleTimes;
-//    private List<DrugDTO> drugIds;
     private DrugGroupDTO group;
     private List<GroupHistoryEntry> histories;
     private GroupHistoryStat stats;

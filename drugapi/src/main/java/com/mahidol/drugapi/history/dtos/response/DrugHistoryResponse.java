@@ -16,14 +16,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @Accessors(chain = true)
 public class DrugHistoryResponse {
-//    private UUID drugId;
-//    private String drugGenericName;
-//    private String dosageForm;
-//    private String strength;
-//    private String unit;
-//    private Double dose;
-//    private List<ScheduleTime> scheduleTimes;
-//    private List<DrugGroupDTO> groups;
     private DrugDTO drug;
     private List<DrugHistoryEntry> histories;
     private DrugHistoryStat stats;
