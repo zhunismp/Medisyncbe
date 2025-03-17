@@ -29,6 +29,23 @@ public class DrugDTOMapper {
         );
     }
 
+    // FOr other entities
+    public static DrugDTO toDTOWithGroup(Drug d) {
+        return new DrugDTO()
+                .setId(d.getId())
+                .setUserId(d.getUserId())
+                .setGenericName(d.getGenericName())
+                .setDosageForm(d.getDosageForm())
+                .setUnit(d.getUnit())
+                .setStrength(d.getStrength())
+                .setAmount(d.getAmount())
+                .setDose(d.getDose())
+                .setTakenAmount(d.getTakenAmount())
+                .setGroups(d.getGroups().stream().map(DrugGroupDTOMapper::toDTO).toList())
+                .setUsageTime(d.getUsageTime())
+                .setIsInternalDrug(d.getIsInternalDrug());
+    }
+
     // For Drug group
     public static DrugDTO toDTO(Drug d) {
         return new DrugDTO()
