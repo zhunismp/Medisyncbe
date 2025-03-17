@@ -74,13 +74,9 @@ public class HistoryServiceImpl implements HistoryService {
                     .stream().filter(h -> h.getGroupId() != null && h.getGroupId().equals(g.getId())).toList();
             List<GroupHistoryEntry> histories = buildGroupHistories(rawHistories, request.getPreferredDate());
             List<ScheduleTime> scheduleTimes = scheduleService.get(g.getId()).stream().map(ScheduleTime::fromSchedule).toList();
-            List<DrugDTO> drugs = g.getDrugs().stream().map(DrugDTOMapper::toDTOWithGroup).toList();
 
             return new GroupHistoryResponse(
-                    g.getId(),
-                    g.getGroupName(),
-                    scheduleTimes,
-                    drugs,
+                    DrugGroupDTOMapper.toDTO(g, scheduleTimes),
                     histories,
                     HistoryStatsCalculator.calculateDrugGroupHistories(histories),
                     HistoryStatsCalculator.generateGroupGraph(histories)
@@ -106,17 +102,9 @@ public class HistoryServiceImpl implements HistoryService {
                     .sorted(Comparator.comparing(DrugHistoryEntry::getDatetime))
                     .toList();
             List<ScheduleTime> scheduleTimes = scheduleService.get(drug.getId()).stream().map(ScheduleTime::fromSchedule).toList();
-            List<DrugGroupDTO> groups = drug.getGroups().stream().map(DrugGroupDTOMapper::toDTO).toList();
 
             return new DrugHistoryResponse(
-                    drug.getId(),
-                    drug.getGenericName(),
-                    drug.getDosageForm(),
-                    drug.getStrength(),
-                    drug.getUnit(),
-                    drug.getDose(),
-                    scheduleTimes,
-                    groups,
+                    DrugDTOMapper.toDTO(drug, scheduleTimes),
                     histories,
                     HistoryStatsCalculator.calculateDrugHistories(histories),
                     HistoryStatsCalculator.generateDrugGraph(histories)
