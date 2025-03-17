@@ -1,26 +1,20 @@
 package com.mahidol.drugapi.history.models;
 
-import com.mahidol.drugapi.history.models.types.GroupTakenStatus;
+import com.mahidol.drugapi.drug.dtos.response.DrugDTO;
+import com.mahidol.drugapi.history.models.types.TakenStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
-public class GroupHistoryEntry {
-
-    private GroupTakenStatus status;
-
+public class DrugHistoryEntryWithInfo {
+    private DrugDTO info;
+    private TakenStatus status;
     private LocalDateTime datetime;
-
-    // If and only if preferred date was set
-    private List<DrugHistoryEntryWithInfo> drugs;
-
-    private Integer takenAmount;
 }

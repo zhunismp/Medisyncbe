@@ -2,6 +2,8 @@ package com.mahidol.drugapi.history.services.impl;
 
 import com.mahidol.drugapi.common.ctx.UserContext;
 import com.mahidol.drugapi.common.models.ScheduleTime;
+import com.mahidol.drugapi.drug.dtos.DrugDTOMapper;
+import com.mahidol.drugapi.drug.dtos.response.DrugDTO;
 import com.mahidol.drugapi.drug.models.entites.Drug;
 import com.mahidol.drugapi.drug.services.DrugService;
 import com.mahidol.drugapi.druggroup.services.DrugGroupService;
@@ -12,6 +14,7 @@ import com.mahidol.drugapi.history.dtos.response.DrugHistoryResponse;
 import com.mahidol.drugapi.history.helper.HistoryStatsCalculator;
 import com.mahidol.drugapi.history.dtos.response.GroupHistoryResponse;
 import com.mahidol.drugapi.history.models.DrugHistoryEntry;
+import com.mahidol.drugapi.history.models.DrugHistoryEntryWithInfo;
 import com.mahidol.drugapi.history.models.GroupHistoryEntry;
 import com.mahidol.drugapi.history.models.entities.History;
 import com.mahidol.drugapi.history.models.types.GroupTakenStatus;
@@ -20,6 +23,7 @@ import com.mahidol.drugapi.history.repositories.HistoryRepository;
 import com.mahidol.drugapi.history.services.HistoryService;
 import com.mahidol.drugapi.relation.services.RelationService;
 import com.mahidol.drugapi.schedule.services.ScheduleService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -68,12 +72,13 @@ public class HistoryServiceImpl implements HistoryService {
                     .stream().filter(h -> h.getGroupId() != null && h.getGroupId().equals(g.getId())).toList();
             List<GroupHistoryEntry> histories = buildGroupHistories(rawHistories, request.getPreferredDate());
             List<ScheduleTime> scheduleTimes = scheduleService.get(g.getId()).stream().map(ScheduleTime::fromSchedule).toList();
+            List<DrugDTO> drugs = g.getDrugs().stream().map(DrugDTOMapper::toDTOWithGroup).toList();
 
             return new GroupHistoryResponse(
                     g.getId(),
                     g.getGroupName(),
                     scheduleTimes,
-                    g.getDrugs().stream().map(Drug::getId).toList(),
+                    drugs,
                     histories,
                     HistoryStatsCalculator.calculateDrugGroupHistories(histories),
                     HistoryStatsCalculator.generateGroupGraph(histories)
@@ -94,7 +99,10 @@ public class HistoryServiceImpl implements HistoryService {
         return drugService.searchDrugByDrugId(userId, request.getDrugId().get()).map(drug -> {
             List<History> rawHistories = getRawHistories(userId, request.getPreferredDate(), request.getYear(), request.getMonth())
                     .stream().filter(h -> h.getDrugId().equals(drug.getId())).toList();
-            List<DrugHistoryEntry> histories = buildDrugHistories(rawHistories);
+            List<DrugHistoryEntry> histories = rawHistories.stream()
+                    .map(DrugHistoryEntry::fromH)
+                    .sorted(Comparator.comparing(DrugHistoryEntry::getDatetime))
+                    .toList();
             List<ScheduleTime> scheduleTimes = scheduleService.get(drug.getId()).stream().map(ScheduleTime::fromSchedule).toList();
 
             return new DrugHistoryResponse(
@@ -175,10 +183,18 @@ public class HistoryServiceImpl implements HistoryService {
                 .orElseGet(() -> historyRepository.findByUserIdAndMonthAndYear(userId, month, year));
     }
 
-    private List<DrugHistoryEntry> buildDrugHistories(List<History> histories) {
-        return histories.stream()
-                .map(DrugHistoryEntry::fromH)
-                .toList();
+    private List<DrugHistoryEntryWithInfo> buildDrugHistoriesWithInfo(List<History> histories) {
+        List<UUID> drugIds = histories.stream().map(History::getDrugId).distinct().toList();
+        Map<UUID, List<DrugDTO>> drugs =  drugService.searchAllDrugByDrugsId(userContext.getUserId(), drugIds).stream()
+                .map(DrugDTOMapper::toDTO)
+                .collect(Collectors.groupingBy(DrugDTO::getId));
+
+        return histories.stream().map(h -> new DrugHistoryEntryWithInfo(
+                drugs.get(h.getDrugId()).stream().findFirst().orElseThrow(() -> new EntityNotFoundException("Drug not found")),
+                h.getStatus(),
+                h.getNotifiedAt()
+        )).toList();
+
     }
 
     private List<GroupHistoryEntry> buildGroupHistories(List<History> histories, Optional<Integer> preferredDate) {
@@ -186,6 +202,7 @@ public class HistoryServiceImpl implements HistoryService {
                 .collect(Collectors.groupingBy(History::getNotifiedAt))
                 .entrySet().stream()
                 .map(entry -> transformGroupEntry(entry.getKey(), entry.getValue(), preferredDate))
+                .sorted(Comparator.comparing(GroupHistoryEntry::getDatetime))
                 .collect(Collectors.toList());
     }
 
@@ -199,7 +216,7 @@ public class HistoryServiceImpl implements HistoryService {
                 : GroupTakenStatus.MISSED;
 
         if (preferredDate.isPresent())
-            return new GroupHistoryEntry(status, dt, buildDrugHistories(histories), takenAmt);
+            return new GroupHistoryEntry(status, dt, buildDrugHistoriesWithInfo(histories), takenAmt);
         else
             return new GroupHistoryEntry(status, dt, null, takenAmt);
     }
