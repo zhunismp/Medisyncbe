@@ -7,12 +7,13 @@ import com.mahidol.drugapi.drug.dtos.response.DrugDTO;
 import com.mahidol.drugapi.drug.models.entites.Drug;
 import com.mahidol.drugapi.drug.services.DrugService;
 import com.mahidol.drugapi.druggroup.dtos.DrugGroupDTOMapper;
-import com.mahidol.drugapi.druggroup.dtos.response.DrugGroupDTO;
+import com.mahidol.drugapi.druggroup.entities.DrugGroup;
 import com.mahidol.drugapi.druggroup.services.DrugGroupService;
 import com.mahidol.drugapi.history.dtos.request.EditHistoryRequest;
 import com.mahidol.drugapi.history.dtos.request.HistoryEntry;
 import com.mahidol.drugapi.history.dtos.request.SearchHistoryRequest;
 import com.mahidol.drugapi.history.dtos.response.DrugHistoryResponse;
+import com.mahidol.drugapi.history.dtos.response.NotiHistoryResponse;
 import com.mahidol.drugapi.history.helper.HistoryStatsCalculator;
 import com.mahidol.drugapi.history.dtos.response.GroupHistoryResponse;
 import com.mahidol.drugapi.history.models.DrugHistoryEntry;
@@ -60,12 +61,7 @@ public class HistoryServiceImpl implements HistoryService {
 
     @Override
     public GroupHistoryResponse searchGroupHistory(SearchHistoryRequest request) {
-        UUID userId = request.getRelativeId().map(i -> {
-            if (!relationService.getIncomingPermission(i).getReadable())
-                throw new IllegalArgumentException("Access denied from your friend");
-
-            return i;
-        }).orElse(userContext.getUserId());
+        UUID userId = resolveUserId(userContext.getUserId(), request.getRelativeId());
 
         // safe get here, since controller already validated.
         // TODO: refactor this to optimize query
@@ -86,21 +82,13 @@ public class HistoryServiceImpl implements HistoryService {
 
     @Override
     public DrugHistoryResponse searchDrugHistory(SearchHistoryRequest request) {
-        UUID userId = request.getRelativeId().map(i -> {
-            if (!relationService.getIncomingPermission(i).getReadable())
-                throw new IllegalArgumentException("Access denied from your friend");
-
-            return i;
-        }).orElse(userContext.getUserId());
+        UUID userId = resolveUserId(userContext.getUserId(), request.getRelativeId());
 
         // safe get here, since controller already validated.
         return drugService.searchDrugByDrugId(userId, request.getDrugId().get()).map(drug -> {
             List<History> rawHistories = getRawHistories(userId, request.getPreferredDate(), request.getYear(), request.getMonth())
                     .stream().filter(h -> h.getDrugId().equals(drug.getId())).toList();
-            List<DrugHistoryEntry> histories = rawHistories.stream()
-                    .map(DrugHistoryEntry::fromH)
-                    .sorted(Comparator.comparing(DrugHistoryEntry::getDatetime))
-                    .toList();
+            List<DrugHistoryEntry> histories = buildDrugHistories(rawHistories);
             List<ScheduleTime> scheduleTimes = scheduleService.get(drug.getId()).stream().map(ScheduleTime::fromSchedule).toList();
 
             return new DrugHistoryResponse(
@@ -110,6 +98,53 @@ public class HistoryServiceImpl implements HistoryService {
                     HistoryStatsCalculator.generateDrugGraph(histories)
             );
         }).orElseThrow(() -> new IllegalArgumentException("User might not own this group or group not exists"));
+    }
+
+    @Override
+    public NotiHistoryResponse searchNotiHistory(LocalDate preferredDate) {
+        List<Drug> allDrugs = drugService.searchDrugByUserId(userContext.getUserId()).stream().filter(d -> d.getGroups().isEmpty()).toList();
+        List<DrugGroup> allGroups = drugGroupService.searchGroupByUserId(userContext.getUserId());
+        List<History> rawHistories = historyRepository.findByUserIdAndDate(userContext.getUserId(), preferredDate);
+
+        Map<Boolean, List<History>> partitioned = rawHistories.stream().collect(Collectors.partitioningBy(h -> h.getGroupId() != null));
+        List<History> groupHistories = partitioned.get(true);
+        List<History> drugHistories = partitioned.get(false);
+
+        List<DrugHistoryResponse> drugHistoryResponses  = allDrugs.stream().map(d -> {
+            List<DrugHistoryEntry> histories =
+                    buildDrugHistories(drugHistories.stream().filter(h -> h.getDrugId().equals(d.getId())).toList());
+            List<ScheduleTime> scheduleTimes = scheduleService.get(d.getId()).stream().map(ScheduleTime::fromSchedule).toList();
+
+            return new DrugHistoryResponse(
+                    DrugDTOMapper.toDTO(d, scheduleTimes),
+                    histories,
+                    null,
+                    null
+            );
+        }).toList();
+
+        List<GroupHistoryResponse> groupHistoryResponses = allGroups.stream().map(g -> {
+            List<GroupHistoryEntry> histories =
+                    buildGroupHistories(
+                            groupHistories.stream().filter(h -> h.getGroupId().equals(g.getId())).toList(),
+                            Optional.of(preferredDate.getDayOfMonth())
+                    );
+            List<ScheduleTime> scheduleTimes = scheduleService.get(g.getId()).stream().map(ScheduleTime::fromSchedule).toList();
+
+            return new GroupHistoryResponse(
+                    DrugGroupDTOMapper.toDTO(g, scheduleTimes),
+                    histories,
+                    null,
+                    null
+            );
+
+        }).toList();
+
+        return new NotiHistoryResponse(
+            groupHistoryResponses,
+            drugHistoryResponses,
+            groupHistoryResponses.size() + drugHistoryResponses.size()
+        );
     }
 
 
@@ -189,6 +224,13 @@ public class HistoryServiceImpl implements HistoryService {
 
     }
 
+    private List<DrugHistoryEntry> buildDrugHistories(List<History> histories) {
+       return histories.stream()
+               .map(DrugHistoryEntry::fromH)
+               .sorted(Comparator.comparing(DrugHistoryEntry::getDatetime))
+               .toList();
+    }
+
     private List<GroupHistoryEntry> buildGroupHistories(List<History> histories, Optional<Integer> preferredDate) {
         return histories.stream()
                 .collect(Collectors.groupingBy(History::getNotifiedAt))
@@ -211,5 +253,14 @@ public class HistoryServiceImpl implements HistoryService {
             return new GroupHistoryEntry(status, dt, buildDrugHistoriesWithInfo(histories), takenAmt);
         else
             return new GroupHistoryEntry(status, dt, null, takenAmt);
+    }
+
+    private UUID resolveUserId(UUID userId, Optional<UUID> relativeId) {
+        return relativeId.map(r -> {
+            if (!relationService.getIncomingPermission(r).getReadable())
+                throw new IllegalArgumentException("Access denied from your friend");
+
+            return r;
+        }).orElse(userId);
     }
 }

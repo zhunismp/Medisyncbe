@@ -133,6 +133,10 @@ public class DrugService {
         return drugRepository.findById(drugId);
     }
 
+    public List<Drug> searchDrugByUserId(UUID userId) {
+        return drugRepository.findByUserId(userId);
+    }
+
     public List<Drug> saveAllDrugs(UUID userId, List<Drug> drugs) {
         if (!validateOwner(userId, drugs.stream().map(Drug::getId).toList()))
             throw new IllegalArgumentException("User is not the owner of requested drug.");
@@ -158,10 +162,6 @@ public class DrugService {
         List<UUID> validDrugIds = drugRepository.findByUserId(userId).stream().map(Drug::getId).toList();
 
         return new HashSet<>(validDrugIds).containsAll(drugIds);
-    }
-
-    private List<Drug> searchDrugByUserId(UUID userId) {
-        return drugRepository.findByUserId(userId);
     }
 
     private List<DrugDTO> applyPaginate(List<DrugDTO> drugs, Optional<Pagination> pagination) {

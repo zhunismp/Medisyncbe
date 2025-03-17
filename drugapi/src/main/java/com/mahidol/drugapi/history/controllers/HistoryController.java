@@ -5,14 +5,13 @@ import com.mahidol.drugapi.history.dtos.request.EditHistoryRequest;
 import com.mahidol.drugapi.history.dtos.request.SearchHistoryRequest;
 import com.mahidol.drugapi.history.services.HistoryService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.PastOrPresent;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -37,9 +36,9 @@ public class HistoryController {
 
     @GetMapping("/searchhistories/noti")
     public ResponseEntity<?> searchAllWithPreferredDate(
-            @RequestParam("preferredDate") @Valid @PastOrPresent LocalDateTime preferredDate
+            @RequestParam("preferredDate") @Valid @PastOrPresent LocalDate preferredDate
     ) {
-        
+        return new ResponseEntity<>(historyService.searchNotiHistory(preferredDate), HttpStatus.OK);
     }
 
     @PostMapping("/edithistories")

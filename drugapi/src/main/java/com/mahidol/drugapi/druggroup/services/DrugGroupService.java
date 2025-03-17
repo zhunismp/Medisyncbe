@@ -86,7 +86,7 @@ public class DrugGroupService {
             return i;
         }).orElse(userContext.getUserId());
 
-        List<DrugGroup> drugGroups = drugGroupRepository.findByUserId(id);
+        List<DrugGroup> drugGroups = searchGroupByUserId(id);
         List<DrugGroupDTO> drugGroupWithDrugInfos = drugGroups.stream()
                 .map(this::transformDTO)
                 .toList();
@@ -137,6 +137,10 @@ public class DrugGroupService {
             throw new IllegalArgumentException("User is not the owner of requested drug group.");
 
         return drugGroupRepository.findById(groupId);
+    }
+
+    public List<DrugGroup> searchGroupByUserId(UUID userId) {
+        return drugGroupRepository.findByUserId(userId);
     }
 
     private DrugGroup getDrugGroupByGroupId(UUID userId, UUID groupId) {
