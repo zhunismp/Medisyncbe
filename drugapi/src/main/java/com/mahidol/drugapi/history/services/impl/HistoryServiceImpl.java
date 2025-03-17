@@ -6,6 +6,8 @@ import com.mahidol.drugapi.drug.dtos.DrugDTOMapper;
 import com.mahidol.drugapi.drug.dtos.response.DrugDTO;
 import com.mahidol.drugapi.drug.models.entites.Drug;
 import com.mahidol.drugapi.drug.services.DrugService;
+import com.mahidol.drugapi.druggroup.dtos.DrugGroupDTOMapper;
+import com.mahidol.drugapi.druggroup.dtos.response.DrugGroupDTO;
 import com.mahidol.drugapi.druggroup.services.DrugGroupService;
 import com.mahidol.drugapi.history.dtos.request.EditHistoryRequest;
 import com.mahidol.drugapi.history.dtos.request.HistoryEntry;
@@ -104,6 +106,7 @@ public class HistoryServiceImpl implements HistoryService {
                     .sorted(Comparator.comparing(DrugHistoryEntry::getDatetime))
                     .toList();
             List<ScheduleTime> scheduleTimes = scheduleService.get(drug.getId()).stream().map(ScheduleTime::fromSchedule).toList();
+            List<DrugGroupDTO> groups = drug.getGroups().stream().map(DrugGroupDTOMapper::toDTO).toList();
 
             return new DrugHistoryResponse(
                     drug.getId(),
@@ -113,6 +116,7 @@ public class HistoryServiceImpl implements HistoryService {
                     drug.getUnit(),
                     drug.getDose(),
                     scheduleTimes,
+                    groups,
                     histories,
                     HistoryStatsCalculator.calculateDrugHistories(histories),
                     HistoryStatsCalculator.generateDrugGraph(histories)
