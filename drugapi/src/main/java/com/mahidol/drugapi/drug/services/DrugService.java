@@ -133,6 +133,7 @@ public class DrugService {
 
         // delete drugs
         deleteAllByDrugIds(userContext.getUserId(), List.of(drugId));
+        scheduleService.remove(drugId);
     }
 
     public List<Drug> searchAllDrugByDrugsId(UUID userId, List<UUID> drugIds) {
