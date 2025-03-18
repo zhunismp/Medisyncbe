@@ -13,6 +13,8 @@ import com.mahidol.drugapi.drug.dtos.response.SearchDrugResponse;
 import com.mahidol.drugapi.drug.models.entites.Drug;
 import com.mahidol.drugapi.drug.models.type.MealCondition;
 import com.mahidol.drugapi.drug.repositories.DrugRepository;
+import com.mahidol.drugapi.druggroup.entities.DrugGroup;
+import com.mahidol.drugapi.druggroup.repositories.DrugGroupRepository;
 import com.mahidol.drugapi.external.aws.s3.S3Service;
 import com.mahidol.drugapi.relation.services.RelationService;
 import com.mahidol.drugapi.schedule.services.ScheduleService;
@@ -25,6 +27,7 @@ import java.util.*;
 public class DrugService {
 
     private final DrugRepository drugRepository;
+    private final DrugGroupRepository drugGroupRepository; // TODO: this service shouldn't inject repo for other contexts.
     private final ScheduleService scheduleService;
     private final RelationService relationService;
     private final PaginationService<DrugDTO> paginationService;
@@ -33,6 +36,7 @@ public class DrugService {
 
     public DrugService(
             DrugRepository drugRepository,
+            DrugGroupRepository drugGroupRepository,
             ScheduleService scheduleService,
             RelationService relationService,
             PaginationService<DrugDTO> paginationService,
@@ -40,6 +44,7 @@ public class DrugService {
             S3Service s3Service
     ) {
         this.drugRepository = drugRepository;
+        this.drugGroupRepository = drugGroupRepository;
         this.scheduleService = scheduleService;
         this.relationService = relationService;
         this.paginationService = paginationService;
@@ -67,7 +72,7 @@ public class DrugService {
         return new SearchDrugResponse(applyPaginate(response, request.getPagination()), filteredDrugs.size());
     }
 
-    public void add(CreateDrugRequest request) {
+    public void create(CreateDrugRequest request) {
         boolean isDrugExists = searchDrugByUserId(userContext.getUserId())
                 .stream()
                 .map(Drug::getGenericName)
@@ -91,7 +96,12 @@ public class DrugService {
 
         // TODO: Fixed AWS service
 //         request.getImage().map(file -> s3Service.uploadFile("medisync-drug", savedDrug.getId().toString(), file));
+
+        // saved schedule
         scheduleService.set(savedDrug, request.getScheduleTimes());
+
+        // saved to group
+        request.getGroups().ifPresent(groupIds -> linkGroup(savedDrug, groupIds));
 
     }
 
@@ -116,6 +126,12 @@ public class DrugService {
     }
 
     public void remove(UUID drugId) {
+        Optional<Drug> drugOpt = drugRepository.findById(drugId);
+
+        // Remove from group before delete.
+        drugOpt.ifPresent(this::unlinkGroup);
+
+        // delete drugs
         deleteAllByDrugIds(userContext.getUserId(), List.of(drugId));
     }
 
@@ -162,6 +178,18 @@ public class DrugService {
         List<UUID> validDrugIds = drugRepository.findByUserId(userId).stream().map(Drug::getId).toList();
 
         return new HashSet<>(validDrugIds).containsAll(drugIds);
+    }
+
+    private void linkGroup(Drug d, List<UUID> groupIds) {
+        List<DrugGroup> groups = drugGroupRepository.findAllById(groupIds)
+                .stream().map(g -> g.addDrug(d)).toList();
+
+        drugGroupRepository.saveAll(groups);
+    }
+
+    private void unlinkGroup(Drug d) {
+        List<DrugGroup> groups = d.getGroups().stream().map(g -> g.removeDrug(d)).toList();
+        drugGroupRepository.saveAll(groups);
     }
 
     private List<DrugDTO> applyPaginate(List<DrugDTO> drugs, Optional<Pagination> pagination) {
