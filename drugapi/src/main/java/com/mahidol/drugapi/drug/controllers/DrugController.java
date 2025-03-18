@@ -6,6 +6,7 @@ import com.mahidol.drugapi.drug.dtos.request.SearchDrugRequest;
 import com.mahidol.drugapi.drug.dtos.request.UpdateDrugRequest;
 import com.mahidol.drugapi.drug.dtos.response.SearchDrugResponse;
 import com.mahidol.drugapi.drug.services.DrugService;
+import com.mahidol.drugapi.druggroup.services.DrugGroupService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +37,7 @@ public class DrugController {
     public ResponseEntity<?> add(@RequestBody @Valid CreateDrugRequest request, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) throw new BindingError(bindingResult.getFieldErrors());
 
-        drugService.add(request);
+        drugService.create(request);
 
         return new ResponseEntity<>(HttpStatus.CREATED);
     }

@@ -33,4 +33,16 @@ public class DrugGroup {
             inverseJoinColumns = @JoinColumn(name = "drug_id")
     )
     private Set<Drug> drugs = new HashSet<>();
+
+    public DrugGroup addDrug(Drug drug) {
+        this.drugs.add(drug);
+        return this;
+    }
+
+    public DrugGroup removeDrug(Drug drug) {
+        if (!this.drugs.remove(drug))
+            throw new IllegalArgumentException("Drug not found in group");
+
+        return this;
+    }
 }

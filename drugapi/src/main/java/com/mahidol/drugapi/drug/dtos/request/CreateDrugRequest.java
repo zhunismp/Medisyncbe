@@ -13,6 +13,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -51,6 +53,12 @@ public class CreateDrugRequest {
     private List<ScheduleTime> scheduleTimes;
 
     private Boolean isInternalDrug;
+
+    private List<UUID> groups;
+
+    public Optional<List<UUID>> getGroups() {
+        return Optional.ofNullable(groups);
+    }
 
     public Option<MultipartFile> getImage() {
         return Option.of(image);
