@@ -97,12 +97,13 @@ public class DrugService {
         // TODO: Fixed AWS service
 //         request.getImage().map(file -> s3Service.uploadFile("medisync-drug", savedDrug.getId().toString(), file));
 
-        // saved schedule
-        scheduleService.set(savedDrug, request.getScheduleTimes());
-
-        // saved to group
-        request.getGroups().ifPresent(groupIds -> linkGroup(savedDrug, groupIds));
-
+        request.getGroups().ifPresentOrElse(
+                groupIds -> {
+                    linkGroup(savedDrug, groupIds);
+                    scheduleService.set(savedDrug, request.getScheduleTimes().stream().map(s -> s.setIsEnabled(false)).toList());
+                },
+                () -> scheduleService.set(savedDrug, request.getScheduleTimes())
+        );
     }
 
     public void update(UpdateDrugRequest request) {
@@ -133,6 +134,7 @@ public class DrugService {
 
         // delete drugs
         deleteAllByDrugIds(userContext.getUserId(), List.of(drugId));
+        scheduleService.remove(drugId);
     }
 
     public List<Drug> searchAllDrugByDrugsId(UUID userId, List<UUID> drugIds) {
