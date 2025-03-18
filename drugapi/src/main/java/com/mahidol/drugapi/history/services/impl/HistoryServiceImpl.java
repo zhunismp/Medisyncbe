@@ -217,6 +217,7 @@ public class HistoryServiceImpl implements HistoryService {
                 .collect(Collectors.groupingBy(DrugDTO::getId));
 
         return histories.stream().map(h -> new DrugHistoryEntryWithInfo(
+                h.getId(),
                 drugs.get(h.getDrugId()).stream().findFirst().orElseThrow(() -> new EntityNotFoundException("Drug not found")),
                 h.getStatus(),
                 h.getNotifiedAt()

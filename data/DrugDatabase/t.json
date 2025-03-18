@@ -1,0 +1,178 @@
+{
+    "group": {
+        "id": "37d5cd20-12ad-4a67-b252-82e40712c788",
+        "userId": "33a1f654-fcaa-eb7b-deca-529d5772c299",
+        "groupName": "Group01",
+        "scheduleTimes": [
+            {
+                "time": "10:00:00",
+                "isEnabled": true
+            }
+        ],
+        "drugs": [
+            {
+                "id": "00a0846d-20dd-4591-aef0-56dd0bd379ad",
+                "drugImageUrl": null,
+                "userId": "33a1f654-fcaa-eb7b-deca-529d5772c299",
+                "genericName": "TestDrug03",
+                "dosageForm": "form",
+                "unit": "Unit",
+                "strength": "500MG",
+                "amount": 20.0,
+                "dose": 5.0,
+                "takenAmount": 20.0,
+                "usageTime": "PRE_MEAL",
+                "scheduleTimes": null,
+                "groups": null,
+                "isInternalDrug": false
+            },
+            {
+                "id": "38d239a7-a761-441a-9a19-b73fcd68e654",
+                "drugImageUrl": null,
+                "userId": "33a1f654-fcaa-eb7b-deca-529d5772c299",
+                "genericName": "TestDrug02",
+                "dosageForm": "form",
+                "unit": "Unit",
+                "strength": "500MG",
+                "amount": 20.0,
+                "dose": 5.0,
+                "takenAmount": 20.0,
+                "usageTime": "PRE_MEAL",
+                "scheduleTimes": null,
+                "groups": null,
+                "isInternalDrug": false
+            },
+            {
+                "id": "f199d051-0280-4dc0-818b-40b09575042d",
+                "drugImageUrl": null,
+                "userId": "33a1f654-fcaa-eb7b-deca-529d5772c299",
+                "genericName": "TestDrug04",
+                "dosageForm": "form",
+                "unit": "Unit",
+                "strength": "500",
+                "amount": 20.0,
+                "dose": 5.0,
+                "takenAmount": 20.0,
+                "usageTime": "PRE_MEAL",
+                "scheduleTimes": null,
+                "groups": null,
+                "isInternalDrug": false
+            },
+            {
+                "id": "666f1999-b5b9-44c1-a31c-108be8442762",
+                "drugImageUrl": null,
+                "userId": "33a1f654-fcaa-eb7b-deca-529d5772c299",
+                "genericName": "TestDrug01",
+                "dosageForm": "form",
+                "unit": "Unit",
+                "strength": "500MG",
+                "amount": 20.0,
+                "dose": 5.0,
+                "takenAmount": 20.0,
+                "usageTime": "PRE_MEAL",
+                "scheduleTimes": null,
+                "groups": null,
+                "isInternalDrug": false
+            }
+        ]
+    },
+    "histories": [
+        {
+            "status": "MISSED",
+            "datetime": "2025-01-19T10:00:00",
+            "drugs": [
+                {
+                    "info": {
+                        "id": "666f1999-b5b9-44c1-a31c-108be8442762",
+                        "drugImageUrl": null,
+                        "userId": "33a1f654-fcaa-eb7b-deca-529d5772c299",
+                        "genericName": "TestDrug01",
+                        "dosageForm": "form",
+                        "unit": "Unit",
+                        "strength": "500MG",
+                        "amount": 20.0,
+                        "dose": 5.0,
+                        "takenAmount": 20.0,
+                        "usageTime": "PRE_MEAL",
+                        "scheduleTimes": null,
+                        "groups": null,
+                        "isInternalDrug": false
+                    },
+                    "status": "MISSED",
+                    "datetime": "2025-01-19T10:00:00"
+                },
+                {
+                    "info": {
+                        "id": "38d239a7-a761-441a-9a19-b73fcd68e654",
+                        "drugImageUrl": null,
+                        "userId": "33a1f654-fcaa-eb7b-deca-529d5772c299",
+                        "genericName": "TestDrug02",
+                        "dosageForm": "form",
+                        "unit": "Unit",
+                        "strength": "500MG",
+                        "amount": 20.0,
+                        "dose": 5.0,
+                        "takenAmount": 20.0,
+                        "usageTime": "PRE_MEAL",
+                        "scheduleTimes": null,
+                        "groups": null,
+                        "isInternalDrug": false
+                    },
+                    "status": "MISSED",
+                    "datetime": "2025-01-19T10:00:00"
+                },
+                {
+                    "info": {
+                        "id": "00a0846d-20dd-4591-aef0-56dd0bd379ad",
+                        "drugImageUrl": null,
+                        "userId": "33a1f654-fcaa-eb7b-deca-529d5772c299",
+                        "genericName": "TestDrug03",
+                        "dosageForm": "form",
+                        "unit": "Unit",
+                        "strength": "500MG",
+                        "amount": 20.0,
+                        "dose": 5.0,
+                        "takenAmount": 20.0,
+                        "usageTime": "PRE_MEAL",
+                        "scheduleTimes": null,
+                        "groups": null,
+                        "isInternalDrug": false
+                    },
+                    "status": "TAKEN",
+                    "datetime": "2025-01-19T10:00:00"
+                },
+                {
+                    "info": {
+                        "id": "f199d051-0280-4dc0-818b-40b09575042d",
+                        "drugImageUrl": null,
+                        "userId": "33a1f654-fcaa-eb7b-deca-529d5772c299",
+                        "genericName": "TestDrug04",
+                        "dosageForm": "form",
+                        "unit": "Unit",
+                        "strength": "500",
+                        "amount": 20.0,
+                        "dose": 5.0,
+                        "takenAmount": 20.0,
+                        "usageTime": "PRE_MEAL",
+                        "scheduleTimes": null,
+                        "groups": null,
+                        "isInternalDrug": false
+                    },
+                    "status": "TAKEN",
+                    "datetime": "2025-01-19T10:00:00"
+                }
+            ],
+            "takenAmount": 2
+        }
+    ],
+    "stats": {
+        "total": 1,
+        "allTaken": 0,
+        "partiallyTaken": 0,
+        "missed": 1,
+        "takenPercent": 0.0
+    },
+    "graph": [
+        0
+    ]
+}
