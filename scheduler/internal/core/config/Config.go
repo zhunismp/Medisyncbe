@@ -10,6 +10,7 @@ type Config struct {
 	DBPort     string
 
 	DrugNotificationInterval        string
+	IgnoredDrugNotificationInterval string
 	AppointmentNotificationInterval string
 	UserStreakInterval              string
 

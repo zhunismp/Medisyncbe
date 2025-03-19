@@ -39,13 +39,22 @@ func (h *HistoryService) CreateHistory(schedules []models.Schedule) {
 }
 
 // Get all missed notification 3 times
-func (h *HistoryService) GetIgnoredHistories(offset int) ([]models.History, error) {
+func (h *HistoryService) GetIgnoredHistories() ([]models.History, error) {
 	var histories []models.History	
-	if err := h.DB.Where("status = ?", "missed").Where("count < ?", offset).Find(&histories).Error; err != nil {
+	if err := h.DB.Preload("Users").Where("status = ? AND count BETWEEN ? AND ?", "missed", 1, 3).Find(&histories).Error; err != nil {
         return nil, err
     }
 
 	return histories, nil
+}
+
+func (h *HistoryService) BatchIncrementCount(history []models.History, inc int32) error {
+    var ids = make([]uuid.UUID, 0)
+    for _, h := range history {
+        ids = append(ids, h.ID)
+    }
+
+    return h.DB.Model(&models.History{}).Where("id IN ?", ids).UpdateColumn("count", gorm.Expr("count + ?", inc)).Error
 }
 
 func (h *HistoryService) createDrugHistory(s models.Schedule) (error) {

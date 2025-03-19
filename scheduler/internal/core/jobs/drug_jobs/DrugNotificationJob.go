@@ -57,7 +57,6 @@ func (j *DrugNotificationJob) Task(start time.Time, parameters ...interface{}) {
 	utils.LogHistories(j.historyService.GetAllHistory())
 
     var wg sync.WaitGroup
-
     for _, schedule := range schedules {
         wg.Add(1)
         go func(schedule repoModels.Schedule) {
