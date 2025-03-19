@@ -9,8 +9,8 @@ type Notification struct {
 type NotificationTopic string
 
 const (
-	Drug NotificationTopic = "DRUG"
-	Appointment NotificationTopic = "APPOINTMENT"
+	DrugTopic NotificationTopic = "DRUG"
+	AppointmentTopic NotificationTopic = "APPOINTMENT"
 )
 
 func (n NotificationTopic) String() string {

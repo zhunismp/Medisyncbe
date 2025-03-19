@@ -64,7 +64,7 @@ func (j *IgnoredDrugNotificationJob) Task(start time.Time, parameters ...interfa
 
             err := j.notificationService.SendNotification(
                 user.RegisterToken,
-				coreModels.Drug,
+				coreModels.DrugTopic,
                 "Don't Forget to take your medicine",
                 fmt.Sprintf("Hi there %s! do you forget something?", user.FirstName),
             )

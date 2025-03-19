@@ -57,7 +57,7 @@ func (j *AppointmentNotificationJob) Task(start time.Time, parameters ...interfa
 
 			err := j.notificationService.SendNotification(
 				appointment.User.RegisterToken,
-				coreModels.Appointment,
+				coreModels.AppointmentTopic,
 				"Appointment Reminder",
 				fmt.Sprintf("Don't forget tomorrow %s appointment. at time %s", appointment.Title, appointment.Datetime),
 			)
