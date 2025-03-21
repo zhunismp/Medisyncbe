@@ -32,7 +32,7 @@ func LoadConfig() (*Config, error) {
 		DBPort:                          os.Getenv("POSTGRES_PORT"),
 		DrugNotificationInterval:        getOrFallback("DRUG_NOTIFICATION_INTERVAL", "*/1 * * * *"),
 		IgnoredDrugNotificationInterval: getOrFallback("IGNORED_DRUG_NOTIFICATION_INTERVAL", "*/1 * * * *"),
-		AppointmentNotificationInterval: getOrFallback("APPOINTMENT_NOTIFICATION_INTERVAL", "0 0 * * *"),
+		AppointmentNotificationInterval: getOrFallback("APPOINTMENT_NOTIFICATION_INTERVAL", "0 1 * * *"),
 		UserStreakInterval:              getOrFallback("USER_STREAK_INTERVAL", "0 1 * * *"),
 		FirebaseClientOption:            clientOption,
 	}, nil
