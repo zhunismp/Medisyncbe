@@ -41,7 +41,7 @@ func (h *HistoryService) CreateHistory(schedules []models.Schedule) {
 // Get all missed notification 3 times
 func (h *HistoryService) GetIgnoredHistories() ([]models.History, error) {
 	var histories []models.History	
-	if err := h.DB.Preload("Users").Where("status = ? AND count BETWEEN ? AND ?", "missed", 1, 3).Find(&histories).Error; err != nil {
+	if err := h.DB.Preload("User").Where("status = ? AND count BETWEEN ? AND ?", "missed", 0, 2).Find(&histories).Error; err != nil {
         return nil, err
     }
 
@@ -66,8 +66,8 @@ func (h *HistoryService) createDrugGroupHistory(s models.Schedule) (error) {
     var drugIds []uuid.UUID
 
     err := h.DB.Raw(`
-        SELECT id
-        FROM drug
+        SELECT drug_id
+        FROM drug_group_drug
         WHERE group_id = ?`, s.ReferenceID,
     ).Scan(&drugIds).Error
 

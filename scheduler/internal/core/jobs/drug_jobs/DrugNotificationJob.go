@@ -9,9 +9,7 @@ import (
 	repoModels "github.com/zhunismp/Medisyncbe/scheduler/internal/app/repositories/models"
 	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/config"
 	coreModels "github.com/zhunismp/Medisyncbe/scheduler/internal/core/models"
-
 	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/services"
-	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/utils"
 )
 
 type DrugNotificationJob struct {
@@ -52,9 +50,6 @@ func (j *DrugNotificationJob) Task(start time.Time, parameters ...interface{}) {
         return
     }
 	j.historyService.CreateHistory(schedules)
-
-	utils.LogSchedules(schedules)
-	utils.LogHistories(j.historyService.GetAllHistory())
 
     var wg sync.WaitGroup
     for _, schedule := range schedules {

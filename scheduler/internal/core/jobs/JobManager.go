@@ -27,6 +27,11 @@ func Initialize(
 		notificationService,
 		config,
 	)
+	ignoredDrugNotificationJob := drug_jobs.NewIgnoredDrugNotificationJob(
+		historyService,
+		notificationService,
+		config,
+	)
 	appointmentNotificationJob := appointment_jobs.NewAppointmentNotificationJob(
 		appointmentService,
 		notificationService,
@@ -40,6 +45,7 @@ func Initialize(
 
 	jobs := []models.BaseJob{
 		drugNotificationJob,
+		ignoredDrugNotificationJob,
 		appointmentNotificationJob,
 		userStreakJob,
 	}
