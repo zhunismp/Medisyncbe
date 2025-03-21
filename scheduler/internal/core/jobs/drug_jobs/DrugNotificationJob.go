@@ -9,9 +9,7 @@ import (
 	repoModels "github.com/zhunismp/Medisyncbe/scheduler/internal/app/repositories/models"
 	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/config"
 	coreModels "github.com/zhunismp/Medisyncbe/scheduler/internal/core/models"
-
 	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/services"
-	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/utils"
 )
 
 type DrugNotificationJob struct {
@@ -53,11 +51,7 @@ func (j *DrugNotificationJob) Task(start time.Time, parameters ...interface{}) {
     }
 	j.historyService.CreateHistory(schedules)
 
-	utils.LogSchedules(schedules)
-	utils.LogHistories(j.historyService.GetAllHistory())
-
     var wg sync.WaitGroup
-
     for _, schedule := range schedules {
         wg.Add(1)
         go func(schedule repoModels.Schedule) {
@@ -65,7 +59,7 @@ func (j *DrugNotificationJob) Task(start time.Time, parameters ...interface{}) {
 
             err := j.notificationService.SendNotification(
                 schedule.User.RegisterToken,
-				coreModels.Drug,
+				coreModels.DrugTopic,
                 "Time to take medicine",
                 fmt.Sprintf("Your %s is ready for you to finish it", schedule.Name),
             )

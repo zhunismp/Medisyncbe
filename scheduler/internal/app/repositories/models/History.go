@@ -16,6 +16,8 @@ type History struct {
 	TakenAt    *time.Time `gorm:"type:timestamp"`
 	NotifiedAt time.Time `gorm:"type:timestamp;not null"`
 	Count      int       `gorm:"type:int;default:0;not null"`
+
+	User        AppUser   `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
 }
 
 func (History) TableName() string {

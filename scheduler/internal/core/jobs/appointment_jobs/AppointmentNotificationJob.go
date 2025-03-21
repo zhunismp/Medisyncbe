@@ -10,7 +10,6 @@ import (
 	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/config"
 	coreModels "github.com/zhunismp/Medisyncbe/scheduler/internal/core/models"
 	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/services"
-	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/utils"
 )
 
 type AppointmentNotificationJob struct {
@@ -45,9 +44,6 @@ func (j *AppointmentNotificationJob) Task(start time.Time, parameters ...interfa
 		return
 	}
 
-	// Log appointments
-	utils.LogAppointment(appointments)
-
 	var wg sync.WaitGroup
 
 	for _, appointment := range appointments {
@@ -57,7 +53,7 @@ func (j *AppointmentNotificationJob) Task(start time.Time, parameters ...interfa
 
 			err := j.notificationService.SendNotification(
 				appointment.User.RegisterToken,
-				coreModels.Appointment,
+				coreModels.AppointmentTopic,
 				"Appointment Reminder",
 				fmt.Sprintf("Don't forget tomorrow %s appointment. at time %s", appointment.Title, appointment.Datetime),
 			)
