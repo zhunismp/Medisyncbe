@@ -5,9 +5,9 @@ import (
 )
 
 type DrugGroup struct {
-	ID       uuid.UUID  `gorm:"type:uuid;primaryKey"`
-	UserID   uuid.UUID  `gorm:"type:uuid;not null"`
-	GroupName string     `gorm:"type:text;not null"`
+	ID        uuid.UUID `gorm:"type:uuid;primaryKey"`
+	UserID    uuid.UUID `gorm:"type:uuid;not null"`
+	GroupName string    `gorm:"type:text;not null"`
 }
 
 func (DrugGroup) TableName() string {

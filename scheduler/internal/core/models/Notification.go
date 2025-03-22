@@ -1,15 +1,15 @@
 package models
 
 type Notification struct {
-	Title string
-	Body  string
+	Title         string
+	Body          string
 	RegisterToken string
 }
 
 type NotificationTopic string
 
 const (
-	DrugTopic NotificationTopic = "DRUG"
+	DrugTopic        NotificationTopic = "DRUG"
 	AppointmentTopic NotificationTopic = "APPOINTMENT"
 )
 

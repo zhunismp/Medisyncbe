@@ -31,6 +31,7 @@ func main() {
 	historyService := services.NewHistoryService(db)
 	userService := services.NewUserService(db)
 	appointmentService := services.NewAppointmentService(db)
+	relationService := services.NewRelationService(db)
 	notificationService, err := services.NewNotificationService(cfg.FirebaseClientOption)
 	if err != nil {
 		fmt.Println("Error initiate notification service: ", err)
@@ -43,6 +44,7 @@ func main() {
 		notificationService,
 		appointmentService,
 		userService,
+		relationService,
 		cfg,
 	)
 	if err != nil {

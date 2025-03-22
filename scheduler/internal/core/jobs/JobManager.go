@@ -19,6 +19,7 @@ func Initialize(
 	notificationService *services.NotificationService,
 	appointmentService *services.AppointmentService,
 	userService *services.UserService,
+	relationService *services.RelationService,
 	config *config.Config,
 ) (gocron.Scheduler, error) {
 	drugNotificationJob := drug_jobs.NewDrugNotificationJob(
@@ -29,6 +30,8 @@ func Initialize(
 	)
 	ignoredDrugNotificationJob := drug_jobs.NewIgnoredDrugNotificationJob(
 		historyService,
+		relationService,
+		userService,
 		notificationService,
 		config,
 	)

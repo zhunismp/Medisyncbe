@@ -8,16 +8,16 @@ import (
 )
 
 type History struct {
-	ID         uuid.UUID `gorm:"type:uuid;primaryKey"`
-	UserID     uuid.UUID `gorm:"type:uuid;not null"`
-	DrugID     uuid.UUID `gorm:"type:uuid;not null"`
+	ID         uuid.UUID  `gorm:"type:uuid;primaryKey"`
+	UserID     uuid.UUID  `gorm:"type:uuid;not null"`
+	DrugID     uuid.UUID  `gorm:"type:uuid;not null"`
 	GroupID    *uuid.UUID `gorm:"type:uuid"`
-	Status     string    `gorm:"type:text;check:status IN ('taken', 'missed', 'skipped')"`
+	Status     string     `gorm:"type:text;check:status IN ('taken', 'missed', 'skipped')"`
 	TakenAt    *time.Time `gorm:"type:timestamp"`
-	NotifiedAt time.Time `gorm:"type:timestamp;not null"`
-	Count      int       `gorm:"type:int;default:0;not null"`
+	NotifiedAt time.Time  `gorm:"type:timestamp;not null"`
+	Count      int        `gorm:"type:int;default:0;not null"`
 
-	User        AppUser   `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
+	User AppUser `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
 }
 
 func (History) TableName() string {
