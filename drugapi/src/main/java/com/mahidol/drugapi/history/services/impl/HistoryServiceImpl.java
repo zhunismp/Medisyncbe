@@ -248,7 +248,7 @@ public class HistoryServiceImpl implements HistoryService {
         int total = histories.size();
         int takenPercentage = (total == 0) ? 0 : (takenAmt * 100 / total);
         GroupTakenStatus status = (takenPercentage == 100) ? GroupTakenStatus.ALL_TAKEN
-                : (takenPercentage > 50) ? GroupTakenStatus.PARTIALLY_TAKEN
+                : (takenPercentage > 0) ? GroupTakenStatus.PARTIALLY_TAKEN
                 : GroupTakenStatus.MISSED;
 
         if (preferredDate.isPresent())
