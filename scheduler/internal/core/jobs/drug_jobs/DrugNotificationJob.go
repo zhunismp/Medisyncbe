@@ -13,61 +13,60 @@ import (
 )
 
 type DrugNotificationJob struct {
-	scheduleService *services.SchedulerService
-	historyService *services.HistoryService
+	scheduleService     *services.SchedulerService
+	historyService      *services.HistoryService
 	notificationService *services.NotificationService
-	config *config.Config
+	config              *config.Config
 }
 
 func NewDrugNotificationJob(
-	scheduleService *services.SchedulerService, 
+	scheduleService *services.SchedulerService,
 	historyService *services.HistoryService,
 	notificationService *services.NotificationService,
 	config *config.Config,
 ) *DrugNotificationJob {
 	return &DrugNotificationJob{
-		scheduleService: scheduleService,
-		historyService: historyService,
+		scheduleService:     scheduleService,
+		historyService:      historyService,
 		notificationService: notificationService,
-		config: config,
+		config:              config,
 	}
 }
 
 func (j *DrugNotificationJob) JobAttributes() coreModels.JobAttributes {
-	return coreModels.JobAttributes {
-		Name: "DrugNotificationJob",
+	return coreModels.JobAttributes{
+		Name:     "DrugNotificationJob",
 		Interval: j.config.DrugNotificationInterval,
 	}
 }
 
-
 func (j *DrugNotificationJob) Task(start time.Time) {
-    schedules, err := j.scheduleService.GetScheduleWithTime(start)
-    if err != nil {
-        log.Println("Error fetching schedules:", err)
-        return
-    }
+	schedules, err := j.scheduleService.GetScheduleWithTime(start)
+	if err != nil {
+		log.Println("Error fetching schedules:", err)
+		return
+	}
 	j.historyService.CreateHistory(schedules)
 
 	log.Printf("[%s] Sending notifications for %d schedules", j.JobAttributes().Name, len(schedules))
 
-    var wg sync.WaitGroup
-    for _, schedule := range schedules {
-        wg.Add(1)
-        go func(schedule repoModels.Schedule) {
-            defer wg.Done() 
+	var wg sync.WaitGroup
+	for _, schedule := range schedules {
+		wg.Add(1)
+		go func(schedule repoModels.Schedule) {
+			defer wg.Done()
 
-            err := j.notificationService.SendNotification(
-                schedule.User.RegisterToken,
+			err := j.notificationService.SendNotification(
+				schedule.User.RegisterToken,
 				coreModels.DrugTopic,
-                "Time to take medicine",
-                fmt.Sprintf("Your %s is ready for you to finish it", schedule.Name),
-            )
-            if err != nil {
-                log.Printf("Error sending notification for schedule %s: %v", schedule.ID, err)
-            }
-        }(schedule)
-    }
+				"Time to take medicine",
+				fmt.Sprintf("Your %s is ready for you to finish it", schedule.Name),
+			)
+			if err != nil {
+				log.Printf("Error sending notification for schedule %s: %v", schedule.ID, err)
+			}
+		}(schedule)
+	}
 
     wg.Wait()
 }

@@ -38,9 +38,9 @@ func (s *UserService) GetAllUsers() ([]models.AppUser, error) {
 	return users, nil
 }
 
-func (s *UserService) UpdateUserStreak( userID uuid.UUID, streak int) error {
+func (s *UserService) UpdateUserStreak(userID uuid.UUID, streak int) error {
 	result := s.DB.Model(&models.AppUser{}).Where("id = ?", userID).Update("streak", streak)
-	
+
 	if result.Error != nil {
 		return fmt.Errorf("failed to update streak for user ID %s: %w", userID, result.Error)
 	}

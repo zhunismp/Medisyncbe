@@ -8,6 +8,6 @@ type BaseJob interface {
 }
 
 type JobAttributes struct {
-	Name string
+	Name     string
 	Interval string
 }

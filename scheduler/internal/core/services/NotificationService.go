@@ -46,19 +46,19 @@ func (ns *NotificationService) SendNotification(token string, topic models.Notif
 			"topic": topic.String(),
 		},
 		APNS: &messaging.APNSConfig{
-            Headers: map[string]string{
-                "apns-priority": "10",
-            },
-            Payload: &messaging.APNSPayload{
-                Aps: &messaging.Aps{
-                    Alert: &messaging.ApsAlert{
-                        Title: title,
-                        Body:  body,
-                    },
-                    Sound: "default",
-                },
-            },
-        },
+			Headers: map[string]string{
+				"apns-priority": "10",
+			},
+			Payload: &messaging.APNSPayload{
+				Aps: &messaging.Aps{
+					Alert: &messaging.ApsAlert{
+						Title: title,
+						Body:  body,
+					},
+					Sound: "default",
+				},
+			},
+		},
 	}
 
 	response, err := ns.client.Send(context.Background(), message)

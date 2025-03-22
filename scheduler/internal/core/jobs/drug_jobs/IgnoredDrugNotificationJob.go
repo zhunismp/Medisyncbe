@@ -14,9 +14,9 @@ import (
 )
 
 type IgnoredDrugNotificationJob struct {
-	historyService *services.HistoryService
+	historyService      *services.HistoryService
 	notificationService *services.NotificationService
-	config *config.Config
+	config              *config.Config
 }
 
 func NewIgnoredDrugNotificationJob(
@@ -25,15 +25,15 @@ func NewIgnoredDrugNotificationJob(
 	config *config.Config,
 ) *IgnoredDrugNotificationJob {
 	return &IgnoredDrugNotificationJob{
-		historyService: historyService,
+		historyService:      historyService,
 		notificationService: notificationService,
-		config: config,
+		config:              config,
 	}
 }
 
 func (j *IgnoredDrugNotificationJob) JobAttributes() coreModels.JobAttributes {
-	return coreModels.JobAttributes {
-		Name: "IgnoredDrugNotificationJob",
+	return coreModels.JobAttributes{
+		Name:     "IgnoredDrugNotificationJob",
 		Interval: j.config.IgnoredDrugNotificationInterval,
 	}
 }
@@ -60,23 +60,23 @@ func (j *IgnoredDrugNotificationJob) Task(start time.Time) {
 
 	var wg sync.WaitGroup
 	for _, user := range deduplicatedUsers {
-        wg.Add(1)
-        go func(user repoModels.AppUser) {
-            defer wg.Done() 
+		wg.Add(1)
+		go func(user repoModels.AppUser) {
+			defer wg.Done()
 
-            err := j.notificationService.SendNotification(
-                user.RegisterToken,
+			err := j.notificationService.SendNotification(
+				user.RegisterToken,
 				coreModels.DrugTopic,
-                "Don't Forget to take your medicine",
-                fmt.Sprintf("Hi there %s! do you forget something?", user.FirstName),
-            )
-            if err != nil {
-                log.Printf("Error resending notification for user %s: %v", user.ID, err)
-            }
-        }(user)
-    }
+				"Don't Forget to take your medicine",
+				fmt.Sprintf("Hi there %s! do you forget something?", user.FirstName),
+			)
+			if err != nil {
+				log.Printf("Error resending notification for user %s: %v", user.ID, err)
+			}
+		}(user)
+	}
 
-    wg.Wait()
+	wg.Wait()
 }
 
 func filteredByTimes(t time.Time, histories []repoModels.History) []repoModels.History {
@@ -108,4 +108,3 @@ func getDeduplicatedUsers(histories []repoModels.History) []repoModels.AppUser {
 
 	return deduplicatedUsers
 }
-
