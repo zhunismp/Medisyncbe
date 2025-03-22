@@ -44,7 +44,7 @@ func (j *AppointmentNotificationJob) Task(start time.Time) {
 		return
 	}
 
-	log.Printf("Sending notifications for %d appointments", len(appointments))
+	log.Printf("[%s] Sending notifications for %d appointments", j.JobAttributes().Name, len(appointments))
 
 	var wg sync.WaitGroup
 

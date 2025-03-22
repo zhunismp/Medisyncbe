@@ -56,7 +56,7 @@ func (j *IgnoredDrugNotificationJob) Task(start time.Time) {
 
 	deduplicatedUsers := getDeduplicatedUsers(filteredByTimes)
 
-	log.Printf("Sending notifications for %d ignored histories", len(filteredByTimes))
+	log.Printf("[%s] Sending notifications for %d ignored histories", j.JobAttributes().Name, len(deduplicatedUsers))
 
 	var wg sync.WaitGroup
 	for _, user := range deduplicatedUsers {
@@ -84,7 +84,7 @@ func filteredByTimes(t time.Time, histories []repoModels.History) []repoModels.H
 	for _, history := range histories {
 		minDiff := int(t.Sub(history.NotifiedAt).Minutes())
 
-		if minDiff % 5 == 0 {
+		if minDiff % 10 == 0 {
 			filteredByTimes = append(filteredByTimes, history)
 		}
 	}
