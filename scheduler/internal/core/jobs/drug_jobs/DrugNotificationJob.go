@@ -49,7 +49,7 @@ func (j *DrugNotificationJob) Task(start time.Time) {
     }
 	j.historyService.CreateHistory(schedules)
 
-	log.Printf("Sending notifications for %d schedules", len(schedules))
+	log.Printf("[%s] Sending notifications for %d schedules", j.JobAttributes().Name, len(schedules))
 
     var wg sync.WaitGroup
     for _, schedule := range schedules {
@@ -70,5 +70,4 @@ func (j *DrugNotificationJob) Task(start time.Time) {
     }
 
     wg.Wait()
-    log.Println("All drugs notifications sent")
 }
