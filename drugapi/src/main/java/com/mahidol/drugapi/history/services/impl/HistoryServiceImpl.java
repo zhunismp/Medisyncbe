@@ -68,7 +68,7 @@ public class HistoryServiceImpl implements HistoryService {
         return drugGroupService.getDrugGroupByGroupIdOpt(userId, request.getGroupId().get()).map(g -> {
             List<History> rawHistories = getRawHistories(userId, request.getPreferredDate(), request.getYear(), request.getMonth())
                     .stream().filter(h -> h.getGroupId() != null && h.getGroupId().equals(g.getId())).toList();
-            List<GroupHistoryEntry> histories = buildGroupHistories(rawHistories, request.getPreferredDate());
+            List<GroupHistoryEntry> histories = buildGroupHistories(userId, rawHistories, request.getPreferredDate());
             List<ScheduleTime> scheduleTimes = scheduleService.get(g.getId()).stream().map(ScheduleTime::fromSchedule).toList();
 
             return new GroupHistoryResponse(
@@ -126,6 +126,7 @@ public class HistoryServiceImpl implements HistoryService {
         List<GroupHistoryResponse> groupHistoryResponses = allGroups.stream().map(g -> {
             List<GroupHistoryEntry> histories =
                     buildGroupHistories(
+                            userContext.getUserId(),
                             groupHistories.stream().filter(h -> h.getGroupId().equals(g.getId())).toList(),
                             Optional.of(preferredDate.getDayOfMonth())
                     );
@@ -210,9 +211,9 @@ public class HistoryServiceImpl implements HistoryService {
                 .orElseGet(() -> historyRepository.findByUserIdAndMonthAndYear(userId, month, year));
     }
 
-    private List<DrugHistoryEntryWithInfo> buildDrugHistoriesWithInfo(List<History> histories) {
+    private List<DrugHistoryEntryWithInfo> buildDrugHistoriesWithInfo(UUID userId, List<History> histories) {
         List<UUID> drugIds = histories.stream().map(History::getDrugId).distinct().toList();
-        Map<UUID, List<DrugDTO>> drugs =  drugService.searchAllDrugByDrugsId(userContext.getUserId(), drugIds).stream()
+        Map<UUID, List<DrugDTO>> drugs =  drugService.searchAllDrugByDrugsId(userId, drugIds).stream()
                 .map(DrugDTOMapper::toDTO)
                 .collect(Collectors.groupingBy(DrugDTO::getId));
 
@@ -232,17 +233,17 @@ public class HistoryServiceImpl implements HistoryService {
                .toList();
     }
 
-    private List<GroupHistoryEntry> buildGroupHistories(List<History> histories, Optional<Integer> preferredDate) {
+    private List<GroupHistoryEntry> buildGroupHistories(UUID userId, List<History> histories, Optional<Integer> preferredDate) {
         return histories.stream()
                 .collect(Collectors.groupingBy(History::getNotifiedAt))
                 .entrySet().stream()
-                .map(entry -> transformGroupEntry(entry.getKey(), entry.getValue(), preferredDate))
+                .map(entry -> transformGroupEntry(userId, entry.getKey(), entry.getValue(), preferredDate))
                 .sorted(Comparator.comparing(GroupHistoryEntry::getDatetime))
                 .collect(Collectors.toList());
     }
 
     // TODO: Find the better way to hide drug histories
-    private GroupHistoryEntry transformGroupEntry(LocalDateTime dt, List<History> histories, Optional<Integer> preferredDate) {
+    private GroupHistoryEntry transformGroupEntry(UUID userId, LocalDateTime dt, List<History> histories, Optional<Integer> preferredDate) {
         int takenAmt = (int) histories.stream().filter(h -> h.getStatus() == TakenStatus.TAKEN).count();
         int total = histories.size();
         int takenPercentage = (total == 0) ? 0 : (takenAmt * 100 / total);
@@ -251,7 +252,7 @@ public class HistoryServiceImpl implements HistoryService {
                 : GroupTakenStatus.MISSED;
 
         if (preferredDate.isPresent())
-            return new GroupHistoryEntry(status, dt, buildDrugHistoriesWithInfo(histories), takenAmt);
+            return new GroupHistoryEntry(status, dt, buildDrugHistoriesWithInfo(userId, histories), takenAmt);
         else
             return new GroupHistoryEntry(status, dt, null, takenAmt);
     }
