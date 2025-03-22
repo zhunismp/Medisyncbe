@@ -4,7 +4,7 @@ import "time"
 
 type BaseJob interface {
 	JobAttributes() JobAttributes
-	Task(start time.Time, parameters ...interface{})
+	Task(start time.Time)
 }
 
 type JobAttributes struct {

@@ -35,9 +35,7 @@ func (j *UserStreakJob) JobAttributes() coreModels.JobAttributes {
 	}
 }
 
-func (j *UserStreakJob) Task(start time.Time, parameters ...interface{}) {
-	log.Println("UserStreakJob started at:", start)
-	
+func (j *UserStreakJob) Task(start time.Time) {	
 	users, err := j.userService.GetAllUsers()
 	if err != nil {
 		log.Println("Error fetching users:", err)

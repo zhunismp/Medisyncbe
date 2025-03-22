@@ -41,15 +41,15 @@ func (j *DrugNotificationJob) JobAttributes() coreModels.JobAttributes {
 }
 
 
-func (j *DrugNotificationJob) Task(start time.Time, parameters ...interface{}) {
-	fmt.Println("Job run at: ", start)
-
+func (j *DrugNotificationJob) Task(start time.Time) {
     schedules, err := j.scheduleService.GetScheduleWithTime(start)
     if err != nil {
         log.Println("Error fetching schedules:", err)
         return
     }
 	j.historyService.CreateHistory(schedules)
+
+	log.Printf("Sending notifications for %d schedules", len(schedules))
 
     var wg sync.WaitGroup
     for _, schedule := range schedules {

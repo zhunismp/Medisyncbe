@@ -37,12 +37,14 @@ func (j *AppointmentNotificationJob) JobAttributes() coreModels.JobAttributes {
 	}
 }
 
-func (j *AppointmentNotificationJob) Task(start time.Time, parameters ...interface{}) {
-	appointments, err := j.appointmemtService.GetAppointmentsAfterTomorrow()
+func (j *AppointmentNotificationJob) Task(start time.Time) {
+	appointments, err := j.appointmemtService.GetAppointmentsForTomorrow()
 	if err != nil {
 		log.Println("Error fetching appointments:", err)
 		return
 	}
+
+	log.Printf("Sending notifications for %d appointments", len(appointments))
 
 	var wg sync.WaitGroup
 
@@ -64,5 +66,4 @@ func (j *AppointmentNotificationJob) Task(start time.Time, parameters ...interfa
 	}
 
 	wg.Wait()
-	log.Println("All appointment notifications sent")
 }
