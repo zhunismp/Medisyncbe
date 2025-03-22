@@ -15,6 +15,7 @@ import (
 
 type IgnoredDrugNotificationJob struct {
 	historyService      *services.HistoryService
+	relationService     *services.RelationService
 	notificationService *services.NotificationService
 	config              *config.Config
 }
@@ -45,21 +46,29 @@ func (j *IgnoredDrugNotificationJob) Task(start time.Time) {
 		return
 	}
 
-	// filtered only passed by 5, 10, 15 minutes
-	filteredByTimes := filteredByTimes(start, ignoredHistories)
+	normalHistories := filteredByTimes(start, ignoredHistories)
+	unacceptableHistories := filteredByCount(normalHistories, 3)
 
-	// increment count for each history
-	err = j.historyService.BatchIncrementCount(filteredByTimes, 1)
+	deduplicatedUsers := getDeduplicatedUsers(normalHistories)
+	deduplicatedFriends := getDeduplicatedRelatives(j.relationService, unacceptableHistories)
+
+	log.Printf("[%s] Sending notifications for %d ignored histories", j.JobAttributes().Name, len(normalHistories))
+	log.Printf("[%s] Sending notifications for %d unacceptable histories", j.JobAttributes().Name, len(unacceptableHistories))
+
+	// sending notifications
+	j.sendBatchNotifications(deduplicatedUsers)
+	j.sendBatchNotifications(deduplicatedFriends)
+
+	// increment count after sending notifications
+	err = j.historyService.BatchIncrementCount(normalHistories, 1)
 	if err != nil {
 		log.Printf("Error incrementing count for histories: %v", err)
 	}
+}
 
-	deduplicatedUsers := getDeduplicatedUsers(filteredByTimes)
-
-	log.Printf("[%s] Sending notifications for %d ignored histories", j.JobAttributes().Name, len(deduplicatedUsers))
-
+func (j *IgnoredDrugNotificationJob) sendBatchNotifications(users []repoModels.AppUser) {
 	var wg sync.WaitGroup
-	for _, user := range deduplicatedUsers {
+	for _, user := range users {
 		wg.Add(1)
 		go func(user repoModels.AppUser) {
 			defer wg.Done()
@@ -92,6 +101,17 @@ func filteredByTimes(t time.Time, histories []repoModels.History) []repoModels.H
 	return filteredByTimes
 }
 
+func filteredByCount(histories []repoModels.History, count int) []repoModels.History {
+	filteredByCount := make([]repoModels.History, 0)
+	for _, history := range histories {
+		if history.Count == count {
+			filteredByCount = append(filteredByCount, history)
+		}
+	}
+
+	return filteredByCount
+}
+
 func getDeduplicatedUsers(histories []repoModels.History) []repoModels.AppUser {
 	userMap := make(map[uuid.UUID]repoModels.AppUser)
 
@@ -107,4 +127,15 @@ func getDeduplicatedUsers(histories []repoModels.History) []repoModels.AppUser {
 	}
 
 	return deduplicatedUsers
+}
+
+func getDeduplicatedRelatives(relationService *services.RelationService, histories []repoModels.History) []repoModels.AppUser {
+	users := getDeduplicatedUsers(histories)
+
+	var relatives []repoModels.AppUser
+	for _, u := range users {
+		relatives = append(relatives, relationService.GetAuthorizedRelatives(u.ID)...)
+	}
+
+	return relatives
 }
