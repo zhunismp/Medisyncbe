@@ -68,6 +68,7 @@ func schedule(jobs []models.BaseJob) (gocron.Scheduler, error) {
 				true,
 			),
 			gocron.NewTask(func() {
+				log.Printf("Starting Job %s at %s", attributes.Name, time.Now().Format(time.RFC3339))
 				job.Task(time.Now().Truncate(time.Minute))
 			}),
 			gocron.WithName(attributes.Name),

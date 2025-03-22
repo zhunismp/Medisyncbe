@@ -38,7 +38,7 @@ func (j *IgnoredDrugNotificationJob) JobAttributes() coreModels.JobAttributes {
 	}
 }
 
-func (j *IgnoredDrugNotificationJob) Task(start time.Time, parameters ...interface{}) {
+func (j *IgnoredDrugNotificationJob) Task(start time.Time) {
 	ignoredHistories, err := j.historyService.GetIgnoredHistories()
 	if err != nil {
 		log.Println("Error fetching ignored histories: ", err)
@@ -55,6 +55,8 @@ func (j *IgnoredDrugNotificationJob) Task(start time.Time, parameters ...interfa
 	}
 
 	deduplicatedUsers := getDeduplicatedUsers(filteredByTimes)
+
+	log.Printf("Sending notifications for %d ignored histories", len(filteredByTimes))
 
 	var wg sync.WaitGroup
 	for _, user := range deduplicatedUsers {
@@ -75,9 +77,6 @@ func (j *IgnoredDrugNotificationJob) Task(start time.Time, parameters ...interfa
     }
 
     wg.Wait()
-    log.Println("All ignored drug notifications sent")
-
-
 }
 
 func filteredByTimes(t time.Time, histories []repoModels.History) []repoModels.History {
@@ -94,15 +93,14 @@ func filteredByTimes(t time.Time, histories []repoModels.History) []repoModels.H
 }
 
 func getDeduplicatedUsers(histories []repoModels.History) []repoModels.AppUser {
-	userMap := make(map[uuid.UUID]repoModels.AppUser) // Map to store unique users by ID
+	userMap := make(map[uuid.UUID]repoModels.AppUser)
 
 	for _, history := range histories {
-		if _, exists := userMap[history.UserID]; !exists { // Check if user already exists
-			userMap[history.UserID] = history.User // Store user if not present
+		if _, exists := userMap[history.UserID]; !exists {
+			userMap[history.UserID] = history.User
 		}
 	}
 
-	// Convert map values to slice
 	deduplicatedUsers := make([]repoModels.AppUser, 0, len(userMap))
 	for _, user := range userMap {
 		deduplicatedUsers = append(deduplicatedUsers, user)
