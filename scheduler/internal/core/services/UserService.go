@@ -49,4 +49,17 @@ func (s *UserService) UpdateUserStreak(userID uuid.UUID, streak int) error {
 		return fmt.Errorf("no user found with ID %s or no change in streak value", userID)
 	}
 	return nil
+
+
+}
+
+func (s *UserService) GetUserByID(id uuid.UUID) (models.AppUser, error) {
+	var user models.AppUser
+
+	result := s.DB.Where("id = ?", id).First(&user)
+	if result.Error != nil {
+		return models.AppUser{}, fmt.Errorf("failed to fetch user with id %v: %w", id, result.Error)
+	}
+
+	return user, nil
 }
