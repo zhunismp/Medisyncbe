@@ -18,9 +18,9 @@ func NewSchedulerService(db *gorm.DB) *SchedulerService {
 
 func (s *SchedulerService) GetScheduleWithTime(t time.Time) ([]models.Schedule, error) {
 	var schedules []models.Schedule
-	fixedDate := time.Date(2000, time.January, 1, t.Hour(), t.Minute(), 0, 0, t.Location()) 
+	fixedDate := time.Date(2000, time.January, 1, t.Hour(), t.Minute(), 0, 0, t.Location())
 
-	result := s.DB.Preload("User").Where("schedule_time = ?", fixedDate).Find(&schedules)
+	result := s.DB.Preload("User").Where("schedule_time = ? and is_enabled = ?", fixedDate, true).Find(&schedules)
 	if result.Error != nil {
 		return nil, fmt.Errorf("failed to fetch schedules for time %v: %w", t, result.Error)
 	}
