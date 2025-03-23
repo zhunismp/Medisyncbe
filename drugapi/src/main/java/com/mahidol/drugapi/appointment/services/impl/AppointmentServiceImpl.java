@@ -40,8 +40,8 @@ public class AppointmentServiceImpl implements AppointmentService {
         }).orElse(userContext.getUserId());
 
         List<Appointment> boundedAppointment =
-                request.getEndDate().map(end -> appointmentRepository.findByUserIdAndDatetimeBetween(userContext.getUserId(), request.getStartDate(), end))
-                .orElse(appointmentRepository.findByUserIdAndDatetimeAfter(userContext.getUserId(), request.getStartDate()));
+                request.getEndDate().map(end -> appointmentRepository.findByUserIdAndDatetimeBetween(id, request.getStartDate(), end))
+                .orElse(appointmentRepository.findByUserIdAndDatetimeAfter(id, request.getStartDate()));
 
         List<Appointment> filteredByTitle =
                 request.getTitle()
