@@ -115,7 +115,7 @@ func (j *IgnoredDrugNotificationJob) sendBatchNotificationsForFriends(relativesM
 			for _, user := range users {
 				err := j.notificationService.SendNotification(
 					user.RegisterToken,
-					coreModels.DrugTopic,
+					coreModels.FamlilyTopic,
 					title,
 					message,
 				)
