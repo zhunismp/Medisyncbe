@@ -8,7 +8,7 @@ DECLARE
     u5 UUID := 'e3f4a7d2-8c59-467a-cfe1-7a8b2d4c5e9f';
 
     group_id UUID := 'c362f634-e49f-44e9-bbe7-49d94488a6ff';
-    drug_id_1 UUID := 'b2876821-1f75-4c1a-999a-46f8f03d7a4f';
+    drug_id_1 UUID := 'b2876821-1f75-4c1a-999a-46f8f03d7a4a';
     drug_id_2 UUID := 'b2876821-1f75-4c1a-999a-46f8f03d7a4c';
     drug_id_3 UUID := 'b2876821-1f75-4c1a-999a-46f8f03d7a4d';
     u3_drug_id UUID := 'b2876821-1f75-4c1a-999a-46f8f03d7a4e';
@@ -20,8 +20,15 @@ DECLARE
 
     end_date TIMESTAMP := now() - INTERVAL '1 day';
     start_date TIMESTAMP := now() - INTERVAL '1 month';
-    status_values TEXT[] := ARRAY['taken', 'missed', 'pending'];
-
+    interval_step INTERVAL := INTERVAL '1 day';
+    status_values TEXT[] := ARRAY['taken', 'missed', 'skipped'];
+	
+    c_time TIMESTAMP;
+	status_value TEXT;
+	count_value INT;
+	notified_at TIMESTAMP;
+	taken_at TIMESTAMP;
+	
     user_drugs CONSTANT UUID[] := ARRAY[drug_id_1, drug_id_2, drug_id_3, u3_drug_id, u4_drug_id];
     user_ids CONSTANT UUID[] := ARRAY[main_user, main_user, main_user, u3, u4];
     group_ids CONSTANT UUID[] := ARRAY[group_id, group_id, NULL, NULL, NULL];
@@ -84,20 +91,20 @@ BEGIN
         (gen_random_uuid(), u4, next_2_minutes, 0, 'Sublocade', u4_drug_id, FALSE);
     
     -- Loop through user drugs and create history records
+    c_time := start_date;
     FOR i IN 1..array_length(user_drugs, 1) LOOP
-        FOR current_time IN start_date..end_date LOOP
+        WHILE c_time <= end_date LOOP
             status_value := status_values[floor(random() * 3) + 1];
             count_value := CASE 
                             WHEN status_value = 'missed' THEN 3 
                             ELSE 2 
                           END;
 
-            notified_at := current_time::date + (next_2_minutes)::time;
+            notified_at := c_time::date + (next_2_minutes)::time;
             taken_at := CASE
-                            WHEN status_value = 'taken' THEN notified_at + INTERVAL '20 minute'
-                            ELSE NULL
+                            WHEN status_value = 'missed' THEN NULL
+                            ELSE notified_at + INTERVAL '20 minute'
                         END;
-
             INSERT INTO HISTORY (id, user_id, drug_id, group_id, status, taken_at, notified_at, count)
             VALUES (
                 gen_random_uuid(),
@@ -109,6 +116,8 @@ BEGIN
                 notified_at,
                 count_value
             );
+
+            c_time := c_time + interval_step;
         END LOOP;
     END LOOP;
 END $$;
