@@ -48,6 +48,7 @@ func (j *AppointmentNotificationJob) Task(start time.Time) {
 
 	var wg sync.WaitGroup
 
+	notificationData := map[string]string{ "topic": coreModels.AppointmentTopic.String() }
 	for _, appointment := range appointments {
 		wg.Add(1)
 		go func(appointment repoModels.Appointment) {
@@ -55,7 +56,7 @@ func (j *AppointmentNotificationJob) Task(start time.Time) {
 
 			err := j.notificationService.SendNotification(
 				appointment.User.RegisterToken,
-				coreModels.AppointmentTopic,
+				notificationData,
 				"Appointment Reminder",
 				fmt.Sprintf("Don't forget tomorrow %s appointment. at time %s", appointment.Title, appointment.Datetime),
 			)
@@ -66,4 +67,4 @@ func (j *AppointmentNotificationJob) Task(start time.Time) {
 	}
 
 	wg.Wait()
-}
+} 

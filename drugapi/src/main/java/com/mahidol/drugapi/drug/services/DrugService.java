@@ -22,6 +22,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class DrugService {
@@ -67,7 +68,9 @@ public class DrugService {
                 .map(gname -> drug.getGenericName().contains(gname)).orElse(true)).toList();
 
         //            Optional<String> drugImageUrl = s3Service.getUrl("medisync-drug", drug.getId().toString());
-        List<DrugDTO> response = filteredDrugs.stream().map(this::transformDTO).toList();
+        List<DrugDTO> response = filteredDrugs.stream().map(this::transformDTO)
+                .sorted(Comparator.comparing(DrugDTO::getGenericName))
+                .collect(Collectors.toList());
 
         return new SearchDrugResponse(applyPaginate(response, request.getPagination()), filteredDrugs.size());
     }

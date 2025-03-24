@@ -14,20 +14,20 @@ DECLARE
     u3_drug_id UUID := 'b2876821-1f75-4c1a-999a-46f8f03d7a4e';
     u4_drug_id UUID := 'b2876821-1f75-4c1a-999a-46f8f03d7a4f';
 
-    next_2_minutes TIMESTAMP := '2000-01-01'::date + (now() + INTERVAL '2 minute')::time;
-    tomorrow TIMESTAMP := now() + INTERVAL '1 day';
-    next_five_months TIMESTAMP := now() + INTERVAL '5 month';
+    next_1_minutes TIMESTAMP := DATE_TRUNC('minute', '2000-01-01'::date + (now() AT TIME ZONE 'Asia/Bangkok' + INTERVAL '1 minute')::time);
+    tomorrow TIMESTAMP := DATE_TRUNC('minute', now() AT TIME ZONE 'Asia/Bangkok' + INTERVAL '1 day');
+    next_five_months TIMESTAMP := DATE_TRUNC('minute', now() AT TIME ZONE 'Asia/Bangkok' + INTERVAL '5 month');
 
-    end_date TIMESTAMP := now() - INTERVAL '1 day';
-    start_date TIMESTAMP := now() - INTERVAL '1 month';
+    end_date TIMESTAMP := DATE_TRUNC('minute', now() AT TIME ZONE 'Asia/Bangkok' - INTERVAL '1 day');
+    start_date TIMESTAMP := DATE_TRUNC('minute', now() AT TIME ZONE 'Asia/Bangkok' - INTERVAL '1 month');
     interval_step INTERVAL := INTERVAL '1 day';
     status_values TEXT[] := ARRAY['taken', 'missed', 'skipped'];
 	
     c_time TIMESTAMP;
-	status_value TEXT;
-	count_value INT;
-	notified_at TIMESTAMP;
-	taken_at TIMESTAMP;
+    status_value TEXT;
+    count_value INT;
+    notified_at TIMESTAMP;
+    taken_at TIMESTAMP;
 	
     user_drugs CONSTANT UUID[] := ARRAY[drug_id_1, drug_id_2, drug_id_3, u3_drug_id, u4_drug_id];
     user_ids CONSTANT UUID[] := ARRAY[main_user, main_user, main_user, u3, u4];
@@ -80,19 +80,19 @@ BEGIN
     
     -- Insert SCHEDULE data for main_user
     INSERT INTO SCHEDULE (id, user_id, schedule_time, type, name, reference_id, is_enabled) VALUES 
-        (gen_random_uuid(), main_user, next_2_minutes, 1, 'Painkillers', group_id, TRUE),
-        (gen_random_uuid(), main_user, next_2_minutes, 0, 'Morning Dose', drug_id_1, FALSE),
-        (gen_random_uuid(), main_user, next_2_minutes, 0, 'Morning Dose', drug_id_2, FALSE),
-        (gen_random_uuid(), main_user, next_2_minutes, 0, 'Morning Dose', drug_id_3, TRUE);
+        (gen_random_uuid(), main_user, DATE_TRUNC('minute',next_1_minutes), 1, 'Painkillers', group_id, TRUE),
+        (gen_random_uuid(), main_user, DATE_TRUNC('minute',next_1_minutes), 0, 'Morning Dose', drug_id_1, FALSE),
+        (gen_random_uuid(), main_user, DATE_TRUNC('minute',next_1_minutes), 0, 'Morning Dose', drug_id_2, FALSE),
+        (gen_random_uuid(), main_user, DATE_TRUNC('minute',next_1_minutes), 0, 'Morning Dose', drug_id_3, TRUE);
 
     -- Insert SCHEDULE data for user friends
     INSERT INTO SCHEDULE (id, user_id, schedule_time, type, name, reference_id, is_enabled) VALUES 
-        (gen_random_uuid(), u3, next_2_minutes, 0, 'Doxycycline', u3_drug_id, TRUE),
-        (gen_random_uuid(), u4, next_2_minutes, 0, 'Sublocade', u4_drug_id, FALSE);
+        (gen_random_uuid(), u3, DATE_TRUNC('minute',next_1_minutes), 0, 'Doxycycline', u3_drug_id, TRUE),
+        (gen_random_uuid(), u4, DATE_TRUNC('minute',next_1_minutes), 0, 'Sublocade', u4_drug_id, FALSE);
     
     -- Loop through user drugs and create history records
-    c_time := start_date;
     FOR i IN 1..array_length(user_drugs, 1) LOOP
+    		c_time := start_date;
         WHILE c_time <= end_date LOOP
             status_value := status_values[floor(random() * 3) + 1];
             count_value := CASE 
@@ -100,7 +100,7 @@ BEGIN
                             ELSE 2 
                           END;
 
-            notified_at := c_time::date + (next_2_minutes)::time;
+            notified_at := c_time::date + (next_1_minutes)::time;
             taken_at := CASE
                             WHEN status_value = 'missed' THEN NULL
                             ELSE notified_at + INTERVAL '20 minute'

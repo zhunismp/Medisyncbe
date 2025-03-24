@@ -18,6 +18,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class DrugGroupService {
@@ -89,7 +90,8 @@ public class DrugGroupService {
         List<DrugGroup> drugGroups = searchGroupByUserId(id);
         List<DrugGroupDTO> drugGroupWithDrugInfos = drugGroups.stream()
                 .map(this::transformDTO)
-                .toList();
+                .sorted(Comparator.comparing(DrugGroupDTO::getGroupName))
+                .collect(Collectors.toList());
 
         return new SearchGroupResponse(
                 applyPaginate(drugGroupWithDrugInfos, request.getPagination()),

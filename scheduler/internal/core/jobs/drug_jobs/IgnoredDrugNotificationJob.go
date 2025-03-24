@@ -73,6 +73,8 @@ func (j *IgnoredDrugNotificationJob) Task(start time.Time) {
 
 func (j *IgnoredDrugNotificationJob) sendBatchNotifications(users []repoModels.AppUser) {
 	var wg sync.WaitGroup
+
+	userNotificationData := map[string]string{ "topic": coreModels.DrugTopic.String() }
 	for _, user := range users {
 		wg.Add(1)
 		go func(user repoModels.AppUser) {
@@ -80,7 +82,7 @@ func (j *IgnoredDrugNotificationJob) sendBatchNotifications(users []repoModels.A
 
 			err := j.notificationService.SendNotification(
 				user.RegisterToken,
-				coreModels.DrugTopic,
+				userNotificationData,
 				"Don't Forget to take your medicine",
 				fmt.Sprintf("Hi there %s! do you forget something?", user.FirstName),
 			)
@@ -103,19 +105,21 @@ func (j *IgnoredDrugNotificationJob) sendBatchNotificationsForFriends(relativesM
 		go func(userId uuid.UUID, users []repoModels.AppUser) {
 			defer wg.Done()
 
-			userName, err := j.userService.GetUserByID(userId)
+			user, err := j.userService.GetUserByID(userId)
 			if err != nil {
 				log.Printf("Error fetching user %s: %v", userId, err)
 				return
 			}
 
-			title := fmt.Sprintf("Your friend %s forget to take a medicine?", userName.FirstName)
-			message := "Your friend wasn't able to take a medicine for 3 times. Do you want to help him?"
+			relativeId, firstName := user.ID.String(), user.FirstName
+			title := fmt.Sprintf("Your friend %s forget to take a medicine?", firstName)
+			message := "Your friend wasn't able to take a medicine for 3 times. Do you want to help them?"
 
+			notificationData := map[string]string{ "topic": coreModels.FamilyTopic.String(), "relativeId": relativeId }
 			for _, user := range users {
 				err := j.notificationService.SendNotification(
 					user.RegisterToken,
-					coreModels.FamlilyTopic,
+					notificationData,
 					title,
 					message,
 				)

@@ -13,8 +13,10 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of the RelationService that manages user relationships,
@@ -57,9 +59,18 @@ public class RelationServiceImpl implements RelationService {
      */
     @Override
     public RelationResponse get() {
-        List<Relation> friends = getRelations();
-        List<RelationRequested> pending = relationRequestedRepository.findByUserId(userContext.getUserId());
-        List<RelationRequested> requested = relationRequestedRepository.findByRelativeId(userContext.getUserId());
+        List<Relation> friends = getRelations()
+                .stream()
+                .sorted(Comparator.comparing(Relation::getCreateAt))
+                .collect(Collectors.toList());
+        List<RelationRequested> pending = relationRequestedRepository.findByUserId(userContext.getUserId())
+                .stream()
+                .sorted(Comparator.comparing(RelationRequested::getCreateAt))
+                .collect(Collectors.toList());
+        List<RelationRequested> requested = relationRequestedRepository.findByRelativeId(userContext.getUserId())
+                .stream()
+                .sorted(Comparator.comparing(RelationRequested::getCreateAt))
+                .collect(Collectors.toList());
 
         return new RelationResponse(friends, pending, requested);
     }
