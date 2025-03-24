@@ -41,7 +41,7 @@ func (h *HistoryService) CreateHistory(schedules []models.Schedule) {
 // Get all missed notification 3 times
 func (h *HistoryService) GetIgnoredHistories() ([]models.History, error) {
 	var histories []models.History
-	if err := h.DB.Preload("User").Where("status = ? AND count BETWEEN ? AND ?", "missed", 0, 2).Find(&histories).Error; err != nil {
+	if err := h.DB.Preload("User").Where("status = ? AND count <= ?", "missed", 2).Find(&histories).Error; err != nil {
 		return nil, err
 	}
 
