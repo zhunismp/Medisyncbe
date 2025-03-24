@@ -33,6 +33,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class HistoryServiceImpl implements HistoryService {
@@ -163,12 +164,6 @@ public class HistoryServiceImpl implements HistoryService {
         }
 
         List<History> histories = historyRepository.findAllById(historyIds);
-        List<Drug> updateDrugs = drugService.searchAllDrugByDrugsId(userId,  histories.stream()
-                .filter(history -> request.getHistories().stream()
-                        .anyMatch(h -> h.getStatus() == TakenStatus.TAKEN)
-                )
-                .map(History::getDrugId).toList()
-        );
 
         // set status
         histories.forEach(history ->
@@ -178,26 +173,14 @@ public class HistoryServiceImpl implements HistoryService {
                     .ifPresent(h -> history.setStatus(h.getStatus()))
         );
 
-        // update taken amount
-        // TODO: Archive drug that taken amt >= amt
-        updateDrugs.forEach(drug -> drug.setTakenAmount(drug.getTakenAmount() + drug.getDose()));
-
+        updateDrugAmount(histories, request.getHistories());
         historyRepository.saveAll(histories);
-        drugService.saveAllDrugs(userId, updateDrugs);
     }
 
     @Override
     public void removeHistoriesByDrugIds(List<UUID> drugIds) {
         historyRepository.deleteAllByDrugIds(drugIds);
     }
-
-//
-//    private <T> List<T> paginate(List<T> items, int pageNumber, int pageSize) {
-//        int start = (pageNumber - 1) * pageSize;
-//        int end = Math.min(start + pageSize, items.size());
-//
-//        return items.subList(start, end);
-//    }
 
     private boolean validate(UUID userId, List<UUID> historyIds) {
         List<UUID> validHistories = historyRepository.findByUserId(userId).stream().map(History::getId).toList();
@@ -264,5 +247,29 @@ public class HistoryServiceImpl implements HistoryService {
 
             return r;
         }).orElse(userId);
+    }
+
+    private void updateDrugAmount(List<History> histories, List<HistoryEntry> historyEntries) {
+        Map<TakenStatus, List<UUID>> drugIdsByStatus = histories.stream()
+                .filter(history -> historyEntries.stream()
+                        .anyMatch(h -> h.getStatus() == history.getStatus())) // Ensure filtering is correct
+                .collect(Collectors.groupingBy(
+                        History::getStatus,
+                        Collectors.mapping(History::getDrugId, Collectors.toList())
+                ));
+        List<Drug> allDrugs = drugService.searchAllDrugByDrugsId(userContext.getUserId(),
+                drugIdsByStatus.values().stream().flatMap(List::stream).distinct().toList());
+        List<Drug> takenDrugs = allDrugs.stream()
+                .filter(drug -> drugIdsByStatus.getOrDefault(TakenStatus.TAKEN, List.of()).contains(drug.getId()))
+                .toList();
+        List<Drug> missingDrugs = allDrugs.stream()
+                .filter(drug -> drugIdsByStatus.getOrDefault(TakenStatus.MISSED, List.of()).contains(drug.getId()))
+                .toList();
+
+        // update amount
+        takenDrugs.forEach(drug -> drug.setTakenAmount(drug.getTakenAmount() + drug.getDose()));
+        missingDrugs.forEach(drug -> drug.setTakenAmount(drug.getTakenAmount() - drug.getDose()));
+
+        drugService.saveAllDrugs(userContext.getUserId(), Stream.concat(takenDrugs.stream(), missingDrugs.stream()).toList());
     }
 }

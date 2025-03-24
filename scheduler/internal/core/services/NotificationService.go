@@ -7,7 +7,6 @@ import (
 
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/messaging"
-	"github.com/zhunismp/Medisyncbe/scheduler/internal/core/models"
 	"google.golang.org/api/option"
 )
 
@@ -35,16 +34,14 @@ func NewNotificationService(opt option.ClientOption) (*NotificationService, erro
 	}, nil
 }
 
-func (ns *NotificationService) SendNotification(token string, topic models.NotificationTopic, title string, body string) error {
+func (ns *NotificationService) SendNotification(token string, data map[string]string, title string, body string) error {
 	message := &messaging.Message{
 		Token: token,
 		Notification: &messaging.Notification{
 			Title: title,
 			Body:  body,
 		},
-		Data: map[string]string{
-			"topic": topic.String(),
-		},
+		Data: data,
 		APNS: &messaging.APNSConfig{
 			Headers: map[string]string{
 				"apns-priority": "10",

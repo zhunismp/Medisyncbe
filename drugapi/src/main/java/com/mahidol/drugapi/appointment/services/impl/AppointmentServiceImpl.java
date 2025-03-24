@@ -13,6 +13,7 @@ import com.mahidol.drugapi.relation.services.RelationService;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class AppointmentServiceImpl implements AppointmentService {
@@ -48,7 +49,9 @@ public class AppointmentServiceImpl implements AppointmentService {
                         .map(title -> boundedAppointment.stream().filter(a -> a.getTitle().equals(title)).toList())
                         .orElse(boundedAppointment);
 
-        List<AppointmentDTO> result = filteredByTitle.stream().map(AppointmentDTO::fromAppointment).toList();
+        List<AppointmentDTO> result = filteredByTitle.stream().map(AppointmentDTO::fromAppointment)
+                .sorted(Comparator.comparing(AppointmentDTO::getDatetime))
+                .collect(Collectors.toList());
 
         return new SearchAppointmentResponse(
                 result,

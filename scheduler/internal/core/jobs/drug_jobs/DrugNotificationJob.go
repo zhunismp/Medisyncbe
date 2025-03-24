@@ -51,6 +51,8 @@ func (j *DrugNotificationJob) Task(start time.Time) {
 	log.Printf("[%s] Sending notifications for %d schedules", j.JobAttributes().Name, len(schedules))
 
 	var wg sync.WaitGroup
+
+	notificationData := map[string]string{ "topic": coreModels.DrugTopic.String() }
 	for _, schedule := range schedules {
 		wg.Add(1)
 		go func(schedule repoModels.Schedule) {
@@ -58,7 +60,7 @@ func (j *DrugNotificationJob) Task(start time.Time) {
 
 			err := j.notificationService.SendNotification(
 				schedule.User.RegisterToken,
-				coreModels.DrugTopic,
+				notificationData,
 				"Time to take medicine",
 				fmt.Sprintf("Your %s is ready for you to finish it", schedule.Name),
 			)
