@@ -25,7 +25,8 @@ public class DrugDTOMapper {
                 d.getUsageTime(),
                 scheduleTimes,
                 d.getGroups().stream().map(DrugGroupDTOMapper::toDTO).toList(),
-                d.getIsInternalDrug()
+                d.getIsInternalDrug(),
+                d.getIsArchived()
         );
     }
 

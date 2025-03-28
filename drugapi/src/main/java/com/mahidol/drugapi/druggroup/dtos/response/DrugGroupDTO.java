@@ -21,6 +21,8 @@ public class DrugGroupDTO {
 
     private String groupName;
 
+    private Boolean isArchived;
+
     private List<ScheduleTime> scheduleTimes;
 
     private List<DrugDTO> drugs;

@@ -44,4 +44,6 @@ public class DrugDTO {
     private List<DrugGroupDTO> groups;
 
     private Boolean isInternalDrug = false;
+
+    private Boolean isArchived = false;
 }

@@ -92,7 +92,7 @@ public class DrugService {
                 .setStrength(request.getStrength())
                 .setAmount(request.getAmount())
                 .setDose(request.getDose())
-                .setTakenAmount(request.getAmount())
+                .setTakenAmount(0.0)
                 .setUsageTime(MealCondition.fromValue(request.getUsageTime()))
                 .setIsInternalDrug(request.getIsInternalDrug())
         );

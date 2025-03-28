@@ -15,6 +15,7 @@ public class DrugGroupDTOMapper {
                 group.getId(),
                 group.getUserId(),
                 group.getGroupName(),
+                group.getIsArchived(),
                 scheduleTimes,
                 group.getDrugs().stream().map(DrugDTOMapper::toDTO).toList()
         );
@@ -25,6 +26,7 @@ public class DrugGroupDTOMapper {
         return new DrugGroupDTO()
                 .setId(group.getId())
                 .setUserId(group.getUserId())
-                .setGroupName(group.getGroupName());
+                .setGroupName(group.getGroupName())
+                .setIsArchived(group.getIsArchived());
     }
 }

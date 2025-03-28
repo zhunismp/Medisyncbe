@@ -51,6 +51,9 @@ public class Drug {
     @Column(name = "is_internal_drug", columnDefinition = "BOOLEAN")
     private Boolean isInternalDrug = false;
 
+    @Column(name = "is_archived", columnDefinition = "BOOLEAN")
+    private Boolean isArchived = false;
+
     @ManyToMany(mappedBy = "drugs")
     private List<DrugGroup> groups;
 
