@@ -289,6 +289,7 @@ public class HistoryServiceImpl implements HistoryService {
 
         List<DrugGroup> archivedGroups = withGroups.stream()
                 .flatMap(drug -> drug.getGroups().stream())
+                .distinct()
                 .filter(g -> g.getDrugs().stream().allMatch(Drug::getIsArchived))
                 .toList();
 
