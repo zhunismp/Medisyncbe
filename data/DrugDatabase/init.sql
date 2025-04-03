@@ -10,6 +10,7 @@ CREATE TABLE DRUG (
     taken_amount FLOAT,
     usage_time INT NOT NULL,
     is_internal_drug BOOLEAN NOT NULL
+    is_archived BOOLEAN DEFAULT FALSE
 );
 
 CREATE INDEX idx_drug_user_id ON drug (user_id);
@@ -42,8 +43,8 @@ CREATE TABLE RELATIONSHIP (
     user_id UUID NOT NULL,
     relative_id UUID NOT NULL,
     relation TEXT,
-    notifiable BOOLEAN DEFAULT FALSE,
-    readable BOOLEAN DEFAULT FALSE,
+    notifiable BOOLEAN DEFAULT TRUE,
+    readable BOOLEAN DEFAULT TRUE,
     create_at TIMESTAMP DEFAULT NOW()
 );
  

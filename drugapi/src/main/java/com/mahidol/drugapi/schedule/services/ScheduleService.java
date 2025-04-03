@@ -11,7 +11,7 @@ import java.util.UUID;
 public interface ScheduleService {
     void set(Drug drug, List<ScheduleTime> schedules);
     void set(DrugGroup drugGroup, List<ScheduleTime> schedules);
-    void setIsEnabled(UUID referenceId, Boolean isEnabled);
+    void setIsEnabled(List<UUID> referenceIds, Boolean isEnabled);
     List<Schedule> get(UUID referenceId);
     void remove(UUID referenceId);
 }

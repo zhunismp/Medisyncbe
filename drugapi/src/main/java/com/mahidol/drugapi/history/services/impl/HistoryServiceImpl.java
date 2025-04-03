@@ -173,7 +173,9 @@ public class HistoryServiceImpl implements HistoryService {
                     .ifPresent(h -> history.setStatus(h.getStatus()))
         );
 
-        updateDrugAmount(histories, request.getHistories());
+        List<Drug> updatedDrugs = updateDrugAmount(histories, request.getHistories());
+        disableSchedule(updatedDrugs);
+
         historyRepository.saveAll(histories);
     }
 
@@ -249,7 +251,7 @@ public class HistoryServiceImpl implements HistoryService {
         }).orElse(userId);
     }
 
-    private void updateDrugAmount(List<History> histories, List<HistoryEntry> historyEntries) {
+    private List<Drug> updateDrugAmount(List<History> histories, List<HistoryEntry> historyEntries) {
         Map<TakenStatus, List<UUID>> drugIdsByStatus = histories.stream()
                 .filter(history -> historyEntries.stream()
                         .anyMatch(h -> h.getStatus() == history.getStatus())) // Ensure filtering is correct
@@ -257,8 +259,16 @@ public class HistoryServiceImpl implements HistoryService {
                         History::getStatus,
                         Collectors.mapping(History::getDrugId, Collectors.toList())
                 ));
-        List<Drug> allDrugs = drugService.searchAllDrugByDrugsId(userContext.getUserId(),
-                drugIdsByStatus.values().stream().flatMap(List::stream).distinct().toList());
+
+        // all non-archived drugs
+        List<Drug> allDrugs = drugService.searchAllDrugByDrugsId(
+                userContext.getUserId(),
+                drugIdsByStatus.values().stream().flatMap(List::stream).distinct().toList()
+        )
+                .stream()
+                .filter(d -> !d.getIsArchived())
+                .toList();
+
         List<Drug> takenDrugs = allDrugs.stream()
                 .filter(drug -> drugIdsByStatus.getOrDefault(TakenStatus.TAKEN, List.of()).contains(drug.getId()))
                 .toList();
@@ -270,6 +280,19 @@ public class HistoryServiceImpl implements HistoryService {
         takenDrugs.forEach(drug -> drug.setTakenAmount(drug.getTakenAmount() + drug.getDose()));
         missingDrugs.forEach(drug -> drug.setTakenAmount(drug.getTakenAmount() - drug.getDose()));
 
-        drugService.saveAllDrugs(userContext.getUserId(), Stream.concat(takenDrugs.stream(), missingDrugs.stream()).toList());
+        return drugService.saveAllDrugs(userContext.getUserId(), Stream.concat(takenDrugs.stream(), missingDrugs.stream()).toList());
+    }
+
+    private void disableSchedule(List<Drug> drugs) {
+        List<Drug> archivedDrugs = drugs.stream().filter(Drug::getIsArchived).toList();
+        List<Drug> withGroups = archivedDrugs.stream().filter(d -> !d.getGroups().isEmpty()).toList();
+
+        List<DrugGroup> archivedGroups = withGroups.stream()
+                .flatMap(drug -> drug.getGroups().stream())
+                .filter(g -> g.getDrugs().stream().allMatch(Drug::getIsArchived))
+                .toList();
+
+        List<UUID> allReferenceIds = Stream.concat(archivedDrugs.stream().map(Drug::getId), archivedGroups.stream().map(DrugGroup::getId)).toList();
+        scheduleService.setIsEnabled(allReferenceIds, false);
     }
 }

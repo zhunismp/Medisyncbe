@@ -25,7 +25,8 @@ public class DrugDTOMapper {
                 d.getUsageTime(),
                 scheduleTimes,
                 d.getGroups().stream().map(DrugGroupDTOMapper::toDTO).toList(),
-                d.getIsInternalDrug()
+                d.getIsInternalDrug(),
+                d.getIsArchived()
         );
     }
 
@@ -43,6 +44,7 @@ public class DrugDTOMapper {
                 .setTakenAmount(d.getTakenAmount())
                 .setGroups(d.getGroups().stream().map(DrugGroupDTOMapper::toDTO).toList())
                 .setUsageTime(d.getUsageTime())
+                .setIsArchived(d.getIsArchived())
                 .setIsInternalDrug(d.getIsInternalDrug());
     }
 
@@ -59,6 +61,7 @@ public class DrugDTOMapper {
                 .setDose(d.getDose())
                 .setTakenAmount(d.getTakenAmount())
                 .setUsageTime(d.getUsageTime())
+                .setIsArchived(d.getIsArchived())
                 .setIsInternalDrug(d.getIsInternalDrug());
     }
 }

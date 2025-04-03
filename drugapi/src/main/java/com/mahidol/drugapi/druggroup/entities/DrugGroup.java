@@ -26,6 +26,8 @@ public class DrugGroup {
     @Column(name = "group_name", columnDefinition = "TEXT")
     private String groupName;
 
+    private Boolean isArchived = false;
+
     @ManyToMany
     @JoinTable(
             name = "drug_group_drug",
@@ -33,6 +35,11 @@ public class DrugGroup {
             inverseJoinColumns = @JoinColumn(name = "drug_id")
     )
     private Set<Drug> drugs = new HashSet<>();
+
+    @PostLoad
+    public void checkIsArchived() {
+        this.isArchived = drugs.stream().allMatch(Drug::getIsArchived);
+    }
 
     public DrugGroup addDrug(Drug drug) {
         this.drugs.add(drug);

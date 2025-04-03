@@ -179,7 +179,7 @@ public class DrugGroupService {
         drugGroupRepository.save(target);
 
         // scheduler
-        drugIds.forEach(id -> scheduleService.setIsEnabled(id, true));
+        scheduleService.setIsEnabled(drugIds, true);
     }
 
     private void linkDrug(List<UUID> drugIds, UUID groupId) {
@@ -194,7 +194,7 @@ public class DrugGroupService {
         drugGroupRepository.save(target);
 
         // scheduler
-        drugIds.forEach(id -> scheduleService.setIsEnabled(id, false));
+        scheduleService.setIsEnabled(drugIds, false);
     }
 
     private DrugGroupDTO transformDTO(DrugGroup group) {

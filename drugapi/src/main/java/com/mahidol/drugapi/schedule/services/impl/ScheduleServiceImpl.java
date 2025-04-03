@@ -67,11 +67,8 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public void setIsEnabled(UUID referenceId, Boolean isEnabled) {
-        List<Schedule> s = scheduleRepository.findAllByReferenceId(referenceId);
-        s.forEach(sch -> sch.setIsEnabled(isEnabled));
-
-        scheduleRepository.saveAll(s);
+    public void setIsEnabled(List<UUID> referenceIds, Boolean isEnabled) {
+        scheduleRepository.updateActiveStatusByReferenceIdIn(referenceIds, isEnabled);
     }
 
     @Override
