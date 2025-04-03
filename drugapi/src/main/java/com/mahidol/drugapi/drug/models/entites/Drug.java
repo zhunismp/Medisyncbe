@@ -16,7 +16,7 @@ import java.util.UUID;
 @Accessors(chain = true)
 @NoArgsConstructor
 @Table(name = "drug")
-public class Drug {
+public class    Drug {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -56,6 +56,13 @@ public class Drug {
 
     @ManyToMany(mappedBy = "drugs")
     private List<DrugGroup> groups;
+
+    public Drug setTakenAmount(double takenAmount) {
+        this.takenAmount = takenAmount;
+        this.isArchived = this.takenAmount >= this.amount;
+
+        return this;
+    }
 
     @Override
     public boolean equals(Object o) {
