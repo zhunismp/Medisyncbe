@@ -39,7 +39,7 @@ public class DrugGroup {
 
     @PostLoad
     public void checkIsArchived() {
-        this.isArchived = drugs.stream().allMatch(Drug::getIsArchived);
+        this.isArchived = !drugs.isEmpty() && drugs.stream().allMatch(Drug::getIsArchived);
     }
 
     public DrugGroup addDrug(Drug drug) {
