@@ -10,6 +10,4 @@ import java.util.UUID;
 @Repository
 public interface DrugGroupRepository extends JpaRepository<DrugGroup, UUID> {
     List<DrugGroup> findByUserId(UUID userId);
-
-    boolean existsByGroupName(String groupName);
 }
