@@ -1,6 +1,7 @@
 package com.mahidol.drugapi.history.repositories;
 
 import com.mahidol.drugapi.history.models.entities.History;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -21,7 +22,8 @@ public interface HistoryRepository extends JpaRepository<History, UUID> {
 
     List<History> findByUserId(UUID userId);
 
-    @Modifying  // Required because it's a modifying query
+    @Transactional
+    @Modifying
     @Query("DELETE FROM History h WHERE h.groupId IN :drugIds")
     void deleteAllByDrugIds(@Param("drugIds") List<UUID> drugsId);
 }
