@@ -121,7 +121,11 @@ public class DrugService {
                         .setAmount(request.getAmount().orElse(drug.getAmount()))
                         .setDose(request.getDose().orElse(drug.getDose()))
                         .setUsageTime(request.getUsageTime().map(MealCondition::fromValue).orElse(drug.getUsageTime()))
-                        .setIsArchived(drug.getAmount() - drug.getTakenAmount() <= 0)
+                        .setIsArchived(
+                                request.getIsActive()
+                                        .or(() -> request.getAmount().map(amt -> amt - drug.getTakenAmount() <= 0))
+                                        .orElse(drug.getIsArchived())
+                        )
                 )
                 .orElseThrow(() -> new EntityNotFoundException("Drug id not found with id " + request.getDrugId()));
 
